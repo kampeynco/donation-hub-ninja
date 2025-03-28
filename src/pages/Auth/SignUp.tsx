@@ -1,9 +1,11 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { IconEye, IconEyeOff } from "@tabler/icons-react";
+
 const SignUp = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -12,9 +14,22 @@ const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordError, setPasswordError] = useState("");
+  const [currentStep, setCurrentStep] = useState(1);
+
+  // Committee information (step 2)
+  const [committeeName, setCommitteeName] = useState("");
+  const [committeeType, setCommitteeType] = useState("");
+
+  // Address information (step 3)
+  const [street, setStreet] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [zip, setZip] = useState("");
+
   const {
     signUp
   } = useAuth();
+
   const validatePassword = () => {
     if (password !== confirmPassword) {
       setPasswordError("Passwords don't match");
@@ -27,19 +42,49 @@ const SignUp = () => {
     setPasswordError("");
     return true;
   };
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validatePassword()) return;
-    setIsLoading(true);
-    try {
-      await signUp(email, password);
-    } catch (error) {
-      console.error("Sign up error:", error);
-    } finally {
-      setIsLoading(false);
+
+  const handleNext = () => {
+    if (currentStep === 1) {
+      if (!validatePassword()) return;
+      if (!email) {
+        setPasswordError("Email is required");
+        return;
+      }
+      setCurrentStep(2);
+    } else if (currentStep === 2) {
+      if (!committeeName) {
+        setPasswordError("Committee name is required");
+        return;
+      }
+      setCurrentStep(3);
     }
   };
-  return <div className="flex min-h-screen">
+
+  const handlePrevious = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (currentStep === 3) {
+      setIsLoading(true);
+      try {
+        await signUp(email, password);
+      } catch (error) {
+        console.error("Sign up error:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
+      handleNext();
+    }
+  };
+
+  return (
+    <div className="flex min-h-screen">
       {/* Left Column - Blue Background */}
       <div className="hidden md:flex md:w-1/2 bg-primary flex-col items-center justify-center text-white p-10">
         <div className="max-w-md">
@@ -77,56 +122,213 @@ const SignUp = () => {
           </div>
           
           <div className="flex items-center space-x-4 mb-6">
-            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-white font-medium">
+            <div className={`flex items-center justify-center w-8 h-8 rounded-full ${currentStep === 1 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-500'} font-medium`}>
               1
             </div>
-            <span className="font-medium">Account</span>
-            <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-medium">
+            <span className={`font-medium ${currentStep === 1 ? 'text-gray-900' : 'text-gray-500'}`}>Account</span>
+            <div className={`flex items-center justify-center w-8 h-8 rounded-full ${currentStep === 2 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-500'} font-medium`}>
               2
             </div>
-            <span className="text-gray-500">Committee</span>
-            <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-medium">
+            <span className={`font-medium ${currentStep === 2 ? 'text-gray-900' : 'text-gray-500'}`}>Committee</span>
+            <div className={`flex items-center justify-center w-8 h-8 rounded-full ${currentStep === 3 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-500'} font-medium`}>
               3
             </div>
-            <span className="text-gray-500">Address</span>
+            <span className={`font-medium ${currentStep === 3 ? 'text-gray-900' : 'text-gray-500'}`}>Address</span>
           </div>
           
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email
-              </label>
-              <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" required className="w-full" />
-            </div>
+            {currentStep === 1 && (
+              <>
+                <div className="space-y-2">
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                    Email
+                  </label>
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    value={email} 
+                    onChange={e => setEmail(e.target.value)} 
+                    placeholder="you@example.com" 
+                    required 
+                    className="w-full" 
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <Input 
+                      id="password" 
+                      type={showPassword ? "text" : "password"} 
+                      value={password} 
+                      onChange={e => setPassword(e.target.value)} 
+                      placeholder="••••••••••••" 
+                      required 
+                      className="w-full pr-10" 
+                    />
+                    <button 
+                      type="button" 
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500" 
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? <IconEyeOff size={20} /> : <IconEye size={20} />}
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                    Confirm Password
+                  </label>
+                  <div className="relative">
+                    <Input 
+                      id="confirmPassword" 
+                      type={showConfirmPassword ? "text" : "password"} 
+                      value={confirmPassword} 
+                      onChange={e => setConfirmPassword(e.target.value)} 
+                      placeholder="••••••••••••" 
+                      required 
+                      className={`w-full pr-10 ${passwordError ? "border-red-500" : ""}`} 
+                    />
+                    <button 
+                      type="button" 
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500" 
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    >
+                      {showConfirmPassword ? <IconEyeOff size={20} /> : <IconEye size={20} />}
+                    </button>
+                  </div>
+                  {passwordError && <p className="text-red-500 text-sm">{passwordError}</p>}
+                </div>
+              </>
+            )}
+
+            {currentStep === 2 && (
+              <>
+                <div className="space-y-2">
+                  <label htmlFor="committeeName" className="block text-sm font-medium text-gray-700">
+                    Committee Name
+                  </label>
+                  <Input
+                    id="committeeName"
+                    type="text"
+                    value={committeeName}
+                    onChange={e => setCommitteeName(e.target.value)}
+                    placeholder="Your Committee Name"
+                    required
+                    className="w-full"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <label htmlFor="committeeType" className="block text-sm font-medium text-gray-700">
+                    Committee Type
+                  </label>
+                  <Input
+                    id="committeeType"
+                    type="text"
+                    value={committeeType}
+                    onChange={e => setCommitteeType(e.target.value)}
+                    placeholder="e.g., Political Action Committee"
+                    className="w-full"
+                  />
+                </div>
+                {passwordError && <p className="text-red-500 text-sm">{passwordError}</p>}
+              </>
+            )}
+
+            {currentStep === 3 && (
+              <>
+                <div className="space-y-2">
+                  <label htmlFor="street" className="block text-sm font-medium text-gray-700">
+                    Street Address
+                  </label>
+                  <Input
+                    id="street"
+                    type="text"
+                    value={street}
+                    onChange={e => setStreet(e.target.value)}
+                    placeholder="123 Main St"
+                    required
+                    className="w-full"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <label htmlFor="city" className="block text-sm font-medium text-gray-700">
+                    City
+                  </label>
+                  <Input
+                    id="city"
+                    type="text"
+                    value={city}
+                    onChange={e => setCity(e.target.value)}
+                    placeholder="Your City"
+                    required
+                    className="w-full"
+                  />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label htmlFor="state" className="block text-sm font-medium text-gray-700">
+                      State
+                    </label>
+                    <Input
+                      id="state"
+                      type="text"
+                      value={state}
+                      onChange={e => setState(e.target.value)}
+                      placeholder="State"
+                      required
+                      className="w-full"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label htmlFor="zip" className="block text-sm font-medium text-gray-700">
+                      ZIP Code
+                    </label>
+                    <Input
+                      id="zip"
+                      type="text"
+                      value={zip}
+                      onChange={e => setZip(e.target.value)}
+                      placeholder="12345"
+                      required
+                      className="w-full"
+                    />
+                  </div>
+                </div>
+              </>
+            )}
             
-            <div className="space-y-2">
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <div className="relative">
-                <Input id="password" type={showPassword ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••••••" required className="w-full pr-10" />
-                <button type="button" className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500" onClick={() => setShowPassword(!showPassword)}>
-                  {showPassword ? <IconEyeOff size={20} /> : <IconEye size={20} />}
-                </button>
-              </div>
+            <div className="flex justify-between">
+              {currentStep > 1 && (
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={handlePrevious}
+                >
+                  Previous
+                </Button>
+              )}
+              
+              <Button 
+                type="submit" 
+                className={`${currentStep === 1 && "w-full"}`} 
+                disabled={isLoading}
+              >
+                {isLoading 
+                  ? "Creating account..." 
+                  : currentStep === 3 
+                    ? "Create Account" 
+                    : "Next"
+                }
+              </Button>
             </div>
-            
-            <div className="space-y-2">
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                Confirm Password
-              </label>
-              <div className="relative">
-                <Input id="confirmPassword" type={showConfirmPassword ? "text" : "password"} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="••••••••••••" required className={`w-full pr-10 ${passwordError ? "border-red-500" : ""}`} />
-                <button type="button" className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-                  {showConfirmPassword ? <IconEyeOff size={20} /> : <IconEye size={20} />}
-                </button>
-              </div>
-              {passwordError && <p className="text-red-500 text-sm">{passwordError}</p>}
-            </div>
-            
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Creating account..." : "Next"}
-            </Button>
           </form>
           
           <div className="mt-8 text-center md:hidden">
@@ -139,6 +341,8 @@ const SignUp = () => {
           </div>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default SignUp;
