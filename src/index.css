@@ -73,11 +73,12 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
     font-feature-settings: "ss01", "ss02", "cv01", "cv02";
   }
 }
 
+/* Keep the rest of the CSS unchanged */
 .donation-table {
   width: 100%;
   border-collapse: separate;
@@ -116,4 +117,3 @@
 .stat-card:hover {
   transform: translateY(-2px);
 }
-
