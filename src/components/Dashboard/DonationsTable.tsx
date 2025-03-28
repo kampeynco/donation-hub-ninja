@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Donation } from "@/types/donation";
 import { toast } from "@/components/ui/use-toast";
+import { IconSearch, IconDownload } from "@tabler/icons-react";
 
 interface DonationsTableProps {
   donations: Donation[];
@@ -28,6 +29,16 @@ const DonationsTable = ({ donations }: DonationsTableProps) => {
 
   const downloadCSV = () => {
     try {
+      // Check if there are any donations to download
+      if (filteredDonations.length === 0) {
+        toast({
+          title: "No data to download",
+          description: "There are no donations matching your filter criteria.",
+          variant: "destructive"
+        });
+        return;
+      }
+      
       // Create CSV header row
       const headers = ["Date", "Name", "Email", "Amount"];
       
@@ -83,21 +94,13 @@ const DonationsTable = ({ donations }: DonationsTableProps) => {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-8 w-full"
           />
-          <svg
+          <IconSearch
             className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            />
-          </svg>
+            size={16}
+          />
         </div>
         <Button variant="outline" size="sm" onClick={downloadCSV}>
+          <IconDownload className="h-4 w-4 mr-2" size={16} />
           Download CSV
         </Button>
       </div>
@@ -146,58 +149,60 @@ const DonationsTable = ({ donations }: DonationsTableProps) => {
           </tbody>
         </table>
       </div>
-      <div className="border-t p-4 flex items-center justify-between">
-        <div className="text-sm text-gray-500">
-          Showing {filteredDonations.length === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1} to{" "}
-          {Math.min(currentPage * itemsPerPage, filteredDonations.length)} of{" "}
-          {filteredDonations.length} entries
+      {filteredDonations.length > 0 && (
+        <div className="border-t p-4 flex items-center justify-between">
+          <div className="text-sm text-gray-500">
+            Showing {filteredDonations.length === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1} to{" "}
+            {Math.min(currentPage * itemsPerPage, filteredDonations.length)} of{" "}
+            {filteredDonations.length} entries
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+            >
+              Prev
+            </Button>
+            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+              const page = i + 1;
+              return (
+                <Button
+                  key={page}
+                  variant={currentPage === page ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setCurrentPage(page)}
+                  className="min-w-[2rem]"
+                >
+                  {page}
+                </Button>
+              );
+            })}
+            {totalPages > 5 && (
+              <>
+                <span className="text-gray-500">...</span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(totalPages)}
+                  className="min-w-[2rem]"
+                >
+                  {totalPages}
+                </Button>
+              </>
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </Button>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-          >
-            Prev
-          </Button>
-          {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-            const page = i + 1;
-            return (
-              <Button
-                key={page}
-                variant={currentPage === page ? "default" : "outline"}
-                size="sm"
-                onClick={() => setCurrentPage(page)}
-                className="min-w-[2rem]"
-              >
-                {page}
-              </Button>
-            );
-          })}
-          {totalPages > 5 && (
-            <>
-              <span className="text-gray-500">...</span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage(totalPages)}
-                className="min-w-[2rem]"
-              >
-                {totalPages}
-              </Button>
-            </>
-          )}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-          >
-            Next
-          </Button>
-        </div>
-      </div>
+      )}
     </div>
   );
 };
