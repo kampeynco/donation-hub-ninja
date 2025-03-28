@@ -1,0 +1,22 @@
+
+export interface Donation {
+  id: string;
+  date: string;
+  name: string | null;
+  email: string | null;
+  amount: number;
+}
+
+export interface DonationStats {
+  lastThirtyDays: {
+    total: number;
+    count: number;
+  };
+  allTime: {
+    total: number;
+    count: number;
+  };
+  monthly: {
+    donors: number;
+  };
+}
