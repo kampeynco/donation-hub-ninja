@@ -1,10 +1,10 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { IconEye, IconEyeOff } from "@tabler/icons-react";
+import { IconEye, IconEyeOff, IconCopy } from "@tabler/icons-react";
 
 const SignUp = () => {
   const [email, setEmail] = useState("");
@@ -18,17 +18,34 @@ const SignUp = () => {
 
   // Committee information (step 2)
   const [committeeName, setCommitteeName] = useState("");
-  const [committeeType, setCommitteeType] = useState("");
 
   // Address information (step 3)
   const [street, setStreet] = useState("");
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
   const [zip, setZip] = useState("");
+  
+  // API credentials (step 3)
+  const [showApiPassword, setShowApiPassword] = useState(false);
+  const [apiPassword, setApiPassword] = useState("");
 
   const {
     signUp
   } = useAuth();
+
+  // Generate random API password on component mount
+  useEffect(() => {
+    const generatePassword = () => {
+      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+";
+      let result = "";
+      for (let i = 0; i < 16; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return result;
+    };
+
+    setApiPassword(generatePassword());
+  }, []);
 
   const validatePassword = () => {
     if (password !== confirmPassword) {
@@ -83,6 +100,10 @@ const SignUp = () => {
     }
   };
 
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+  };
+
   return (
     <div className="flex min-h-screen">
       {/* Left Column - Blue Background */}
@@ -133,7 +154,7 @@ const SignUp = () => {
             <div className={`flex items-center justify-center w-8 h-8 rounded-full ${currentStep === 3 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-500'} font-medium`}>
               3
             </div>
-            <span className={`font-medium ${currentStep === 3 ? 'text-gray-900' : 'text-gray-500'}`}>Address</span>
+            <span className={`font-medium ${currentStep === 3 ? 'text-gray-900' : 'text-gray-500'}`}>API Access</span>
           </div>
           
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -221,26 +242,96 @@ const SignUp = () => {
                     className="w-full"
                   />
                 </div>
-                
-                <div className="space-y-2">
-                  <label htmlFor="committeeType" className="block text-sm font-medium text-gray-700">
-                    Committee Type
-                  </label>
-                  <Input
-                    id="committeeType"
-                    type="text"
-                    value={committeeType}
-                    onChange={e => setCommitteeType(e.target.value)}
-                    placeholder="e.g., Political Action Committee"
-                    className="w-full"
-                  />
-                </div>
                 {passwordError && <p className="text-red-500 text-sm">{passwordError}</p>}
               </>
             )}
 
             {currentStep === 3 && (
               <>
+                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 mb-6">
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">API Access Credentials</h3>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Use these credentials to access the DonorCamp API. Save these details as they won't be shown again.
+                  </p>
+
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <label htmlFor="endpoint" className="block text-sm font-medium text-gray-700">
+                        Endpoint URL
+                      </label>
+                      <div className="relative">
+                        <Input 
+                          id="endpoint" 
+                          type="text" 
+                          value="https://api.donorcamp.com/v1" 
+                          readOnly
+                          className="w-full pr-10" 
+                        />
+                        <button 
+                          type="button" 
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500" 
+                          onClick={() => copyToClipboard("https://api.donorcamp.com/v1")}
+                        >
+                          <IconCopy size={20} />
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                        Username
+                      </label>
+                      <div className="relative">
+                        <Input 
+                          id="username" 
+                          type="text" 
+                          value={email} 
+                          readOnly
+                          className="w-full pr-10" 
+                        />
+                        <button 
+                          type="button" 
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500" 
+                          onClick={() => copyToClipboard(email)}
+                        >
+                          <IconCopy size={20} />
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label htmlFor="apiPassword" className="block text-sm font-medium text-gray-700">
+                        Password
+                      </label>
+                      <div className="relative">
+                        <Input 
+                          id="apiPassword" 
+                          type={showApiPassword ? "text" : "password"} 
+                          value={apiPassword} 
+                          readOnly
+                          className="w-full pr-16" 
+                        />
+                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex">
+                          <button 
+                            type="button" 
+                            className="text-gray-500 mr-2" 
+                            onClick={() => setShowApiPassword(!showApiPassword)}
+                          >
+                            {showApiPassword ? <IconEyeOff size={20} /> : <IconEye size={20} />}
+                          </button>
+                          <button 
+                            type="button" 
+                            className="text-gray-500" 
+                            onClick={() => copyToClipboard(apiPassword)}
+                          >
+                            <IconCopy size={20} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="space-y-2">
                   <label htmlFor="street" className="block text-sm font-medium text-gray-700">
                     Street Address
