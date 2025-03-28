@@ -72,13 +72,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp = async (email: string, password: string) => {
     try {
+      // Email confirmation is disabled in Supabase console
       const { error } = await supabase.auth.signUp({ 
         email, 
         password,
-        options: {
-          // Email verification is disabled in Supabase console
-          emailRedirectTo: window.location.origin + "/auth/signin"
-        }
+        // No email confirmation options since it's disabled in Supabase console
       });
       
       if (error) throw error;

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
@@ -42,7 +41,7 @@ const SignIn = () => {
           
           <h1 className="text-4xl font-bold mb-6">Welcome back</h1>
           <p className="text-lg mb-10">
-            Sign in to access your account and manage your committee's thank you notes with ease.
+            Sign in to access your donor management dashboard and continue tracking contributions, managing relationships, and sending personalized thank you notes to your supporters.
           </p>
           
           <div className="mt-10">
@@ -62,7 +61,7 @@ const SignIn = () => {
           <div className="text-center md:text-left mb-10">
             <h2 className="text-3xl font-bold text-gray-900 mb-2">Sign in</h2>
             <p className="text-gray-600">
-              Enter your email and password to access your account
+              Access your donor management dashboard and continue your fundraising efforts
             </p>
           </div>
           

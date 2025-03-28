@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
@@ -63,7 +62,7 @@ const SignUp = () => {
           
           <h1 className="text-4xl font-bold mb-6">Create an account</h1>
           <p className="text-lg mb-10">
-            Join DonorCamp to streamline your campaign donor communications and send personalized thank you notes.
+            Join DonorCamp to centralize your donor database, track contributions, build deeper relationships with supporters, and streamline your thank you note process for more effective fundraising.
           </p>
           
           <div className="mt-10">
@@ -83,7 +82,7 @@ const SignUp = () => {
           <div className="text-center md:text-left mb-10">
             <h2 className="text-3xl font-bold text-gray-900 mb-2">Get started</h2>
             <p className="text-gray-600">
-              Enter the details below to create your account today
+              Create your account to start tracking donors and managing your fundraising campaigns
             </p>
           </div>
           
