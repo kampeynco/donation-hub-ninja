@@ -1,20 +1,131 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { toast } from "@/components/ui/use-toast";
+import { IconRefresh, IconClipboard, IconArrowRight } from "@tabler/icons-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import ImageUploader from "@/components/ImageUploader";
+import CopyableInput from "@/components/Auth/CopyableInput";
+import CopyablePasswordInput from "@/components/Auth/CopyablePasswordInput";
+import { 
+  WebhookCredentials, 
+  fetchWebhookCredentials, 
+  updateWebhookCredentials, 
+  regenerateApiPassword,
+  testWebhook,
+  getWebhookEventStats
+} from "@/services/webhookService";
 
 const Account = () => {
   const [profileImage, setProfileImage] = useState<string | undefined>();
+  const [webhookCredentials, setWebhookCredentials] = useState<WebhookCredentials | null>(null);
+  const [webhookUrl, setWebhookUrl] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isRegeneratingPassword, setIsRegeneratingPassword] = useState(false);
+  const [isTesting, setIsTesting] = useState(false);
+  const [webhookStats, setWebhookStats] = useState({ total: 0, processed: 0, errors: 0 });
+  
+  useEffect(() => {
+    const loadWebhookCredentials = async () => {
+      const credentials = await fetchWebhookCredentials();
+      if (credentials) {
+        setWebhookCredentials(credentials);
+        setWebhookUrl(credentials.endpoint_url);
+      }
+      
+      const stats = await getWebhookEventStats();
+      setWebhookStats(stats);
+    };
+    
+    loadWebhookCredentials();
+  }, []);
   
   const handleImageChange = (_file: File, dataUrl: string) => {
     setProfileImage(dataUrl);
     // In a real app, you would upload the file to a server here
     console.log("Image changed, would upload in a real app");
+  };
+  
+  const handleSaveWebhookUrl = async () => {
+    if (!webhookCredentials) return;
+    
+    setIsLoading(true);
+    try {
+      const success = await updateWebhookCredentials(webhookCredentials.id, { 
+        endpoint_url: webhookUrl 
+      });
+      
+      if (success) {
+        setWebhookCredentials({
+          ...webhookCredentials,
+          endpoint_url: webhookUrl
+        });
+        
+        toast({
+          title: "Webhook URL updated",
+          description: "Your webhook endpoint has been updated successfully."
+        });
+      } else {
+        throw new Error("Failed to update webhook URL");
+      }
+    } catch (error) {
+      console.error("Error updating webhook URL:", error);
+      toast({
+        title: "Error updating webhook URL",
+        description: error instanceof Error ? error.message : "An unknown error occurred",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const handleRegeneratePassword = async () => {
+    if (!webhookCredentials) return;
+    
+    setIsRegeneratingPassword(true);
+    try {
+      const newPassword = await regenerateApiPassword(webhookCredentials.id);
+      
+      if (newPassword) {
+        setWebhookCredentials({
+          ...webhookCredentials,
+          api_password: newPassword
+        });
+        
+        toast({
+          title: "API Password regenerated",
+          description: "Your new API password has been generated. Make sure to update your ActBlue webhook settings."
+        });
+      } else {
+        throw new Error("Failed to regenerate API password");
+      }
+    } catch (error) {
+      console.error("Error regenerating API password:", error);
+      toast({
+        title: "Error regenerating password",
+        description: error instanceof Error ? error.message : "An unknown error occurred",
+        variant: "destructive",
+      });
+    } finally {
+      setIsRegeneratingPassword(false);
+    }
+  };
+  
+  const handleTestWebhook = async () => {
+    if (!webhookCredentials) return;
+    
+    setIsTesting(true);
+    try {
+      await testWebhook(webhookCredentials.id);
+    } finally {
+      setIsTesting(false);
+    }
   };
 
   return (
@@ -78,72 +189,155 @@ const Account = () => {
             <CardHeader>
               <CardTitle>Webhook Integration</CardTitle>
               <CardDescription>
-                Set up webhook endpoints to receive donation events
+                Configure your ActBlue webhook integration to automatically sync donations
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="webhookUrl">Webhook URL</Label>
-                <div className="flex gap-2">
-                  <Input
-                    id="webhookUrl"
-                    placeholder="https://your-service.com/webhook"
-                    className="flex-1"
-                  />
-                  <Button variant="outline">Test</Button>
-                </div>
-                <p className="text-xs text-gray-500">
-                  We'll send a POST request to this URL whenever a donation is received.
-                </p>
+            <CardContent className="space-y-6">
+              {/* Webhook Stats */}
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-3 mb-6">
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="text-center">
+                      <p className="text-sm font-medium text-gray-500">Total Events</p>
+                      <h3 className="mt-2 text-3xl font-bold">{webhookStats.total}</h3>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="text-center">
+                      <p className="text-sm font-medium text-gray-500">Processed</p>
+                      <h3 className="mt-2 text-3xl font-bold">{webhookStats.processed}</h3>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="text-center">
+                      <p className="text-sm font-medium text-gray-500">Errors</p>
+                      <h3 className="mt-2 text-3xl font-bold">{webhookStats.errors}</h3>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
-
-              <Separator className="my-4" />
-
-              <div className="space-y-2">
-                <h3 className="font-medium">Webhook Secret</h3>
-                <div className="flex gap-2">
-                  <Input
-                    type="password"
-                    defaultValue="1234567890"
-                    className="flex-1"
-                    readOnly
-                  />
-                  <Button variant="outline">Regenerate</Button>
+              
+              {/* Webhook Configuration */}
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="webhookUrl">ActBlue Webhook URL</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="webhookUrl"
+                      value={webhookUrl}
+                      onChange={(e) => setWebhookUrl(e.target.value)}
+                      placeholder="https://your-actblue-webhook-url.com"
+                      className="flex-1"
+                    />
+                    <Button 
+                      variant="outline" 
+                      onClick={handleSaveWebhookUrl}
+                      disabled={isLoading || !webhookCredentials}
+                    >
+                      {isLoading ? "Saving..." : "Save"}
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={handleTestWebhook}
+                      disabled={isTesting || !webhookCredentials}
+                    >
+                      {isTesting ? "Testing..." : "Test"}
+                    </Button>
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    This is where DonorCamp will send ActBlue donation data. Configure this in your ActBlue webhook settings.
+                  </p>
                 </div>
-                <p className="text-xs text-gray-500">
-                  Use this secret to verify that requests are coming from DonorCamp.
-                </p>
-              </div>
 
-              <Separator className="my-4" />
+                <Separator className="my-6" />
 
-              <div className="space-y-2">
-                <h3 className="font-medium">Events</h3>
-                <p className="text-sm text-gray-500">
-                  Select which events should trigger a webhook notification:
-                </p>
-                <div className="grid grid-cols-1 gap-2 pt-2 sm:grid-cols-2">
-                  <div className="flex items-center gap-2">
-                    <input type="checkbox" id="event-donation" defaultChecked />
-                    <label htmlFor="event-donation">New donation</label>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <input type="checkbox" id="event-refund" defaultChecked />
-                    <label htmlFor="event-refund">Refunded donation</label>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <input type="checkbox" id="event-recurring" defaultChecked />
-                    <label htmlFor="event-recurring">Recurring donation</label>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <input type="checkbox" id="event-cancelled" defaultChecked />
-                    <label htmlFor="event-cancelled">Cancelled recurring donation</label>
+                <div className="space-y-4">
+                  <h3 className="font-medium">DonorCamp API Credentials</h3>
+                  <p className="text-sm text-gray-500 mb-4">
+                    Use these credentials in your ActBlue webhook settings to authenticate requests to DonorCamp.
+                  </p>
+                  
+                  {webhookCredentials ? (
+                    <div className="space-y-4">
+                      <CopyableInput 
+                        id="apiEndpoint" 
+                        value="https://api.donorcamp.com/v1" 
+                        label="API Endpoint" 
+                      />
+                      
+                      <CopyableInput 
+                        id="apiUsername" 
+                        value={webhookCredentials.api_username} 
+                        label="API Username" 
+                      />
+                      
+                      <div className="flex flex-col space-y-2">
+                        <div className="flex justify-between items-center">
+                          <Label htmlFor="apiPassword">API Password</Label>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={handleRegeneratePassword}
+                            disabled={isRegeneratingPassword}
+                            className="h-8 px-2 text-xs"
+                          >
+                            <IconRefresh size={16} className="mr-1" />
+                            {isRegeneratingPassword ? "Regenerating..." : "Regenerate"}
+                          </Button>
+                        </div>
+                        <CopyablePasswordInput 
+                          id="apiPassword" 
+                          value={webhookCredentials.api_password} 
+                        />
+                        <p className="text-xs text-gray-500">
+                          For security reasons, we recommend regenerating your API password periodically.
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="py-4 text-center text-gray-500">
+                      Loading webhook credentials...
+                    </div>
+                  )}
+                </div>
+
+                <Separator className="my-6" />
+
+                <div className="space-y-4">
+                  <h3 className="font-medium">ActBlue Integration Instructions</h3>
+                  <div className="space-y-4 rounded-lg border p-4">
+                    <h4 className="font-medium">Step 1: Access ActBlue Dashboard</h4>
+                    <p className="text-sm text-gray-500">
+                      Log into your ActBlue account and navigate to the Webhook settings section.
+                    </p>
+                    
+                    <h4 className="font-medium">Step 2: Configure Webhook</h4>
+                    <p className="text-sm text-gray-500">
+                      Enter the DonorCamp API Endpoint, Username, and Password from above into ActBlue's webhook configuration.
+                    </p>
+                    
+                    <h4 className="font-medium">Step 3: Select Events</h4>
+                    <p className="text-sm text-gray-500">
+                      Enable webhook notifications for donation events in ActBlue's settings.
+                    </p>
+                    
+                    <h4 className="font-medium">Step 4: Test Integration</h4>
+                    <p className="text-sm text-gray-500">
+                      Use ActBlue's test feature to verify the webhook is properly configured.
+                    </p>
+                    
+                    <div className="mt-4">
+                      <Button variant="outline" className="w-full">
+                        <span>View ActBlue Integration Guide</span>
+                        <IconArrowRight size={16} className="ml-2" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
-              </div>
-
-              <div className="flex justify-end">
-                <Button>Save Integration</Button>
               </div>
             </CardContent>
           </Card>

@@ -1,5 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/components/ui/use-toast";
 
 export interface WebhookCredentials {
   id: string;
@@ -62,6 +63,60 @@ export const regenerateApiPassword = async (webhookId: string): Promise<string |
   }
   
   return newPassword;
+};
+
+export const testWebhook = async (webhookId: string): Promise<boolean> => {
+  try {
+    const { data: webhook } = await supabase
+      .from('webhooks')
+      .select('endpoint_url, api_username, api_password')
+      .eq('id', webhookId)
+      .single();
+    
+    if (!webhook) {
+      toast({
+        title: "Error testing webhook",
+        description: "Webhook credentials not found",
+        variant: "destructive",
+      });
+      return false;
+    }
+    
+    // Send a test request to the ActBlue webhook URL
+    const testPayload = {
+      test: true,
+      timestamp: new Date().toISOString(),
+      message: "This is a test webhook from DonorCamp"
+    };
+    
+    const response = await fetch(webhook.endpoint_url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Basic ${btoa(`${webhook.api_username}:${webhook.api_password}`)}`
+      },
+      body: JSON.stringify(testPayload)
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    
+    toast({
+      title: "Webhook test successful",
+      description: "Your webhook endpoint responded correctly",
+    });
+    
+    return true;
+  } catch (error) {
+    console.error("Error testing webhook:", error);
+    toast({
+      title: "Webhook test failed",
+      description: error instanceof Error ? error.message : "Unknown error occurred",
+      variant: "destructive",
+    });
+    return false;
+  }
 };
 
 export const getWebhookEventStats = async (): Promise<{ total: number, processed: number, errors: number }> => {
