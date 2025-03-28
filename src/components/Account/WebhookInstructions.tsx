@@ -15,7 +15,8 @@ const WebhookInstructions = () => {
         
         <h4 className="font-medium">Step 2: Configure Webhook</h4>
         <p className="text-sm text-gray-500">
-          Enter the DonorCamp API Endpoint, Username, and Password from above into ActBlue's webhook configuration.
+          Enter your ActBlue webhook URL, Username, and Password from above into ActBlue's webhook configuration.
+          This secure URL routes through Hookdeck for better reliability and monitoring.
         </p>
         
         <h4 className="font-medium">Step 3: Select Events</h4>
@@ -25,7 +26,7 @@ const WebhookInstructions = () => {
         
         <h4 className="font-medium">Step 4: Test Integration</h4>
         <p className="text-sm text-gray-500">
-          Use ActBlue's test feature to verify the webhook is properly configured.
+          Use the "Test" button above or ActBlue's test feature to verify the webhook is properly configured.
         </p>
         
         <div className="mt-4">

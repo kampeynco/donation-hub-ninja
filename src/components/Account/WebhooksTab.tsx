@@ -4,29 +4,22 @@ import { Card, CardHeader, CardContent, CardTitle, CardDescription } from "@/com
 import { Separator } from "@/components/ui/separator";
 import { 
   WebhookCredentials, 
-  fetchWebhookCredentials, 
-  getWebhookEventStats 
+  fetchWebhookCredentials
 } from "@/services/webhookService";
-import WebhookStats from "./WebhookStats";
 import WebhookConfig from "./WebhookConfig";
 import WebhookInstructions from "./WebhookInstructions";
-import WebhookEventViewer from "./WebhookEventViewer";
 
 const WebhooksTab = () => {
   const [webhookCredentials, setWebhookCredentials] = useState<WebhookCredentials | null>(null);
-  const [webhookUrl, setWebhookUrl] = useState<string>("");
-  const [webhookStats, setWebhookStats] = useState({ total: 0, processed: 0, errors: 0 });
+  const [actBlueWebhookUrl, setActBlueWebhookUrl] = useState<string>("");
 
   useEffect(() => {
     const loadWebhookCredentials = async () => {
       const credentials = await fetchWebhookCredentials();
       if (credentials) {
         setWebhookCredentials(credentials);
-        setWebhookUrl(credentials.endpoint_url);
+        setActBlueWebhookUrl(credentials.actblue_webhook_url || "");
       }
-      
-      const stats = await getWebhookEventStats();
-      setWebhookStats(stats);
     };
     
     loadWebhookCredentials();
@@ -41,25 +34,13 @@ const WebhooksTab = () => {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Webhook Stats */}
-        <WebhookStats 
-          total={webhookStats.total} 
-          processed={webhookStats.processed} 
-          errors={webhookStats.errors} 
-        />
-        
         {/* Webhook Configuration */}
         <WebhookConfig 
           webhookCredentials={webhookCredentials}
           setWebhookCredentials={setWebhookCredentials}
-          webhookUrl={webhookUrl}
-          setWebhookUrl={setWebhookUrl}
+          actBlueWebhookUrl={actBlueWebhookUrl}
+          setActBlueWebhookUrl={setActBlueWebhookUrl}
         />
-
-        <Separator className="my-6" />
-
-        {/* Webhook Event Viewer */}
-        <WebhookEventViewer />
 
         <Separator className="my-6" />
 

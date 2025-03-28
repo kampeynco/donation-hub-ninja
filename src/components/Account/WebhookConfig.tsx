@@ -7,21 +7,27 @@ import { Separator } from "@/components/ui/separator";
 import CopyableInput from "@/components/Auth/CopyableInput";
 import CopyablePasswordInput from "@/components/Auth/CopyablePasswordInput";
 import { IconRefresh } from "@tabler/icons-react";
-import { WebhookCredentials, updateWebhookCredentials, regenerateApiPassword, testWebhook } from "@/services/webhookService";
+import { 
+  WebhookCredentials, 
+  updateWebhookCredentials, 
+  regenerateApiPassword, 
+  updateActBlueWebhookUrl,
+  testActBlueWebhook
+} from "@/services/webhookService";
 import { toast } from "@/components/ui/use-toast";
 
 interface WebhookConfigProps {
   webhookCredentials: WebhookCredentials | null;
   setWebhookCredentials: React.Dispatch<React.SetStateAction<WebhookCredentials | null>>;
-  webhookUrl: string;
-  setWebhookUrl: React.Dispatch<React.SetStateAction<string>>;
+  actBlueWebhookUrl: string;
+  setActBlueWebhookUrl: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const WebhookConfig = ({
   webhookCredentials,
   setWebhookCredentials,
-  webhookUrl,
-  setWebhookUrl
+  actBlueWebhookUrl,
+  setActBlueWebhookUrl
 }: WebhookConfigProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isRegeneratingPassword, setIsRegeneratingPassword] = useState(false);
@@ -32,19 +38,17 @@ const WebhookConfig = ({
     
     setIsLoading(true);
     try {
-      const success = await updateWebhookCredentials(webhookCredentials.id, { 
-        endpoint_url: webhookUrl 
-      });
+      const success = await updateActBlueWebhookUrl(webhookCredentials.id, actBlueWebhookUrl);
       
       if (success) {
         setWebhookCredentials({
           ...webhookCredentials,
-          endpoint_url: webhookUrl
+          actblue_webhook_url: actBlueWebhookUrl
         });
         
         toast({
           title: "Webhook URL updated",
-          description: "Your webhook endpoint has been updated successfully."
+          description: "Your ActBlue webhook URL has been updated successfully."
         });
       } else {
         throw new Error("Failed to update webhook URL");
@@ -98,7 +102,7 @@ const WebhookConfig = ({
     
     setIsTesting(true);
     try {
-      await testWebhook(webhookCredentials.id);
+      await testActBlueWebhook(webhookCredentials.id);
     } finally {
       setIsTesting(false);
     }
@@ -107,12 +111,12 @@ const WebhookConfig = ({
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <Label htmlFor="webhookUrl">ActBlue Webhook URL</Label>
+        <Label htmlFor="actBlueWebhookUrl">ActBlue Webhook URL</Label>
         <div className="flex gap-2">
           <Input
-            id="webhookUrl"
-            value={webhookUrl}
-            onChange={(e) => setWebhookUrl(e.target.value)}
+            id="actBlueWebhookUrl"
+            value={actBlueWebhookUrl}
+            onChange={(e) => setActBlueWebhookUrl(e.target.value)}
             placeholder="https://your-actblue-webhook-url.com"
             className="flex-1"
           />
@@ -126,13 +130,13 @@ const WebhookConfig = ({
           <Button 
             variant="outline" 
             onClick={handleTestWebhook}
-            disabled={isTesting || !webhookCredentials}
+            disabled={isTesting || !webhookCredentials || !actBlueWebhookUrl}
           >
             {isTesting ? "Testing..." : "Test"}
           </Button>
         </div>
         <p className="text-xs text-gray-500">
-          This is where DonorCamp will send ActBlue donation data. Configure this in your ActBlue webhook settings.
+          This is the secure Hookdeck webhook URL that you'll configure in your ActBlue account settings.
         </p>
       </div>
 
@@ -146,12 +150,6 @@ const WebhookConfig = ({
         
         {webhookCredentials ? (
           <div className="space-y-4">
-            <CopyableInput 
-              id="apiEndpoint" 
-              value="https://api.donorcamp.com/v1" 
-              label="API Endpoint" 
-            />
-            
             <CopyableInput 
               id="apiUsername" 
               value={webhookCredentials.api_username} 

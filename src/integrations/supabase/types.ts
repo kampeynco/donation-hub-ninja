@@ -301,53 +301,15 @@ export type Database = {
         }
         Relationships: []
       }
-      webhook_events: {
-        Row: {
-          created_at: string
-          error: string | null
-          event_type: string
-          id: string
-          payload: Json
-          processed: boolean
-          processed_at: string | null
-          webhook_id: string
-        }
-        Insert: {
-          created_at?: string
-          error?: string | null
-          event_type: string
-          id?: string
-          payload: Json
-          processed?: boolean
-          processed_at?: string | null
-          webhook_id: string
-        }
-        Update: {
-          created_at?: string
-          error?: string | null
-          event_type?: string
-          id?: string
-          payload?: Json
-          processed?: boolean
-          processed_at?: string | null
-          webhook_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "webhook_events_webhook_id_fkey"
-            columns: ["webhook_id"]
-            isOneToOne: false
-            referencedRelation: "webhooks"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       webhooks: {
         Row: {
+          actblue_webhook_url: string | null
           api_password: string
           api_username: string
           created_at: string
-          endpoint_url: string
+          hookdeck_connection_id: string | null
+          hookdeck_destination_url: string
+          hookdeck_source_id: string | null
           id: string
           is_active: boolean
           last_used_at: string | null
@@ -355,10 +317,13 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          actblue_webhook_url?: string | null
           api_password: string
           api_username: string
           created_at?: string
-          endpoint_url?: string
+          hookdeck_connection_id?: string | null
+          hookdeck_destination_url?: string
+          hookdeck_source_id?: string | null
           id?: string
           is_active?: boolean
           last_used_at?: string | null
@@ -366,10 +331,13 @@ export type Database = {
           user_id: string
         }
         Update: {
+          actblue_webhook_url?: string | null
           api_password?: string
           api_username?: string
           created_at?: string
-          endpoint_url?: string
+          hookdeck_connection_id?: string | null
+          hookdeck_destination_url?: string
+          hookdeck_source_id?: string | null
           id?: string
           is_active?: boolean
           last_used_at?: string | null

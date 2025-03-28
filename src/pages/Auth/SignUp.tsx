@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import AuthSidebar from "@/components/Auth/AuthSidebar";
 import SignUpForm from "@/components/Auth/SignUpForm";
 import { SignUpData } from "@/hooks/useSignUpFlow";
+import { createHookdeckWebhook } from "@/services/webhookService";
 
 const SignUp = () => {
   const { signUp } = useAuth();
@@ -36,10 +37,14 @@ const SignUp = () => {
         .insert({
           user_id: authData.user.id,
           api_username: data.email,
-          api_password: data.apiPassword
+          api_password: data.apiPassword,
+          hookdeck_destination_url: "https://igjnhwvtasegwyiwcdkr.supabase.co/functions/v1/handle-webhook"
         });
       
       if (webhookError) throw webhookError;
+      
+      // Step 4: Create Hookdeck webhook
+      await createHookdeckWebhook(authData.user.id, data.email);
       
       toast({
         title: "Account created successfully",
