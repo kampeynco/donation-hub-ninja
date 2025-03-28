@@ -47,19 +47,16 @@ const Navbar = () => {
               </div>
               <div className="max-h-80 overflow-auto">
                 <div className="border-b p-4 hover:bg-gray-50">
-                  <p className="font-medium">New donation received</p>
-                  <p className="text-sm text-gray-500">John Doe donated $50.00</p>
-                  <p className="text-xs text-gray-400">2 minutes ago</p>
+                  <p className="text-sm text-gray-700">John Doe donated $50.00</p>
+                  <p className="text-xs text-gray-400 mt-1">2 minutes ago</p>
                 </div>
                 <div className="border-b p-4 hover:bg-gray-50">
-                  <p className="font-medium">New donation received</p>
-                  <p className="text-sm text-gray-500">Jane Smith donated $25.00</p>
-                  <p className="text-xs text-gray-400">1 hour ago</p>
+                  <p className="text-sm text-gray-700">Jane Smith donated $25.00</p>
+                  <p className="text-xs text-gray-400 mt-1">1 hour ago</p>
                 </div>
                 <div className="p-4 hover:bg-gray-50">
-                  <p className="font-medium">New donor joined</p>
-                  <p className="text-sm text-gray-500">Mike Johnson created an account</p>
-                  <p className="text-xs text-gray-400">Yesterday</p>
+                  <p className="text-sm text-gray-700">Mike Johnson created an account</p>
+                  <p className="text-xs text-gray-400 mt-1">Yesterday</p>
                 </div>
               </div>
             </PopoverContent>
