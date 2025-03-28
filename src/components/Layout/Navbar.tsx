@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { X } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/context/AuthContext";
 
 const Navbar = () => {
   // Define initial notifications
@@ -17,6 +18,7 @@ const Navbar = () => {
 
   // State to manage notifications
   const [notifications, setNotifications] = useState(initialNotifications);
+  const { user, signOut } = useAuth();
 
   // Function to remove a notification
   const removeNotification = (id: number) => {
@@ -26,6 +28,13 @@ const Navbar = () => {
   // Function to mark all notifications as read
   const markAllAsRead = () => {
     setNotifications([]);
+  };
+
+  // Get user initials for avatar
+  const getUserInitials = () => {
+    if (!user || !user.email) return "U";
+    const email = user.email;
+    return email.substring(0, 2).toUpperCase();
   };
 
   return (
@@ -102,14 +111,14 @@ const Navbar = () => {
               <Button variant="ghost" size="icon" className="rounded-full hover:bg-gray-100">
                 <Avatar className="h-9 w-9 border-2 border-gray-200">
                   <AvatarImage src="" />
-                  <AvatarFallback className="bg-primary text-primary-foreground">JS</AvatarFallback>
+                  <AvatarFallback className="bg-primary text-primary-foreground">{getUserInitials()}</AvatarFallback>
                 </Avatar>
               </Button>
             </PopoverTrigger>
             <PopoverContent align="end" className="w-56 p-0 rounded-xl shadow-lg border-gray-200">
               <div className="border-b p-4">
-                <p className="font-medium">John Smith</p>
-                <p className="text-sm text-gray-500">john@example.com</p>
+                <p className="font-medium">{user?.email || "User"}</p>
+                <p className="text-sm text-gray-500">{user?.email}</p>
               </div>
               <div className="p-2">
                 <Link to="/account" className="block rounded-lg px-2 py-1.5 text-sm hover:bg-gray-100">
@@ -118,7 +127,10 @@ const Navbar = () => {
                 <Link to="/" className="block rounded-lg px-2 py-1.5 text-sm hover:bg-gray-100">
                   Help & support
                 </Link>
-                <button className="block w-full rounded-lg px-2 py-1.5 text-left text-sm text-red-600 hover:bg-gray-100">
+                <button 
+                  onClick={signOut}
+                  className="block w-full rounded-lg px-2 py-1.5 text-left text-sm text-red-600 hover:bg-gray-100"
+                >
                   Sign out
                 </button>
               </div>
