@@ -8,6 +8,7 @@ export interface SignUpData {
   confirmPassword: string;
   committeeName: string;
   apiPassword: string;
+  currentStep: number;
 }
 
 interface UseSignUpFlowProps {
@@ -115,47 +116,75 @@ export const useSignUpFlow = ({ onSubmit }: UseSignUpFlowProps) => {
         return;
       }
       
-      handleNext();
-      return;
-    }
-    
-    // For step 2, validate committee name before proceeding
-    if (currentStep === 2) {
-      if (!validateCommitteeName()) {
-        return;
-      }
-      
-      handleNext();
-      return;
-    }
-    
-    if (currentStep === 3) {
       setIsLoading(true);
       try {
-        console.log("Submitting form with data:", {
-          email,
-          committeeName,
-          // Omitting password for security
-        });
-        
         await onSubmit({
           email,
           password,
           confirmPassword,
           committeeName,
-          apiPassword
+          apiPassword,
+          currentStep
+        });
+        
+        handleNext();
+      } catch (error: any) {
+        console.error("Step 1 error:", error);
+        setError(error.message || "An error occurred during step 1");
+      } finally {
+        setIsLoading(false);
+      }
+      return;
+    }
+    
+    // For step 2, validate committee name
+    if (currentStep === 2) {
+      if (!validateCommitteeName()) {
+        return;
+      }
+      
+      setIsLoading(true);
+      try {
+        await onSubmit({
+          email,
+          password,
+          confirmPassword,
+          committeeName,
+          apiPassword,
+          currentStep
+        });
+        
+        handleNext();
+      } catch (error: any) {
+        console.error("Step 2 error:", error);
+        setError(error.message || "An error occurred during step 2");
+      } finally {
+        setIsLoading(false);
+      }
+      return;
+    }
+    
+    // For step 3, complete the process
+    if (currentStep === 3) {
+      setIsLoading(true);
+      try {
+        await onSubmit({
+          email,
+          password,
+          confirmPassword,
+          committeeName,
+          apiPassword,
+          currentStep
         });
         
         // If we reach here, submission was successful
         console.log("Form submission successful");
       } catch (error: any) {
-        console.error("Sign up error in flow:", error);
-        setError(error.message || "An error occurred during sign up");
+        console.error("Step 3 error:", error);
+        setError(error.message || "An error occurred during step 3");
       } finally {
         setIsLoading(false);
       }
-    } else {
-      handleNext();
     }
   };
 

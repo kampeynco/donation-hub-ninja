@@ -74,7 +74,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSubmit }) => {
           />
         )}
         
-        {currentStep === 3 && error && (
+        {error && currentStep === 3 && (
           <div className="text-red-500 text-sm">{error}</div>
         )}
         
@@ -95,9 +95,9 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSubmit }) => {
             disabled={isLoading}
           >
             {isLoading 
-              ? "Creating account..." 
+              ? currentStep < 3 ? "Processing..." : "Creating account..." 
               : currentStep === 3 
-                ? "Create Account" 
+                ? "Complete Registration" 
                 : "Next"
             }
           </Button>

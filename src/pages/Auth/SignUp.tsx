@@ -18,66 +18,98 @@ const SignUp = () => {
         // Omitting password for security
       });
 
-      // Important: Create user with metadata containing committee name
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: data.email,
-        password: data.password,
-        options: {
-          data: {
-            committee_name: data.committeeName // Store committee name in user metadata
-          }
-        }
-      });
-      
-      if (authError) {
-        console.error("Auth error during signup:", authError);
-        throw authError;
-      }
-      
-      if (!authData.user) {
-        console.error("No user returned from auth signup");
-        throw new Error("Failed to create user account");
-      }
-      
-      console.log("User created successfully:", authData.user.id);
-      
-      // Step 2: Create webhook credentials
-      const { error: webhookError } = await supabase
-        .from('webhooks')
-        .insert({
-          user_id: authData.user.id,
-          api_username: data.email,
-          api_password: data.apiPassword,
-          hookdeck_destination_url: "https://igjnhwvtasegwyiwcdkr.supabase.co/functions/v1/handle-webhook"
+      // Step 1: Create user (without committee name in metadata)
+      if (data.currentStep === 1) {
+        console.log("Creating user account");
+        
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+          email: data.email,
+          password: data.password
         });
-      
-      if (webhookError) {
-        console.error("Webhook creation error:", webhookError);
-        throw webhookError;
+        
+        if (authError) {
+          console.error("Auth error during signup:", authError);
+          throw authError;
+        }
+        
+        if (!authData.user) {
+          console.error("No user returned from auth signup");
+          throw new Error("Failed to create user account");
+        }
+        
+        console.log("User created successfully:", authData.user.id);
+        
+        // Create Hookdeck webhook
+        try {
+          const hookdeckUrl = await createHookdeckWebhook(authData.user.id, data.email);
+          console.log("Hookdeck webhook created:", hookdeckUrl);
+        } catch (hookdeckError) {
+          console.error("Hookdeck webhook creation error:", hookdeckError);
+          // Continue even if Hookdeck creation fails, as the user account is already created
+        }
+        
+        // Create webhook credentials 
+        const { error: webhookError } = await supabase
+          .from('webhooks')
+          .insert({
+            user_id: authData.user.id,
+            api_username: data.email,
+            api_password: data.apiPassword,
+            hookdeck_destination_url: "https://igjnhwvtasegwyiwcdkr.supabase.co/functions/v1/handle-webhook"
+          });
+        
+        if (webhookError) {
+          console.error("Webhook creation error:", webhookError);
+          throw webhookError;
+        }
+        
+        console.log("Webhook credentials created");
+        
+        // Already created account, proceed to next step
+        return;
       }
       
-      console.log("Webhook credentials created");
-      
-      // Step 3: Create Hookdeck webhook
-      try {
-        const hookdeckUrl = await createHookdeckWebhook(authData.user.id, data.email);
-        console.log("Hookdeck webhook created:", hookdeckUrl);
-      } catch (hookdeckError) {
-        console.error("Hookdeck webhook creation error:", hookdeckError);
-        // Continue even if Hookdeck creation fails, as the user account is already created
+      // Step 2: Update profile with committee name
+      if (data.currentStep === 2) {
+        console.log("Updating profile with committee name");
+        
+        const { data: sessionData } = await supabase.auth.getSession();
+        if (!sessionData.session?.user) {
+          throw new Error("No authenticated user found");
+        }
+        
+        const userId = sessionData.session.user.id;
+        
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({ committee_name: data.committeeName })
+          .eq('id', userId);
+        
+        if (profileError) {
+          console.error("Profile update error:", profileError);
+          throw profileError;
+        }
+        
+        console.log("Profile updated with committee name");
+        return;
       }
       
-      toast({
-        title: "Account created successfully",
-        description: "You can now sign in with your credentials.",
-        duration: 5000,
-      });
-      
-      // Sign out the automatically signed in user (Supabase behavior)
-      await supabase.auth.signOut();
-      
-      // Navigate to sign in page
-      navigate("/auth/signin");
+      // Step 3: Just show webhook details, all changes already done
+      if (data.currentStep === 3) {
+        console.log("Completing signup process");
+        
+        toast({
+          title: "Account created successfully",
+          description: "You can now sign in with your credentials.",
+          duration: 5000,
+        });
+        
+        // Sign out the automatically signed in user (Supabase behavior)
+        await supabase.auth.signOut();
+        
+        // Navigate to sign in page
+        navigate("/auth/signin");
+      }
     } catch (error: any) {
       console.error("Sign up error:", error);
       toast({
