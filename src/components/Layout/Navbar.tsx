@@ -1,6 +1,6 @@
 
 import { Link } from "react-router-dom";
-import { IconBell, IconUserCircle } from "@tabler/icons-react";
+import { IconBell } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -21,12 +21,12 @@ const Navbar = () => {
           <nav className="hidden md:flex">
             <ul className="flex gap-8">
               <li>
-                <Link to="/dashboard" className="border-b-2 border-primary pb-4 text-sm font-medium text-primary">
+                <Link to="/dashboard" className="border-b-2 border-transparent pb-4 text-sm font-medium text-gray-500 hover:text-gray-900">
                   Donors
                 </Link>
               </li>
               <li>
-                <Link to="/account" className="border-b-2 border-transparent pb-4 text-sm font-medium text-gray-500 hover:text-gray-900">
+                <Link to="/account" className="border-b-2 border-primary pb-4 text-sm font-medium text-primary">
                   Account
                 </Link>
               </li>
