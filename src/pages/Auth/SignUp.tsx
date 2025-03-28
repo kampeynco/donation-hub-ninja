@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
@@ -20,19 +19,13 @@ const SignUp = () => {
   // Committee information (step 2)
   const [committeeName, setCommitteeName] = useState("");
 
-  // Address information (step 3)
-  const [street, setStreet] = useState("");
-  const [city, setCity] = useState("");
-  const [state, setState] = useState("");
-  const [zip, setZip] = useState("");
-  
   // API credentials (step 3)
   const [apiPassword, setApiPassword] = useState("");
 
   const steps = [
     { number: 1, title: "Account" },
     { number: 2, title: "Committee" },
-    { number: 3, title: "API Access" }
+    { number: 3, title: "Webhook" }
   ];
 
   const {
@@ -154,14 +147,6 @@ const SignUp = () => {
               <StepThree 
                 email={email}
                 apiPassword={apiPassword}
-                street={street}
-                setStreet={setStreet}
-                city={city}
-                setCity={setCity}
-                state={state}
-                setState={setState}
-                zip={zip}
-                setZip={setZip}
               />
             )}
             
