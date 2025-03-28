@@ -15,17 +15,6 @@ export interface WebhookCredentials {
   actblue_webhook_url: string | null;
 }
 
-// Add the WebhookEvent interface to fix the type error
-export interface WebhookEvent {
-  id: string;
-  created_at: string;
-  event_type: string;
-  payload: any;
-  processed: boolean;
-  processed_at: string | null;
-  error: string | null;
-}
-
 export const fetchWebhookCredentials = async (): Promise<WebhookCredentials | null> => {
   const { data, error } = await supabase
     .from('webhooks')
@@ -171,20 +160,4 @@ export const createHookdeckWebhook = async (userId: string, email: string): Prom
     console.error("Error creating Hookdeck webhook:", error);
     return null;
   }
-};
-
-// Add the fetchWebhookEvents function to fix the import error
-export const fetchWebhookEvents = async (
-  limit: number = 10,
-  page: number = 1,
-  searchTerm: string = ""
-): Promise<{ events: WebhookEvent[], total: number }> => {
-  // Since we've removed webhook_events table, return empty data
-  // This is a placeholder function to prevent build errors
-  // In a real implementation, we would fetch from Hookdeck API
-  console.warn("fetchWebhookEvents is deprecated. Events are now stored in Hookdeck.");
-  return {
-    events: [],
-    total: 0
-  };
 };
