@@ -47,11 +47,6 @@ const Navbar = () => {
                   Donors
                 </Link>
               </li>
-              <li>
-                <Link to="/account" className="border-b-2 border-primary pb-4 text-sm font-medium text-primary">
-                  Account
-                </Link>
-              </li>
             </ul>
           </nav>
         </div>
