@@ -4,18 +4,17 @@ import { useAuth } from "@/context/AuthContext";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { IconEye, IconEyeOff } from "@tabler/icons-react";
-
 const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const { signIn } = useAuth();
-
+  const {
+    signIn
+  } = useAuth();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
     try {
       await signIn(email, password);
     } catch (error) {
@@ -24,9 +23,7 @@ const SignIn = () => {
       setIsLoading(false);
     }
   };
-
-  return (
-    <div className="flex min-h-screen">
+  return <div className="flex min-h-screen">
       {/* Left Column - Blue Background */}
       <div className="hidden md:flex md:w-1/2 bg-primary flex-col items-center justify-center text-white p-10">
         <div className="max-w-md">
@@ -40,9 +37,7 @@ const SignIn = () => {
           </Link>
           
           <h1 className="text-4xl font-bold mb-6">Welcome back</h1>
-          <p className="text-lg mb-10">
-            Sign in to access your donor management dashboard and continue tracking contributions, managing relationships, and sending personalized thank you notes to your supporters.
-          </p>
+          <p className="text-lg mb-10">Sign in to access your dashboard to track donor activity and manage relationships.</p>
           
           <div className="mt-10">
             <p>
@@ -70,15 +65,7 @@ const SignIn = () => {
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                 Email
               </label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                required
-                className="w-full"
-              />
+              <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" required className="w-full" />
             </div>
             
             <div className="space-y-2">
@@ -86,25 +73,9 @@ const SignIn = () => {
                 Password
               </label>
               <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••••••"
-                  required
-                  className="w-full pr-10"
-                />
-                <button
-                  type="button"
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <IconEyeOff size={20} />
-                  ) : (
-                    <IconEye size={20} />
-                  )}
+                <Input id="password" type={showPassword ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••••••" required className="w-full pr-10" />
+                <button type="button" className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500" onClick={() => setShowPassword(!showPassword)}>
+                  {showPassword ? <IconEyeOff size={20} /> : <IconEye size={20} />}
                 </button>
               </div>
             </div>
@@ -124,8 +95,6 @@ const SignIn = () => {
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default SignIn;
