@@ -11,9 +11,9 @@ interface StatCardProps {
 
 const StatCard = ({ title, value, subtitle, className, children }: StatCardProps) => {
   return (
-    <div className={cn("stat-card flex flex-col justify-between", className)}>
-      <div className="text-xs opacity-80">{subtitle}</div>
-      <div className="my-2 text-3xl font-semibold">{value}</div>
+    <div className={cn("stat-card flex flex-col justify-between rounded-xl p-6", className)}>
+      <div className="text-xs font-medium uppercase tracking-wider opacity-85">{subtitle}</div>
+      <div className="my-3 text-4xl font-bold">{value}</div>
       <div className="text-sm font-medium">{title}</div>
       {children}
     </div>
