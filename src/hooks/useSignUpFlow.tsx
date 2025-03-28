@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface SignUpData {
   email: string;
@@ -16,7 +17,7 @@ interface UseSignUpFlowProps {
 export const useSignUpFlow = ({ onSubmit }: UseSignUpFlowProps) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-  const [passwordError, setPasswordError] = useState("");
+  const [error, setError] = useState("");
   
   // Form data
   const [email, setEmail] = useState("");
@@ -41,14 +42,14 @@ export const useSignUpFlow = ({ onSubmit }: UseSignUpFlowProps) => {
 
   const validatePassword = () => {
     if (password !== confirmPassword) {
-      setPasswordError("Passwords don't match");
+      setError("Passwords don't match");
       return false;
     }
     if (password.length < 6) {
-      setPasswordError("Password must be at least 6 characters");
+      setError("Password must be at least 6 characters");
       return false;
     }
-    setPasswordError("");
+    setError("");
     return true;
   };
 
@@ -56,13 +57,13 @@ export const useSignUpFlow = ({ onSubmit }: UseSignUpFlowProps) => {
     if (currentStep === 1) {
       if (!validatePassword()) return;
       if (!email) {
-        setPasswordError("Email is required");
+        setError("Email is required");
         return;
       }
       setCurrentStep(2);
     } else if (currentStep === 2) {
       if (!committeeName) {
-        setPasswordError("Committee name is required");
+        setError("Committee name is required");
         return;
       }
       setCurrentStep(3);
@@ -88,8 +89,9 @@ export const useSignUpFlow = ({ onSubmit }: UseSignUpFlowProps) => {
           committeeName,
           apiPassword
         });
-      } catch (error) {
+      } catch (error: any) {
         console.error("Sign up error:", error);
+        setError(error.message || "An error occurred during sign up");
       } finally {
         setIsLoading(false);
       }
@@ -101,7 +103,7 @@ export const useSignUpFlow = ({ onSubmit }: UseSignUpFlowProps) => {
   return {
     currentStep,
     isLoading,
-    passwordError,
+    error,
     email,
     setEmail,
     password,

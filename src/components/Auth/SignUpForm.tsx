@@ -21,7 +21,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSubmit }) => {
   const {
     currentStep,
     isLoading,
-    passwordError,
+    error,
     email,
     setEmail,
     password,
@@ -55,7 +55,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSubmit }) => {
             setPassword={setPassword}
             confirmPassword={confirmPassword}
             setConfirmPassword={setConfirmPassword}
-            passwordError={passwordError}
+            passwordError={error}
           />
         )}
 
@@ -63,7 +63,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSubmit }) => {
           <StepTwo 
             committeeName={committeeName}
             setCommitteeName={setCommitteeName}
-            passwordError={passwordError}
+            passwordError={error}
           />
         )}
 
@@ -72,6 +72,10 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSubmit }) => {
             email={email}
             apiPassword={apiPassword}
           />
+        )}
+        
+        {error && currentStep === 3 && (
+          <div className="text-red-500 text-sm">{error}</div>
         )}
         
         <div className="flex justify-between">
