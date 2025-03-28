@@ -61,23 +61,34 @@ export const useSignUpFlow = ({ onSubmit }: UseSignUpFlowProps) => {
         return;
       }
       setCurrentStep(2);
+      setError(""); // Clear errors when moving to next step
     } else if (currentStep === 2) {
-      if (!committeeName) {
+      if (!committeeName || committeeName.trim() === "") {
         setError("Committee name is required");
         return;
       }
       setCurrentStep(3);
+      setError(""); // Clear errors when moving to next step
     }
   };
 
   const handlePrevious = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
+      setError(""); // Clear errors when moving to previous step
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // For step 2, validate committee name before proceeding
+    if (currentStep === 2) {
+      if (!committeeName || committeeName.trim() === "") {
+        setError("Committee name is required");
+        return;
+      }
+    }
     
     if (currentStep === 3) {
       setIsLoading(true);

@@ -63,7 +63,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSubmit }) => {
           <StepTwo 
             committeeName={committeeName}
             setCommitteeName={setCommitteeName}
-            passwordError={error}
+            error={error}
           />
         )}
 
@@ -74,7 +74,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSubmit }) => {
           />
         )}
         
-        {error && currentStep === 3 && (
+        {currentStep === 3 && error && (
           <div className="text-red-500 text-sm">{error}</div>
         )}
         

@@ -1,24 +1,26 @@
 
 import React from "react";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { FormItem } from "@/components/ui/form";
 
 interface StepTwoProps {
   committeeName: string;
   setCommitteeName: (committeeName: string) => void;
-  passwordError: string;
+  error: string;
 }
 
 const StepTwo: React.FC<StepTwoProps> = ({
   committeeName,
   setCommitteeName,
-  passwordError,
+  error,
 }) => {
   return (
     <>
-      <div className="space-y-2">
-        <label htmlFor="committeeName" className="block text-sm font-medium text-gray-700">
+      <FormItem className="space-y-2">
+        <Label htmlFor="committeeName" className="block text-sm font-medium text-gray-700">
           Committee Name
-        </label>
+        </Label>
         <Input
           id="committeeName"
           type="text"
@@ -26,10 +28,10 @@ const StepTwo: React.FC<StepTwoProps> = ({
           onChange={(e) => setCommitteeName(e.target.value)}
           placeholder="Your Committee Name"
           required
-          className="w-full"
+          className={`w-full ${error ? "border-red-500" : ""}`}
         />
-      </div>
-      {passwordError && <p className="text-red-500 text-sm">{passwordError}</p>}
+        {error && <p className="text-red-500 text-sm">{error}</p>}
+      </FormItem>
     </>
   );
 };
