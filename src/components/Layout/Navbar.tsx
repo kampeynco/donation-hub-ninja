@@ -23,11 +23,6 @@ const Navbar = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/editor" className="border-b-2 border-transparent pb-4 text-sm font-medium text-gray-500 hover:text-gray-900">
-                  Editor
-                </Link>
-              </li>
-              <li>
                 <Link to="/account" className="border-b-2 border-transparent pb-4 text-sm font-medium text-gray-500 hover:text-gray-900">
                   Account
                 </Link>
