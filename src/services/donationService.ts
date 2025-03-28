@@ -5,23 +5,39 @@ import { toast } from "@/components/ui/use-toast";
 
 export async function fetchRecentDonations(limit = 30): Promise<Donation[]> {
   try {
+    // Modified query to correctly join with emails and avoid the relationship error
     const { data, error } = await supabase
       .from('donations')
       .select(`
         id,
         amount,
         paid_at,
-        donors(
+        donors:donor_id (
           id,
           first_name,
           last_name
-        ),
-        emails(email)
+        )
       `)
       .order('created_at', { ascending: false })
       .limit(limit);
 
     if (error) throw error;
+
+    // Get emails separately since there's no direct relationship between donations and emails
+    const donoEmails = new Map();
+    for (const donation of data) {
+      if (donation.donors && donation.donors.id) {
+        const { data: emailData } = await supabase
+          .from('emails')
+          .select('email')
+          .eq('donor_id', donation.donors.id)
+          .limit(1);
+          
+        if (emailData && emailData.length > 0) {
+          donoEmails.set(donation.donors.id, emailData[0].email);
+        }
+      }
+    }
 
     // Transform the data to match our Donation type
     return data.map((item: any) => ({
@@ -32,9 +48,9 @@ export async function fetchRecentDonations(limit = 30): Promise<Donation[]> {
         year: 'numeric'
       }),
       name: item.donors ? 
-        `${item.donors.first_name || ''} ${item.donors.last_name || ''}`.trim() || null 
-        : null,
-      email: item.emails && item.emails.length > 0 ? item.emails[0].email : null,
+        `${item.donors.first_name || ''} ${item.donors.last_name || ''}`.trim() || 'Anonymous' 
+        : 'Anonymous',
+      email: item.donors ? donoEmails.get(item.donors.id) || null : null,
       amount: Number(item.amount)
     }));
   } catch (error) {
