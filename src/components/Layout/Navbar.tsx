@@ -4,8 +4,30 @@ import { IconBell } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { X } from "lucide-react";
+import { useState } from "react";
 
 const Navbar = () => {
+  // Define initial notifications
+  const initialNotifications = [
+    { id: 1, message: "John Doe donated $50.00", timestamp: "2 minutes ago" },
+    { id: 2, message: "Jane Smith donated $25.00", timestamp: "1 hour ago" },
+    { id: 3, message: "Mike Johnson created an account", timestamp: "Yesterday" }
+  ];
+
+  // State to manage notifications
+  const [notifications, setNotifications] = useState(initialNotifications);
+
+  // Function to remove a notification
+  const removeNotification = (id: number) => {
+    setNotifications(notifications.filter(notification => notification.id !== id));
+  };
+
+  // Function to mark all notifications as read
+  const markAllAsRead = () => {
+    setNotifications([]);
+  };
+
   return (
     <header className="border-b bg-white shadow-sm">
       <div className="container max-w-7xl mx-auto flex items-center justify-between py-4 px-4 sm:px-6 lg:px-8">
@@ -38,26 +60,44 @@ const Navbar = () => {
             <PopoverTrigger asChild>
               <Button variant="ghost" size="icon" className="relative rounded-full hover:bg-gray-100">
                 <IconBell className="h-5 w-5 text-gray-600" />
-                <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-medium text-white">3</span>
+                {notifications.length > 0 && (
+                  <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-medium text-white">
+                    {notifications.length}
+                  </span>
+                )}
               </Button>
             </PopoverTrigger>
             <PopoverContent align="end" className="w-80 p-0 rounded-xl shadow-lg border-gray-200">
-              <div className="border-b p-4">
+              <div className="border-b p-4 flex justify-between items-center">
                 <p className="font-medium">Notifications</p>
+                {notifications.length > 0 && (
+                  <button 
+                    onClick={markAllAsRead} 
+                    className="text-xs text-primary hover:underline"
+                  >
+                    Mark all as read
+                  </button>
+                )}
               </div>
               <div className="max-h-80 overflow-auto">
-                <div className="border-b p-4 hover:bg-gray-50">
-                  <p className="text-sm text-gray-700">John Doe donated $50.00</p>
-                  <p className="text-xs text-gray-400 mt-1">2 minutes ago</p>
-                </div>
-                <div className="border-b p-4 hover:bg-gray-50">
-                  <p className="text-sm text-gray-700">Jane Smith donated $25.00</p>
-                  <p className="text-xs text-gray-400 mt-1">1 hour ago</p>
-                </div>
-                <div className="p-4 hover:bg-gray-50">
-                  <p className="text-sm text-gray-700">Mike Johnson created an account</p>
-                  <p className="text-xs text-gray-400 mt-1">Yesterday</p>
-                </div>
+                {notifications.length > 0 ? (
+                  notifications.map((notification) => (
+                    <div key={notification.id} className="border-b p-4 hover:bg-gray-50 relative">
+                      <button 
+                        onClick={() => removeNotification(notification.id)} 
+                        className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
+                      >
+                        <X size={14} />
+                      </button>
+                      <p className="text-sm text-gray-700 pr-5">{notification.message}</p>
+                      <p className="text-xs text-gray-400 mt-1">{notification.timestamp}</p>
+                    </div>
+                  ))
+                ) : (
+                  <div className="p-4 text-center">
+                    <p className="text-sm text-gray-500">No notifications</p>
+                  </div>
+                )}
               </div>
             </PopoverContent>
           </Popover>
