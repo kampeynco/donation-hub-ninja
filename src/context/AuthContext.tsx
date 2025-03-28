@@ -79,11 +79,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signUp = async (email: string, password: string) => {
     try {
       console.log("Attempting sign up for:", email);
-      // Email confirmation is disabled in Supabase console
+      
       const { error, data } = await supabase.auth.signUp({ 
         email, 
         password,
-        // No email confirmation options since it's disabled in Supabase console
       });
       
       console.log("Sign up response:", { error, data });
@@ -94,6 +93,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         title: "Sign up successful",
         description: "Your account has been created. You can now sign in.",
       });
+      
+      // Sign out to make sure the user goes through the login flow
+      await supabase.auth.signOut();
+      
       navigate("/auth/signin");
     } catch (error: any) {
       console.error("Sign up error in context:", error);

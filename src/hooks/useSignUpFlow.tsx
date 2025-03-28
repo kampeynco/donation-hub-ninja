@@ -40,33 +40,58 @@ export const useSignUpFlow = ({ onSubmit }: UseSignUpFlowProps) => {
     setApiPassword(generatePassword());
   }, []);
 
-  const validatePassword = () => {
-    if (password !== confirmPassword) {
-      setError("Passwords don't match");
+  const validateEmail = () => {
+    if (!email.trim()) {
+      setError("Email is required");
       return false;
     }
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError("Please enter a valid email address");
+      return false;
+    }
+    
+    return true;
+  };
+
+  const validatePassword = () => {
+    if (!password) {
+      setError("Password is required");
+      return false;
+    }
+    
     if (password.length < 6) {
       setError("Password must be at least 6 characters");
       return false;
     }
-    setError("");
+    
+    if (password !== confirmPassword) {
+      setError("Passwords don't match");
+      return false;
+    }
+    
+    return true;
+  };
+
+  const validateCommitteeName = () => {
+    if (!committeeName || committeeName.trim() === "") {
+      setError("Committee name is required");
+      return false;
+    }
     return true;
   };
 
   const handleNext = () => {
     if (currentStep === 1) {
-      if (!email.trim()) {
-        setError("Email is required");
+      if (!validateEmail() || !validatePassword()) {
         return;
       }
-      
-      if (!validatePassword()) return;
       
       setCurrentStep(2);
       setError(""); // Clear errors when moving to next step
     } else if (currentStep === 2) {
-      if (!committeeName || committeeName.trim() === "") {
-        setError("Committee name is required");
+      if (!validateCommitteeName()) {
         return;
       }
       setCurrentStep(3);
@@ -86,12 +111,9 @@ export const useSignUpFlow = ({ onSubmit }: UseSignUpFlowProps) => {
     
     // For step 1, validate email and password
     if (currentStep === 1) {
-      if (!email.trim()) {
-        setError("Email is required");
+      if (!validateEmail() || !validatePassword()) {
         return;
       }
-      
-      if (!validatePassword()) return;
       
       handleNext();
       return;
@@ -99,8 +121,7 @@ export const useSignUpFlow = ({ onSubmit }: UseSignUpFlowProps) => {
     
     // For step 2, validate committee name before proceeding
     if (currentStep === 2) {
-      if (!committeeName || committeeName.trim() === "") {
-        setError("Committee name is required");
+      if (!validateCommitteeName()) {
         return;
       }
       
@@ -111,6 +132,12 @@ export const useSignUpFlow = ({ onSubmit }: UseSignUpFlowProps) => {
     if (currentStep === 3) {
       setIsLoading(true);
       try {
+        console.log("Submitting form with data:", {
+          email,
+          committeeName,
+          // Omitting password for security
+        });
+        
         await onSubmit({
           email,
           password,
@@ -118,6 +145,9 @@ export const useSignUpFlow = ({ onSubmit }: UseSignUpFlowProps) => {
           committeeName,
           apiPassword
         });
+        
+        // If we reach here, submission was successful
+        console.log("Form submission successful");
       } catch (error: any) {
         console.error("Sign up error in flow:", error);
         setError(error.message || "An error occurred during sign up");

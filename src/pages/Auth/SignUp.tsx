@@ -1,6 +1,5 @@
 
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import AuthSidebar from "@/components/Auth/AuthSidebar";
@@ -9,7 +8,6 @@ import { SignUpData } from "@/hooks/useSignUpFlow";
 import { createHookdeckWebhook } from "@/services/webhookService";
 
 const SignUp = () => {
-  const { signUp } = useAuth();
   const navigate = useNavigate();
 
   const handleSignUp = async (data: SignUpData) => {
@@ -20,7 +18,7 @@ const SignUp = () => {
         // Omitting password for security
       });
 
-      // Step 1: Create the user account
+      // Step 1: Create the user account with Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
