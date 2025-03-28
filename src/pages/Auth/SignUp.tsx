@@ -18,10 +18,15 @@ const SignUp = () => {
         // Omitting password for security
       });
 
-      // Step 1: Create the user account with Supabase Auth
+      // Important: Create user with metadata containing committee name
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
+        options: {
+          data: {
+            committee_name: data.committeeName // Store committee name in user metadata
+          }
+        }
       });
       
       if (authError) {
@@ -36,20 +41,7 @@ const SignUp = () => {
       
       console.log("User created successfully:", authData.user.id);
       
-      // Step 2: Update profile with committee name
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({ committee_name: data.committeeName })
-        .eq('id', authData.user.id);
-      
-      if (profileError) {
-        console.error("Profile update error:", profileError);
-        throw profileError;
-      }
-      
-      console.log("Profile updated with committee name");
-      
-      // Step 3: Create webhook credentials
+      // Step 2: Create webhook credentials
       const { error: webhookError } = await supabase
         .from('webhooks')
         .insert({
@@ -66,7 +58,7 @@ const SignUp = () => {
       
       console.log("Webhook credentials created");
       
-      // Step 4: Create Hookdeck webhook
+      // Step 3: Create Hookdeck webhook
       try {
         const hookdeckUrl = await createHookdeckWebhook(authData.user.id, data.email);
         console.log("Hookdeck webhook created:", hookdeckUrl);
