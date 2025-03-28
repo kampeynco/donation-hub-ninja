@@ -10,6 +10,7 @@ import {
 import WebhookStats from "./WebhookStats";
 import WebhookConfig from "./WebhookConfig";
 import WebhookInstructions from "./WebhookInstructions";
+import WebhookEventViewer from "./WebhookEventViewer";
 
 const WebhooksTab = () => {
   const [webhookCredentials, setWebhookCredentials] = useState<WebhookCredentials | null>(null);
@@ -54,6 +55,11 @@ const WebhooksTab = () => {
           webhookUrl={webhookUrl}
           setWebhookUrl={setWebhookUrl}
         />
+
+        <Separator className="my-6" />
+
+        {/* Webhook Event Viewer */}
+        <WebhookEventViewer />
 
         <Separator className="my-6" />
 

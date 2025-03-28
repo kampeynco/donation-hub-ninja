@@ -12,6 +12,17 @@ export interface WebhookCredentials {
   last_used_at: string | null;
 }
 
+export interface WebhookEvent {
+  id: string;
+  event_type: string;
+  payload: any;
+  processed: boolean;
+  error: string | null;
+  created_at: string;
+  processed_at: string | null;
+  webhook_id: string;
+}
+
 export const fetchWebhookCredentials = async (): Promise<WebhookCredentials | null> => {
   const { data, error } = await supabase
     .from('webhooks')
@@ -145,4 +156,63 @@ export const getWebhookEventStats = async (): Promise<{ total: number, processed
   const errors = statsData.filter(event => event.error).length;
   
   return { total, processed, errors };
+};
+
+export const fetchWebhookEvents = async (
+  limit: number = 10, 
+  page: number = 1,
+  searchTerm: string = ""
+): Promise<{ events: WebhookEvent[], total: number }> => {
+  const startIndex = (page - 1) * limit;
+  
+  // First get the webhook id
+  const { data: webhook, error: webhookError } = await supabase
+    .from('webhooks')
+    .select('id')
+    .single();
+  
+  if (webhookError || !webhook) {
+    console.error("Error fetching webhook:", webhookError);
+    return { events: [], total: 0 };
+  }
+  
+  // Query with filters and pagination
+  let query = supabase
+    .from('webhook_events')
+    .select('*', { count: 'exact' })
+    .eq('webhook_id', webhook.id)
+    .order('created_at', { ascending: false })
+    .range(startIndex, startIndex + limit - 1);
+  
+  // Add search filter if provided
+  if (searchTerm) {
+    query = query.or(`event_type.ilike.%${searchTerm}%,payload.ilike.%${searchTerm}%`);
+  }
+  
+  const { data, error, count } = await query;
+  
+  if (error) {
+    console.error("Error fetching webhook events:", error);
+    return { events: [], total: 0 };
+  }
+  
+  return { 
+    events: data as WebhookEvent[], 
+    total: count || 0 
+  };
+};
+
+export const getWebhookEvent = async (eventId: string): Promise<WebhookEvent | null> => {
+  const { data, error } = await supabase
+    .from('webhook_events')
+    .select('*')
+    .eq('id', eventId)
+    .single();
+  
+  if (error) {
+    console.error("Error fetching webhook event:", error);
+    return null;
+  }
+  
+  return data as WebhookEvent;
 };
