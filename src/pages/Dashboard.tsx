@@ -1,24 +1,35 @@
 
 import { useEffect, useState } from "react";
 import { Donation, DonationStats } from "@/types/donation";
-import { generateMockDonations, calculateDonationStats } from "@/services/mockData";
 import StatCard from "@/components/Dashboard/StatCard";
 import DonationsTable from "@/components/Dashboard/DonationsTable";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { fetchRecentDonations, fetchDonationStats } from "@/services/donationService";
+import { useQuery } from "@tanstack/react-query";
 
 const Dashboard = () => {
-  const [donations, setDonations] = useState<Donation[]>([]);
-  const [stats, setStats] = useState<DonationStats | null>(null);
+  const { 
+    data: donations = [], 
+    isLoading: isDonationsLoading 
+  } = useQuery({
+    queryKey: ['donations'],
+    queryFn: () => fetchRecentDonations(30),
+  });
 
-  useEffect(() => {
-    // In a real app, this would fetch from your API
-    const mockDonations = generateMockDonations(30);
-    setDonations(mockDonations);
-    setStats(calculateDonationStats(mockDonations));
-  }, []);
+  const { 
+    data: stats,
+    isLoading: isStatsLoading 
+  } = useQuery({
+    queryKey: ['donationStats'],
+    queryFn: fetchDonationStats,
+  });
+
+  if (isStatsLoading || isDonationsLoading) {
+    return <div className="flex justify-center p-8">Loading...</div>;
+  }
 
   if (!stats) {
-    return <div className="flex justify-center p-8">Loading...</div>;
+    return <div className="flex justify-center p-8">Failed to load donation statistics</div>;
   }
 
   return (

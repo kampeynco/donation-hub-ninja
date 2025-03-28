@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Donation } from "@/types/donation";
+import { toast } from "@/components/ui/use-toast";
 
 interface DonationsTableProps {
   donations: Donation[];
@@ -24,6 +25,52 @@ const DonationsTable = ({ donations }: DonationsTableProps) => {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
+  const downloadCSV = () => {
+    try {
+      // Create CSV header row
+      const headers = ["Date", "Name", "Email", "Amount"];
+      
+      // Convert donation data to CSV rows
+      const csvRows = [
+        headers.join(","),
+        ...filteredDonations.map(d => 
+          [
+            d.date, 
+            d.name ? `"${d.name}"` : "Anonymous", 
+            d.email ? `"${d.email}"` : "---", 
+            d.amount
+          ].join(",")
+        )
+      ];
+      
+      // Create blob and download link
+      const csvString = csvRows.join("\n");
+      const blob = new Blob([csvString], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      
+      // Create download link and trigger click
+      const a = document.createElement("a");
+      a.setAttribute("hidden", "");
+      a.setAttribute("href", url);
+      a.setAttribute("download", `donations-${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      
+      toast({
+        title: "Success",
+        description: "Donations CSV downloaded successfully",
+      });
+    } catch (error) {
+      console.error("Error downloading CSV:", error);
+      toast({
+        title: "Error",
+        description: "Failed to download donations CSV",
+        variant: "destructive"
+      });
+    }
+  };
 
   return (
     <div className="bg-white rounded-lg shadow">
@@ -50,15 +97,15 @@ const DonationsTable = ({ donations }: DonationsTableProps) => {
             />
           </svg>
         </div>
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" onClick={downloadCSV}>
           Download CSV
         </Button>
       </div>
       <div className="overflow-x-auto">
-        <table className="donation-table">
-          <thead>
+        <table className="w-full">
+          <thead className="bg-gray-50 text-xs uppercase tracking-wider text-gray-500">
             <tr>
-              <th className="cursor-pointer">
+              <th className="px-6 py-3 text-left font-medium cursor-pointer">
                 DATE
                 <svg
                   className="ml-1 inline-block h-4 w-4 text-gray-400"
@@ -74,26 +121,34 @@ const DonationsTable = ({ donations }: DonationsTableProps) => {
                   />
                 </svg>
               </th>
-              <th>NAME</th>
-              <th>EMAIL</th>
-              <th className="text-right">AMOUNT</th>
+              <th className="px-6 py-3 text-left font-medium">NAME</th>
+              <th className="px-6 py-3 text-left font-medium">EMAIL</th>
+              <th className="px-6 py-3 text-right font-medium">AMOUNT</th>
             </tr>
           </thead>
-          <tbody>
-            {paginatedDonations.map((donation) => (
-              <tr key={donation.id} className="hover:bg-gray-50">
-                <td className="text-gray-600">{donation.date}</td>
-                <td>{donation.name || "Anonymous"}</td>
-                <td className="text-blue-500">{donation.email || "---"}</td>
-                <td className="text-right font-medium">${donation.amount.toFixed(2)}</td>
+          <tbody className="divide-y divide-gray-200 text-sm">
+            {paginatedDonations.length > 0 ? (
+              paginatedDonations.map((donation) => (
+                <tr key={donation.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 text-gray-600">{donation.date}</td>
+                  <td className="px-6 py-4">{donation.name || "Anonymous"}</td>
+                  <td className="px-6 py-4 text-blue-500">{donation.email || "---"}</td>
+                  <td className="px-6 py-4 text-right font-medium">${donation.amount.toFixed(2)}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
+                  No donations found
+                </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
       <div className="border-t p-4 flex items-center justify-between">
         <div className="text-sm text-gray-500">
-          Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
+          Showing {filteredDonations.length === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1} to{" "}
           {Math.min(currentPage * itemsPerPage, filteredDonations.length)} of{" "}
           {filteredDonations.length} entries
         </div>

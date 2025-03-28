@@ -9,16 +9,294 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      donations: {
+        Row: {
+          amount: number
+          created_at: string
+          credit_card_expiration: string | null
+          donor_id: string | null
+          express_signup: boolean | null
+          id: string
+          is_express: boolean | null
+          is_mobile: boolean | null
+          is_paypal: boolean | null
+          paid_at: string | null
+          recurring_duration: number | null
+          recurring_period:
+            | Database["public"]["Enums"]["recurring_period"]
+            | null
+          text_message_option:
+            | Database["public"]["Enums"]["text_message_option"]
+            | null
+          updated_at: string
+          with_express_lane: boolean | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          credit_card_expiration?: string | null
+          donor_id?: string | null
+          express_signup?: boolean | null
+          id?: string
+          is_express?: boolean | null
+          is_mobile?: boolean | null
+          is_paypal?: boolean | null
+          paid_at?: string | null
+          recurring_duration?: number | null
+          recurring_period?:
+            | Database["public"]["Enums"]["recurring_period"]
+            | null
+          text_message_option?:
+            | Database["public"]["Enums"]["text_message_option"]
+            | null
+          updated_at?: string
+          with_express_lane?: boolean | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          credit_card_expiration?: string | null
+          donor_id?: string | null
+          express_signup?: boolean | null
+          id?: string
+          is_express?: boolean | null
+          is_mobile?: boolean | null
+          is_paypal?: boolean | null
+          paid_at?: string | null
+          recurring_duration?: number | null
+          recurring_period?:
+            | Database["public"]["Enums"]["recurring_period"]
+            | null
+          text_message_option?:
+            | Database["public"]["Enums"]["text_message_option"]
+            | null
+          updated_at?: string
+          with_express_lane?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "donations_donor_id_fkey"
+            columns: ["donor_id"]
+            isOneToOne: false
+            referencedRelation: "donors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      donors: {
+        Row: {
+          created_at: string
+          first_name: string | null
+          id: string
+          is_express: boolean | null
+          is_mobile: boolean | null
+          is_paypal: boolean | null
+          last_name: string | null
+          text_message_option:
+            | Database["public"]["Enums"]["text_message_option"]
+            | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          first_name?: string | null
+          id?: string
+          is_express?: boolean | null
+          is_mobile?: boolean | null
+          is_paypal?: boolean | null
+          last_name?: string | null
+          text_message_option?:
+            | Database["public"]["Enums"]["text_message_option"]
+            | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          first_name?: string | null
+          id?: string
+          is_express?: boolean | null
+          is_mobile?: boolean | null
+          is_paypal?: boolean | null
+          last_name?: string | null
+          text_message_option?:
+            | Database["public"]["Enums"]["text_message_option"]
+            | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      emails: {
+        Row: {
+          created_at: string
+          donor_id: string | null
+          email: string
+          id: string
+          updated_at: string
+          verified: boolean | null
+        }
+        Insert: {
+          created_at?: string
+          donor_id?: string | null
+          email: string
+          id?: string
+          updated_at?: string
+          verified?: boolean | null
+        }
+        Update: {
+          created_at?: string
+          donor_id?: string | null
+          email?: string
+          id?: string
+          updated_at?: string
+          verified?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emails_donor_id_fkey"
+            columns: ["donor_id"]
+            isOneToOne: false
+            referencedRelation: "donors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      locations: {
+        Row: {
+          city: string | null
+          country: string | null
+          created_at: string
+          donor_id: string | null
+          id: string
+          state: string | null
+          street: string | null
+          type: Database["public"]["Enums"]["location_type"] | null
+          updated_at: string
+          zip: string | null
+        }
+        Insert: {
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          donor_id?: string | null
+          id?: string
+          state?: string | null
+          street?: string | null
+          type?: Database["public"]["Enums"]["location_type"] | null
+          updated_at?: string
+          zip?: string | null
+        }
+        Update: {
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          donor_id?: string | null
+          id?: string
+          state?: string | null
+          street?: string | null
+          type?: Database["public"]["Enums"]["location_type"] | null
+          updated_at?: string
+          zip?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "locations_donor_id_fkey"
+            columns: ["donor_id"]
+            isOneToOne: false
+            referencedRelation: "donors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          action: Database["public"]["Enums"]["notification_action"]
+          created_at: string
+          date: string
+          donor_id: string | null
+          id: string
+          is_read: boolean | null
+          message: string
+        }
+        Insert: {
+          action: Database["public"]["Enums"]["notification_action"]
+          created_at?: string
+          date?: string
+          donor_id?: string | null
+          id?: string
+          is_read?: boolean | null
+          message: string
+        }
+        Update: {
+          action?: Database["public"]["Enums"]["notification_action"]
+          created_at?: string
+          date?: string
+          donor_id?: string | null
+          id?: string
+          is_read?: boolean | null
+          message?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_donor_id_fkey"
+            columns: ["donor_id"]
+            isOneToOne: false
+            referencedRelation: "donors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      phones: {
+        Row: {
+          created_at: string
+          donor_id: string | null
+          id: string
+          phone: string
+          updated_at: string
+          verified: boolean | null
+        }
+        Insert: {
+          created_at?: string
+          donor_id?: string | null
+          id?: string
+          phone: string
+          updated_at?: string
+          verified?: boolean | null
+        }
+        Update: {
+          created_at?: string
+          donor_id?: string | null
+          id?: string
+          phone?: string
+          updated_at?: string
+          verified?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "phones_donor_id_fkey"
+            columns: ["donor_id"]
+            isOneToOne: false
+            referencedRelation: "donors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_average_recurring_duration: {
+        Args: {
+          donor_uuid: string
+        }
+        Returns: number
+      }
     }
     Enums: {
-      [_ in never]: never
+      location_type: "main" | "work"
+      notification_action: "user" | "system" | "donor"
+      recurring_period: "once" | "weekly" | "monthly"
+      text_message_option: "unknown" | "opt_in" | "opt_out"
     }
     CompositeTypes: {
       [_ in never]: never
