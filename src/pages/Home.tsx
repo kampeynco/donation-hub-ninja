@@ -31,14 +31,14 @@ const Home = () => {
       {/* Hero Section */}
       <header className="bg-primary text-white">
         <div className="container mx-auto px-4 py-6 flex justify-between items-center">
-          <div className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2">
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#2563EB" />
               </svg>
             </div>
             <span className="text-xl font-semibold tracking-tight">DonorCamp</span>
-          </div>
+          </Link>
           <div className="flex gap-4">
             <Link to="/auth/signin">
               <Button variant="outline" className="bg-white text-primary hover:bg-gray-100">
@@ -130,14 +130,14 @@ const Home = () => {
       <footer className="bg-gray-900 text-white py-12">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center gap-2 mb-6 md:mb-0">
+            <Link to="/" className="flex items-center gap-2 mb-6 md:mb-0">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#2563EB" />
                 </svg>
               </div>
               <span className="text-xl font-semibold tracking-tight">DonorCamp</span>
-            </div>
+            </Link>
             <div className="text-gray-400 text-sm">
               © {new Date().getFullYear()} DonorCamp. All rights reserved.
             </div>

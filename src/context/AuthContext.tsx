@@ -72,12 +72,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signUp({ email, password });
+      const { error } = await supabase.auth.signUp({ 
+        email, 
+        password,
+        options: {
+          // Email verification is disabled in Supabase console
+          emailRedirectTo: window.location.origin + "/auth/signin"
+        }
+      });
+      
       if (error) throw error;
       
       toast({
         title: "Sign up successful",
-        description: "Please check your email to confirm your account",
+        description: "Your account has been created. You can now sign in.",
       });
       navigate("/auth/signin");
     } catch (error: any) {
