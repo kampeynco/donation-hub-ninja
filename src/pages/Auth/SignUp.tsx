@@ -2,17 +2,17 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { IconEye, IconEyeOff, IconCopy } from "@tabler/icons-react";
+import StepIndicator from "@/components/Auth/StepIndicator";
+import StepOne from "@/components/Auth/SignUpSteps/StepOne";
+import StepTwo from "@/components/Auth/SignUpSteps/StepTwo";
+import StepThree from "@/components/Auth/SignUpSteps/StepThree";
 
 const SignUp = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordError, setPasswordError] = useState("");
   const [currentStep, setCurrentStep] = useState(1);
 
@@ -26,8 +26,13 @@ const SignUp = () => {
   const [zip, setZip] = useState("");
   
   // API credentials (step 3)
-  const [showApiPassword, setShowApiPassword] = useState(false);
   const [apiPassword, setApiPassword] = useState("");
+
+  const steps = [
+    { number: 1, title: "Account" },
+    { number: 2, title: "Committee" },
+    { number: 3, title: "API Access" }
+  ];
 
   const {
     signUp
@@ -100,10 +105,6 @@ const SignUp = () => {
     }
   };
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-  };
-
   return (
     <div className="flex min-h-screen">
       {/* Left Column - Blue Background */}
@@ -142,258 +143,42 @@ const SignUp = () => {
             </p>
           </div>
           
-          <div className="flex items-center space-x-4 mb-6">
-            <div className={`flex items-center justify-center w-8 h-8 rounded-full ${currentStep === 1 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-500'} font-medium`}>
-              1
-            </div>
-            <span className={`font-medium ${currentStep === 1 ? 'text-gray-900' : 'text-gray-500'}`}>Account</span>
-            <div className={`flex items-center justify-center w-8 h-8 rounded-full ${currentStep === 2 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-500'} font-medium`}>
-              2
-            </div>
-            <span className={`font-medium ${currentStep === 2 ? 'text-gray-900' : 'text-gray-500'}`}>Committee</span>
-            <div className={`flex items-center justify-center w-8 h-8 rounded-full ${currentStep === 3 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-500'} font-medium`}>
-              3
-            </div>
-            <span className={`font-medium ${currentStep === 3 ? 'text-gray-900' : 'text-gray-500'}`}>API Access</span>
-          </div>
+          <StepIndicator currentStep={currentStep} steps={steps} />
           
           <form onSubmit={handleSubmit} className="space-y-6">
             {currentStep === 1 && (
-              <>
-                <div className="space-y-2">
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                    Email
-                  </label>
-                  <Input 
-                    id="email" 
-                    type="email" 
-                    value={email} 
-                    onChange={e => setEmail(e.target.value)} 
-                    placeholder="you@example.com" 
-                    required 
-                    className="w-full" 
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                    Password
-                  </label>
-                  <div className="relative">
-                    <Input 
-                      id="password" 
-                      type={showPassword ? "text" : "password"} 
-                      value={password} 
-                      onChange={e => setPassword(e.target.value)} 
-                      placeholder="••••••••••••" 
-                      required 
-                      className="w-full pr-10" 
-                    />
-                    <button 
-                      type="button" 
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500" 
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? <IconEyeOff size={20} /> : <IconEye size={20} />}
-                    </button>
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                    Confirm Password
-                  </label>
-                  <div className="relative">
-                    <Input 
-                      id="confirmPassword" 
-                      type={showConfirmPassword ? "text" : "password"} 
-                      value={confirmPassword} 
-                      onChange={e => setConfirmPassword(e.target.value)} 
-                      placeholder="••••••••••••" 
-                      required 
-                      className={`w-full pr-10 ${passwordError ? "border-red-500" : ""}`} 
-                    />
-                    <button 
-                      type="button" 
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500" 
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    >
-                      {showConfirmPassword ? <IconEyeOff size={20} /> : <IconEye size={20} />}
-                    </button>
-                  </div>
-                  {passwordError && <p className="text-red-500 text-sm">{passwordError}</p>}
-                </div>
-              </>
+              <StepOne 
+                email={email}
+                setEmail={setEmail}
+                password={password}
+                setPassword={setPassword}
+                confirmPassword={confirmPassword}
+                setConfirmPassword={setConfirmPassword}
+                passwordError={passwordError}
+              />
             )}
 
             {currentStep === 2 && (
-              <>
-                <div className="space-y-2">
-                  <label htmlFor="committeeName" className="block text-sm font-medium text-gray-700">
-                    Committee Name
-                  </label>
-                  <Input
-                    id="committeeName"
-                    type="text"
-                    value={committeeName}
-                    onChange={e => setCommitteeName(e.target.value)}
-                    placeholder="Your Committee Name"
-                    required
-                    className="w-full"
-                  />
-                </div>
-                {passwordError && <p className="text-red-500 text-sm">{passwordError}</p>}
-              </>
+              <StepTwo 
+                committeeName={committeeName}
+                setCommitteeName={setCommitteeName}
+                passwordError={passwordError}
+              />
             )}
 
             {currentStep === 3 && (
-              <>
-                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 mb-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">API Access Credentials</h3>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Use these credentials to access the DonorCamp API. Save these details as they won't be shown again.
-                  </p>
-
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <label htmlFor="endpoint" className="block text-sm font-medium text-gray-700">
-                        Endpoint URL
-                      </label>
-                      <div className="relative">
-                        <Input 
-                          id="endpoint" 
-                          type="text" 
-                          value="https://api.donorcamp.com/v1" 
-                          readOnly
-                          className="w-full pr-10" 
-                        />
-                        <button 
-                          type="button" 
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500" 
-                          onClick={() => copyToClipboard("https://api.donorcamp.com/v1")}
-                        >
-                          <IconCopy size={20} />
-                        </button>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-                        Username
-                      </label>
-                      <div className="relative">
-                        <Input 
-                          id="username" 
-                          type="text" 
-                          value={email} 
-                          readOnly
-                          className="w-full pr-10" 
-                        />
-                        <button 
-                          type="button" 
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500" 
-                          onClick={() => copyToClipboard(email)}
-                        >
-                          <IconCopy size={20} />
-                        </button>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <label htmlFor="apiPassword" className="block text-sm font-medium text-gray-700">
-                        Password
-                      </label>
-                      <div className="relative">
-                        <Input 
-                          id="apiPassword" 
-                          type={showApiPassword ? "text" : "password"} 
-                          value={apiPassword} 
-                          readOnly
-                          className="w-full pr-16" 
-                        />
-                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex">
-                          <button 
-                            type="button" 
-                            className="text-gray-500 mr-2" 
-                            onClick={() => setShowApiPassword(!showApiPassword)}
-                          >
-                            {showApiPassword ? <IconEyeOff size={20} /> : <IconEye size={20} />}
-                          </button>
-                          <button 
-                            type="button" 
-                            className="text-gray-500" 
-                            onClick={() => copyToClipboard(apiPassword)}
-                          >
-                            <IconCopy size={20} />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label htmlFor="street" className="block text-sm font-medium text-gray-700">
-                    Street Address
-                  </label>
-                  <Input
-                    id="street"
-                    type="text"
-                    value={street}
-                    onChange={e => setStreet(e.target.value)}
-                    placeholder="123 Main St"
-                    required
-                    className="w-full"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <label htmlFor="city" className="block text-sm font-medium text-gray-700">
-                    City
-                  </label>
-                  <Input
-                    id="city"
-                    type="text"
-                    value={city}
-                    onChange={e => setCity(e.target.value)}
-                    placeholder="Your City"
-                    required
-                    className="w-full"
-                  />
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label htmlFor="state" className="block text-sm font-medium text-gray-700">
-                      State
-                    </label>
-                    <Input
-                      id="state"
-                      type="text"
-                      value={state}
-                      onChange={e => setState(e.target.value)}
-                      placeholder="State"
-                      required
-                      className="w-full"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label htmlFor="zip" className="block text-sm font-medium text-gray-700">
-                      ZIP Code
-                    </label>
-                    <Input
-                      id="zip"
-                      type="text"
-                      value={zip}
-                      onChange={e => setZip(e.target.value)}
-                      placeholder="12345"
-                      required
-                      className="w-full"
-                    />
-                  </div>
-                </div>
-              </>
+              <StepThree 
+                email={email}
+                apiPassword={apiPassword}
+                street={street}
+                setStreet={setStreet}
+                city={city}
+                setCity={setCity}
+                state={state}
+                setState={setState}
+                zip={zip}
+                setZip={setZip}
+              />
             )}
             
             <div className="flex justify-between">
