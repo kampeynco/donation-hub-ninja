@@ -280,6 +280,104 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          committee_name: string
+          created_at: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          committee_name: string
+          created_at?: string
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          committee_name?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      webhook_events: {
+        Row: {
+          created_at: string
+          error: string | null
+          event_type: string
+          id: string
+          payload: Json
+          processed: boolean
+          processed_at: string | null
+          webhook_id: string
+        }
+        Insert: {
+          created_at?: string
+          error?: string | null
+          event_type: string
+          id?: string
+          payload: Json
+          processed?: boolean
+          processed_at?: string | null
+          webhook_id: string
+        }
+        Update: {
+          created_at?: string
+          error?: string | null
+          event_type?: string
+          id?: string
+          payload?: Json
+          processed?: boolean
+          processed_at?: string | null
+          webhook_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webhook_events_webhook_id_fkey"
+            columns: ["webhook_id"]
+            isOneToOne: false
+            referencedRelation: "webhooks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      webhooks: {
+        Row: {
+          api_password: string
+          api_username: string
+          created_at: string
+          endpoint_url: string
+          id: string
+          is_active: boolean
+          last_used_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          api_password: string
+          api_username: string
+          created_at?: string
+          endpoint_url?: string
+          id?: string
+          is_active?: boolean
+          last_used_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          api_password?: string
+          api_username?: string
+          created_at?: string
+          endpoint_url?: string
+          id?: string
+          is_active?: boolean
+          last_used_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

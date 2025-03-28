@@ -14,18 +14,41 @@ const SignUp = () => {
   const handleSignUp = async (data: SignUpData) => {
     try {
       // Step 1: Create the user account
-      await signUp(data.email, data.password);
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+      });
       
-      // Step 2: Create webhook credentials
-      // In a real implementation, you would store this in the database
-      // using a Supabase edge function or directly with the Supabase client
-      // after the user is authenticated
+      if (authError) throw authError;
+      if (!authData.user) throw new Error("Failed to create user account");
+      
+      // Step 2: Update profile with committee name
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({ committee_name: data.committeeName })
+        .eq('id', authData.user.id);
+      
+      if (profileError) throw profileError;
+      
+      // Step 3: Create webhook credentials
+      const { error: webhookError } = await supabase
+        .from('webhooks')
+        .insert({
+          user_id: authData.user.id,
+          api_username: data.email,
+          api_password: data.apiPassword
+        });
+      
+      if (webhookError) throw webhookError;
       
       toast({
         title: "Account created successfully",
         description: "You can now sign in with your credentials. Your webhook details have been saved.",
         duration: 5000,
       });
+      
+      // Sign out the automatically signed in user (Supabase behavior)
+      await supabase.auth.signOut();
       
       // Navigate to sign in page
       navigate("/auth/signin");
