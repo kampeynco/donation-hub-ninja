@@ -55,11 +55,13 @@ export const useSignUpFlow = ({ onSubmit }: UseSignUpFlowProps) => {
 
   const handleNext = () => {
     if (currentStep === 1) {
-      if (!validatePassword()) return;
-      if (!email) {
+      if (!email.trim()) {
         setError("Email is required");
         return;
       }
+      
+      if (!validatePassword()) return;
+      
       setCurrentStep(2);
       setError(""); // Clear errors when moving to next step
     } else if (currentStep === 2) {
@@ -82,12 +84,28 @@ export const useSignUpFlow = ({ onSubmit }: UseSignUpFlowProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // For step 1, validate email and password
+    if (currentStep === 1) {
+      if (!email.trim()) {
+        setError("Email is required");
+        return;
+      }
+      
+      if (!validatePassword()) return;
+      
+      handleNext();
+      return;
+    }
+    
     // For step 2, validate committee name before proceeding
     if (currentStep === 2) {
       if (!committeeName || committeeName.trim() === "") {
         setError("Committee name is required");
         return;
       }
+      
+      handleNext();
+      return;
     }
     
     if (currentStep === 3) {
@@ -101,7 +119,7 @@ export const useSignUpFlow = ({ onSubmit }: UseSignUpFlowProps) => {
           apiPassword
         });
       } catch (error: any) {
-        console.error("Sign up error:", error);
+        console.error("Sign up error in flow:", error);
         setError(error.message || "An error occurred during sign up");
       } finally {
         setIsLoading(false);

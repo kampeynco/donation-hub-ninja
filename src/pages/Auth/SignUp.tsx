@@ -14,14 +14,29 @@ const SignUp = () => {
 
   const handleSignUp = async (data: SignUpData) => {
     try {
+      console.log("Starting signup process with data:", {
+        email: data.email,
+        committeeName: data.committeeName,
+        // Omitting password for security
+      });
+
       // Step 1: Create the user account
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
       });
       
-      if (authError) throw authError;
-      if (!authData.user) throw new Error("Failed to create user account");
+      if (authError) {
+        console.error("Auth error during signup:", authError);
+        throw authError;
+      }
+      
+      if (!authData.user) {
+        console.error("No user returned from auth signup");
+        throw new Error("Failed to create user account");
+      }
+      
+      console.log("User created successfully:", authData.user.id);
       
       // Step 2: Update profile with committee name
       const { error: profileError } = await supabase
@@ -29,7 +44,12 @@ const SignUp = () => {
         .update({ committee_name: data.committeeName })
         .eq('id', authData.user.id);
       
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error("Profile update error:", profileError);
+        throw profileError;
+      }
+      
+      console.log("Profile updated with committee name");
       
       // Step 3: Create webhook credentials
       const { error: webhookError } = await supabase
@@ -41,14 +61,25 @@ const SignUp = () => {
           hookdeck_destination_url: "https://igjnhwvtasegwyiwcdkr.supabase.co/functions/v1/handle-webhook"
         });
       
-      if (webhookError) throw webhookError;
+      if (webhookError) {
+        console.error("Webhook creation error:", webhookError);
+        throw webhookError;
+      }
+      
+      console.log("Webhook credentials created");
       
       // Step 4: Create Hookdeck webhook
-      await createHookdeckWebhook(authData.user.id, data.email);
+      try {
+        const hookdeckUrl = await createHookdeckWebhook(authData.user.id, data.email);
+        console.log("Hookdeck webhook created:", hookdeckUrl);
+      } catch (hookdeckError) {
+        console.error("Hookdeck webhook creation error:", hookdeckError);
+        // Continue even if Hookdeck creation fails, as the user account is already created
+      }
       
       toast({
         title: "Account created successfully",
-        description: "You can now sign in with your credentials. Your webhook details have been saved.",
+        description: "You can now sign in with your credentials.",
         duration: 5000,
       });
       
