@@ -4,7 +4,6 @@ import { useAuth } from "@/context/AuthContext";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { IconEye, IconEyeOff } from "@tabler/icons-react";
-
 const SignUp = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -13,30 +12,25 @@ const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordError, setPasswordError] = useState("");
-  const { signUp } = useAuth();
-
+  const {
+    signUp
+  } = useAuth();
   const validatePassword = () => {
     if (password !== confirmPassword) {
       setPasswordError("Passwords don't match");
       return false;
     }
-    
     if (password.length < 6) {
       setPasswordError("Password must be at least 6 characters");
       return false;
     }
-    
     setPasswordError("");
     return true;
   };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!validatePassword()) return;
-    
     setIsLoading(true);
-    
     try {
       await signUp(email, password);
     } catch (error) {
@@ -45,9 +39,7 @@ const SignUp = () => {
       setIsLoading(false);
     }
   };
-
-  return (
-    <div className="flex min-h-screen">
+  return <div className="flex min-h-screen">
       {/* Left Column - Blue Background */}
       <div className="hidden md:flex md:w-1/2 bg-primary flex-col items-center justify-center text-white p-10">
         <div className="max-w-md">
@@ -61,9 +53,7 @@ const SignUp = () => {
           </Link>
           
           <h1 className="text-4xl font-bold mb-6">Create an account</h1>
-          <p className="text-lg mb-10">
-            Join DonorCamp to centralize your donor database, track contributions, build deeper relationships with supporters, and streamline your thank you note process for more effective fundraising.
-          </p>
+          <p className="text-lg mb-10">Join DonorCamp to track donor activity and build deeper relationships with donors.</p>
           
           <div className="mt-10">
             <p>
@@ -106,15 +96,7 @@ const SignUp = () => {
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                 Email
               </label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                required
-                className="w-full"
-              />
+              <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" required className="w-full" />
             </div>
             
             <div className="space-y-2">
@@ -122,25 +104,9 @@ const SignUp = () => {
                 Password
               </label>
               <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••••••"
-                  required
-                  className="w-full pr-10"
-                />
-                <button
-                  type="button"
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <IconEyeOff size={20} />
-                  ) : (
-                    <IconEye size={20} />
-                  )}
+                <Input id="password" type={showPassword ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••••••" required className="w-full pr-10" />
+                <button type="button" className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500" onClick={() => setShowPassword(!showPassword)}>
+                  {showPassword ? <IconEyeOff size={20} /> : <IconEye size={20} />}
                 </button>
               </div>
             </div>
@@ -150,30 +116,12 @@ const SignUp = () => {
                 Confirm Password
               </label>
               <div className="relative">
-                <Input
-                  id="confirmPassword"
-                  type={showConfirmPassword ? "text" : "password"}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="••••••••••••"
-                  required
-                  className={`w-full pr-10 ${passwordError ? "border-red-500" : ""}`}
-                />
-                <button
-                  type="button"
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                >
-                  {showConfirmPassword ? (
-                    <IconEyeOff size={20} />
-                  ) : (
-                    <IconEye size={20} />
-                  )}
+                <Input id="confirmPassword" type={showConfirmPassword ? "text" : "password"} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="••••••••••••" required className={`w-full pr-10 ${passwordError ? "border-red-500" : ""}`} />
+                <button type="button" className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+                  {showConfirmPassword ? <IconEyeOff size={20} /> : <IconEye size={20} />}
                 </button>
               </div>
-              {passwordError && (
-                <p className="text-red-500 text-sm">{passwordError}</p>
-              )}
+              {passwordError && <p className="text-red-500 text-sm">{passwordError}</p>}
             </div>
             
             <Button type="submit" className="w-full" disabled={isLoading}>
@@ -191,8 +139,6 @@ const SignUp = () => {
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default SignUp;
