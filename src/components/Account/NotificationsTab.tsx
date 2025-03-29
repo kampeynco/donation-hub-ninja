@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -61,7 +62,7 @@ const NotificationsTab: React.FC = () => {
             
             <NotificationSection 
               title="ActBlue Notifications" 
-              showHeaders={true}
+              showHeaders={false}
             >
               <NotificationRow
                 id="donations"
