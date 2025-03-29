@@ -1,4 +1,3 @@
-
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.29.0";
 import { ActBlueContribution, ActBlueDonor, ActBlueLineItem } from "../types.ts";
 import { errorResponses } from "../error-handler.ts";
@@ -6,7 +5,7 @@ import { ProcessResult } from "./types.ts";
 
 // Import refactored modules
 import { extractDonationData, createDonation, processCustomFields, processMerchandise } from "./donation/index.ts";
-import { extractDonorData, findOrCreateDonor, addDonorLocation, addEmployerData } from "./donor.ts";
+import { extractDonorData, findOrCreateDonor, addDonorLocation, addEmployerData } from "./donor/index.ts";
 import { updateWebhookTimestamp } from "./webhook.ts";
 import { createSuccessResponse } from "./response.ts";
 import { sendDonationNotification } from "./notification.ts";
@@ -149,4 +148,3 @@ export async function processDonation(
     };
   }
 }
-
