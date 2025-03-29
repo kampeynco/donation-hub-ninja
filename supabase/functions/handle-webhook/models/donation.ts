@@ -53,8 +53,10 @@ export async function createDonation(
   donorId: string | null,
   requestId: string,
   timestamp: string
-): ProcessResult<{donationId: string, donationData: any}>> {
+): Promise<ProcessResult<{donationId: string, donationData: any}>> {
   try {
+    console.log(`[${requestId}] Attempting to insert donation with data:`, JSON.stringify(donationData));
+    
     const { data: newDonation, error: donationError } = await supabase
       .from("donations")
       .insert({

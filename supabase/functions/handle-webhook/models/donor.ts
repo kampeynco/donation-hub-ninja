@@ -61,6 +61,8 @@ export async function findOrCreateDonor(
     if (existingEmail?.donor_id) {
       // Update existing donor
       donorId = existingEmail.donor_id;
+      console.log(`[${requestId}] Found existing donor with ID ${donorId}, updating donor data`);
+      
       const { error: donorUpdateError } = await supabase
         .from("donors")
         .update(donorData)
@@ -80,6 +82,8 @@ export async function findOrCreateDonor(
       logDbOperation("Updated existing donor", donorId, requestId);
     } else {
       // Create new donor
+      console.log(`[${requestId}] No existing donor found for email ${donor.email}, creating new donor`);
+      
       const { data: newDonor, error: donorError } = await supabase
         .from("donors")
         .insert(donorData)
@@ -152,6 +156,8 @@ export async function addDonorLocation(
   }
 
   try {
+    console.log(`[${requestId}] Adding location data for donor ${donorId}`);
+    
     const { data: newLocation, error: locationError } = await supabase
       .from("locations")
       .insert({

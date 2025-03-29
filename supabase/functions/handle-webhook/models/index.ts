@@ -21,9 +21,12 @@ export async function processDonation(
   timestamp: string
 ): Promise<ProcessResult> {
   try {
+    console.log(`[${requestId}] Starting donation processing with contribution ID: ${contribution.orderNumber}`);
+    
     // Extract donation data
     const extractedDonation = extractDonationData(contribution, lineitems, requestId);
     if (!extractedDonation.success) {
+      console.error(`[${requestId}] Failed to extract donation data:`, extractedDonation.error);
       return { success: false, error: extractedDonation.error };
     }
     
@@ -35,70 +38,62 @@ export async function processDonation(
     console.log(`[${requestId}] Processed donor data:`, JSON.stringify(donorData));
 
     // Find or create donor
+    let donorId = null;
+    let locationId = null;
+    
     if (donor?.email) {
+      console.log(`[${requestId}] Processing donor with email: ${donor.email}`);
       const donorResult = await findOrCreateDonor(supabase, donor, donorData, requestId, timestamp);
       if (!donorResult.success) {
+        console.error(`[${requestId}] Failed to process donor:`, donorResult.error);
         return { success: false, error: donorResult.error };
       }
       
-      const { donorId } = donorResult.data;
-      
-      // Create donation record
-      const donationResult = await createDonation(supabase, donationData, donorId, requestId, timestamp);
-      if (!donationResult.success) {
-        return { success: false, error: donationResult.error };
-      }
-      
-      const { donationId } = donationResult.data;
+      donorId = donorResult.data.donorId;
       
       // Add location if provided
-      const locationResult = await addDonorLocation(supabase, donor, donorId, requestId);
-      const { locationId } = locationResult;
-      
-      // Update webhook timestamp (non-critical)
-      await updateWebhookTimestamp(supabase, timestamp, requestId);
-      
-      // Create success response
-      const successResponse = createSuccessResponse(
-        donationId, 
-        donationData, 
-        donorId, 
-        donorData, 
-        donor, 
-        locationId, 
-        requestId, 
-        timestamp
-      );
-      
-      return { success: true, data: successResponse, error: null };
-    } else {
-      // Handle anonymous donation (no email)
-      const donationResult = await createDonation(supabase, donationData, null, requestId, timestamp);
-      if (!donationResult.success) {
-        return { success: false, error: donationResult.error };
+      if (donorId) {
+        const locationResult = await addDonorLocation(supabase, donor, donorId, requestId);
+        locationId = locationResult.locationId;
       }
-      
-      const { donationId } = donationResult.data;
-      
-      // Update webhook timestamp (non-critical)
-      await updateWebhookTimestamp(supabase, timestamp, requestId);
-      
-      // Create success response for anonymous donation
-      const successResponse = createSuccessResponse(
-        donationId, 
-        donationData, 
-        null, 
-        null, 
-        undefined, 
-        null, 
-        requestId, 
-        timestamp
-      );
-      
-      return { success: true, data: successResponse, error: null };
+    } else {
+      console.log(`[${requestId}] Processing anonymous donation (no email provided)`);
     }
+    
+    // Create donation record
+    const donationResult = await createDonation(supabase, donationData, donorId, requestId, timestamp);
+    if (!donationResult.success) {
+      console.error(`[${requestId}] Failed to create donation:`, donationResult.error);
+      return { success: false, error: donationResult.error };
+    }
+    
+    const { donationId, donationData: savedDonation } = donationResult.data;
+    console.log(`[${requestId}] Successfully created donation with ID: ${donationId}`);
+    
+    // Update webhook timestamp (non-critical)
+    try {
+      await updateWebhookTimestamp(supabase, timestamp, requestId);
+    } catch (e) {
+      console.error(`[${requestId}] Non-critical error updating webhook timestamp:`, e);
+      // Continue processing, this is non-critical
+    }
+    
+    // Create success response
+    const successResponse = createSuccessResponse(
+      donationId, 
+      savedDonation, 
+      donorId, 
+      donorData, 
+      donor, 
+      locationId, 
+      requestId, 
+      timestamp
+    );
+    
+    console.log(`[${requestId}] Webhook processing completed successfully`);
+    return { success: true, data: successResponse };
   } catch (error) {
-    console.error(`[${requestId}] Unexpected database error:`, error);
+    console.error(`[${requestId}] Unexpected error in processDonation:`, error);
     return { 
       success: false, 
       error: errorResponses.databaseError(

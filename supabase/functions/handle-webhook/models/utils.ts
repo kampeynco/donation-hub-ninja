@@ -19,12 +19,14 @@ export function handleDatabaseError(
   timestamp: string,
   errorResponseFn: Function
 ) {
-  console.error(`[${requestId}] Database error ${operation} ${entityType}:`, error);
+  const errorMessage = typeof error === 'object' ? JSON.stringify(error) : error.toString();
+  console.error(`[${requestId}] Database error ${operation} ${entityType}:`, errorMessage);
+  
   return { 
     success: false, 
     error: errorResponseFn(
       `Error ${operation} ${entityType}`,
-      error.message,
+      error.message || errorMessage,
       requestId,
       timestamp
     )
