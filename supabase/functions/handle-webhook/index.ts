@@ -28,52 +28,105 @@ serve(async (req) => {
     
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Extract Hookdeck headers
-    const sourceId = req.headers.get("hookdeck-source-id");
-    const hookdeckSignature = req.headers.get("hookdeck-signature");
+    // Parse the request body (ActBlue payload)
+    const payload = await req.json();
+    console.log("Received ActBlue webhook payload:", JSON.stringify(payload));
+
+    // Process ActBlue payload
+    // The shape of the payload will depend on ActBlue's webhook format
+    if (!payload || !payload.contribution) {
+      throw new Error("Invalid ActBlue payload format");
+    }
+
+    const { contribution } = payload;
     
-    // Validate the request came from Hookdeck
-    if (!sourceId || !hookdeckSignature) {
-      console.error("Missing Hookdeck headers", { sourceId, hookdeckSignature });
-      return new Response(JSON.stringify({ error: "Unauthorized: Invalid Hookdeck request" }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 401,
-      });
+    // Extract relevant data from the contribution
+    const donationData = {
+      amount: parseFloat(contribution.amount) || 0,
+      paid_at: new Date(contribution.orderDate).toISOString(),
+      is_mobile: contribution.mobileDevice || false,
+      recurring_period: contribution.recurringFrequency === 'monthly' ? 'monthly' : 
+                        contribution.recurringFrequency === 'weekly' ? 'weekly' : 'once',
+      express_signup: contribution.expressSignup || false,
+      is_express: contribution.express || false,
+    };
+
+    // Extract donor information
+    const donorData = {
+      first_name: contribution.donor?.firstName || null,
+      last_name: contribution.donor?.lastName || null,
+      is_express: contribution.express || false,
+      is_mobile: contribution.mobileDevice || false,
+    };
+
+    // Create or update donor
+    let donorId;
+    if (contribution.donor?.email) {
+      // Try to find existing donor by email
+      const { data: existingEmail } = await supabase
+        .from("emails")
+        .select("donor_id, email")
+        .eq("email", contribution.donor.email)
+        .maybeSingle();
+
+      if (existingEmail?.donor_id) {
+        // Update existing donor
+        donorId = existingEmail.donor_id;
+        await supabase
+          .from("donors")
+          .update(donorData)
+          .eq("id", donorId);
+      } else {
+        // Create new donor
+        const { data: newDonor, error: donorError } = await supabase
+          .from("donors")
+          .insert(donorData)
+          .select()
+          .single();
+
+        if (donorError) {
+          console.error("Error creating donor:", donorError);
+          throw donorError;
+        }
+
+        donorId = newDonor.id;
+
+        // Create email record
+        await supabase
+          .from("emails")
+          .insert({
+            email: contribution.donor.email,
+            donor_id: donorId,
+          });
+      }
+
+      // Create donation record
+      await supabase
+        .from("donations")
+        .insert({
+          ...donationData,
+          donor_id: donorId,
+        });
+    } else {
+      // Handle anonymous donation (no email)
+      await supabase
+        .from("donations")
+        .insert({
+          ...donationData,
+          donor_id: null,
+        });
     }
 
-    console.log("Received webhook from Hookdeck source:", sourceId);
-
-    // Find the webhook by Hookdeck source ID
-    const { data: webhook, error: webhookError } = await supabase
-      .from("webhooks")
-      .select("*")
-      .eq("hookdeck_source_id", sourceId)
-      .eq("is_active", true)
-      .single();
-
-    if (webhookError || !webhook) {
-      console.error("Error finding webhook for source:", sourceId, webhookError);
-      return new Response(JSON.stringify({ error: "Invalid source ID or webhook not found" }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 401,
-      });
-    }
-
-    // Parse the request body
-    const requestBody = await req.json();
-    console.log("Received ActBlue webhook payload:", JSON.stringify(requestBody));
-
-    // TODO: Process donation data and store in database
-    // This would be expanded to handle ActBlue donation events
-
-    // Update last_used_at timestamp
+    // Update webhook last_used_at timestamp
+    // Since we don't require specific webhook identification anymore,
+    // let's update all active webhooks (typically there would be just one)
     await supabase
       .from("webhooks")
       .update({ last_used_at: new Date().toISOString() })
-      .eq("id", webhook.id);
+      .eq("is_active", true);
 
     // Return success response
-    return new Response(JSON.stringify({ success: true }), {
+    return new Response(JSON.stringify({ success: true, message: "Donation processed successfully" }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
