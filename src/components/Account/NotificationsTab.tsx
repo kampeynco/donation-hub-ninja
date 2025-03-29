@@ -3,6 +3,7 @@ import { Card, CardHeader, CardContent, CardTitle, CardDescription } from "@/com
 import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const NotificationsTab = () => {
   return (
@@ -14,73 +15,91 @@ const NotificationsTab = () => {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="space-y-4">
-          <h3 className="font-medium">Email Notifications</h3>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label htmlFor="email-donations">Donation Received</Label>
-                <p className="text-sm text-muted-foreground">
-                  Receive an email when a new donation is made
-                </p>
-              </div>
-              <input type="checkbox" id="email-donations" defaultChecked />
+        <div>
+          <h3 className="font-medium mb-4">Account</h3>
+          <div className="space-y-4">
+            <div className="grid grid-cols-[1fr_100px_100px] items-center">
+              <div className="col-span-1"></div>
+              <div className="text-sm font-medium text-center">Email</div>
+              <div className="text-sm font-medium text-center">Text</div>
             </div>
             
-            <Separator />
-            
-            <div className="flex items-center justify-between">
+            <div className="grid grid-cols-[1fr_100px_100px] items-center">
               <div className="space-y-0.5">
-                <Label htmlFor="email-marketing">Marketing Updates</Label>
+                <Label>Marketing Updates</Label>
                 <p className="text-sm text-muted-foreground">
                   Receive tips and updates about DonorCamp features
                 </p>
               </div>
-              <input type="checkbox" id="email-marketing" defaultChecked />
+              <div className="flex justify-center">
+                <Checkbox id="email-marketing" defaultChecked />
+              </div>
+              <div className="flex justify-center">
+                <Checkbox id="text-marketing" />
+              </div>
             </div>
             
-            <Separator />
-            
-            <div className="flex items-center justify-between">
+            <div className="grid grid-cols-[1fr_100px_100px] items-center">
               <div className="space-y-0.5">
-                <Label htmlFor="email-reports">Weekly Reports</Label>
+                <Label>Weekly Reports</Label>
                 <p className="text-sm text-muted-foreground">
-                  Receive a weekly summary of your donations and platform activity
+                  Receive a weekly summary of your account activity
                 </p>
               </div>
-              <input type="checkbox" id="email-reports" defaultChecked />
-            </div>
-          </div>
-          
-          <div className="space-y-4 mt-6">
-            <h3 className="font-medium">Push Notifications</h3>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="push-all">All Activities</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Receive push notifications for all account activities
-                  </p>
-                </div>
-                <input type="checkbox" id="push-all" defaultChecked />
+              <div className="flex justify-center">
+                <Checkbox id="email-reports" defaultChecked />
               </div>
-              
-              <Separator />
-              
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="push-mentioned">Mentions</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Only when you're mentioned in comments
-                  </p>
-                </div>
-                <input type="checkbox" id="push-mentioned" />
+              <div className="flex justify-center">
+                <Checkbox id="text-reports" />
               </div>
             </div>
           </div>
         </div>
         
-        <div className="flex justify-end">
+        <Separator className="my-4" />
+        
+        <div>
+          <h3 className="font-medium mb-4">Donor</h3>
+          <div className="space-y-4">
+            <div className="grid grid-cols-[1fr_100px_100px] items-center">
+              <div className="col-span-1"></div>
+              <div className="text-sm font-medium text-center">Email</div>
+              <div className="text-sm font-medium text-center">Text</div>
+            </div>
+            
+            <div className="grid grid-cols-[1fr_100px_100px] items-center">
+              <div className="space-y-0.5">
+                <Label>Donation Received</Label>
+                <p className="text-sm text-muted-foreground">
+                  Receive a notification when a new donation is made
+                </p>
+              </div>
+              <div className="flex justify-center">
+                <Checkbox id="email-donations" defaultChecked />
+              </div>
+              <div className="flex justify-center">
+                <Checkbox id="text-donations" />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-[1fr_100px_100px] items-center">
+              <div className="space-y-0.5">
+                <Label>Recurring Donations</Label>
+                <p className="text-sm text-muted-foreground">
+                  Receive a notification when recurring donations are processed
+                </p>
+              </div>
+              <div className="flex justify-center">
+                <Checkbox id="email-recurring" defaultChecked />
+              </div>
+              <div className="flex justify-center">
+                <Checkbox id="text-recurring" />
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div className="flex justify-end mt-6">
           <Button>Save Preferences</Button>
         </div>
       </CardContent>
