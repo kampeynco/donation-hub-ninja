@@ -18,7 +18,7 @@ const NotFound = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="text-center">
         <div className="mx-auto mb-6 bg-[#007AFF] text-white p-3 rounded-full w-16 h-16 flex items-center justify-center">
-          <IconStarFilled size={24} color="white" />
+          <IconStarFilled size={16} color="white" />
         </div>
         <h1 className="text-6xl font-bold text-primary mb-4">404</h1>
         <p className="text-xl text-gray-600 mb-6">Oops! We couldn't find that page</p>

@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -30,7 +31,7 @@ const Home = () => {
         <div className="container mx-auto px-4 py-6 flex justify-between items-center">
           <Link to="/" className="flex items-center gap-2">
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white">
-              <IconStarFilled size={24} color="#007AFF" />
+              <IconStarFilled size={16} color="#007AFF" />
             </div>
             <span className="text-xl font-semibold tracking-tight">Donor Camp</span>
           </Link>
@@ -124,7 +125,7 @@ const Home = () => {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <Link to="/" className="flex items-center gap-2 mb-6 md:mb-0">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white">
-                <IconStarFilled size={24} color="#007AFF" />
+                <IconStarFilled size={16} color="#007AFF" />
               </div>
               <span className="text-xl font-semibold tracking-tight">Donor Camp</span>
             </Link>

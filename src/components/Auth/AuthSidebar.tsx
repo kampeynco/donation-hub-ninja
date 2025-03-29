@@ -20,7 +20,7 @@ const AuthSidebar: React.FC<AuthSidebarProps> = ({
       <div className="max-w-md">
         <Link to="/" className="flex items-center gap-2 mb-10">
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white">
-            <IconStarFilled size={24} color="#007AFF" />
+            <IconStarFilled size={16} color="#007AFF" />
           </div>
           <span className="text-xl font-semibold tracking-tight">Donor Camp</span>
         </Link>
