@@ -1,34 +1,68 @@
 
-export interface ActBlueContribution {
-  contributionId: string;
-  orderDate: string;
-  amount: string;
-  donor?: {
-    firstName?: string;
-    lastName?: string;
-    email?: string;
-    phone?: string;
-    occupation?: string;
+export interface ActBlueDonor {
+  firstname?: string;
+  lastname?: string;
+  addr1?: string;
+  city?: string;
+  state?: string;
+  zip?: string;
+  country?: string;
+  email?: string;
+  phone?: string;
+  isEligibleForExpressLane?: boolean;
+  employerData?: {
     employer?: string;
-    address?: {
-      street1?: string;
-      street2?: string;
-      city?: string;
-      state?: string;
-      zip?: string;
-      country?: string;
-    };
+    occupation?: string;
+    employerAddr1?: string;
+    employerCity?: string;
+    employerState?: string;
+    employerCountry?: string;
   };
-  recurringFrequency?: 'weekly' | 'monthly' | null;
+}
+
+export interface ActBlueContribution {
+  createdAt: string;
+  orderNumber: string;
+  contributionForm: string;
+  refcodes?: Record<string, string>;
+  refcode?: string | null;
+  refcode2?: string | null;
+  creditCardExpiration?: string;
+  recurringPeriod?: string;
   recurringDuration?: number;
-  expressSignup?: boolean;
-  express?: boolean;
-  mobileDevice?: boolean;
-  paymentType?: string;
+  isRecurring: boolean;
+  isPaypal: boolean;
+  isMobile: boolean;
+  isExpress: boolean;
+  withExpressLane: boolean;
+  expressSignup: boolean;
+  textMessageOption?: string;
+  status: string;
+  paidAt?: string;
+  amount?: string;
+}
+
+export interface ActBlueLineItem {
+  sequence: number;
+  entityId: number;
+  fecId: string;
+  committeeName: string;
+  amount: string;
+  recurringAmount: string | null;
+  paidAt: string;
+  paymentId: number;
+  lineitemId: number;
 }
 
 export interface ActBlueWebhookPayload {
+  donor?: ActBlueDonor;
   contribution: ActBlueContribution;
-  eventType: string;
-  timestamp: string;
+  lineitems?: ActBlueLineItem[];
+  form?: {
+    name: string;
+    kind: string;
+    ownerEmail: string;
+    managingEntityName: string | null;
+    managingEntityCommitteeName: string | null;
+  };
 }
