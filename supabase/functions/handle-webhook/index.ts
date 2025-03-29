@@ -53,7 +53,7 @@ serve(async (req) => {
 
     // Authentication check (using basic auth headers when present)
     const authHeader = req.headers.get("authorization");
-    const authResult = await validateWebhookAuth(authHeader, supabase, requestId, timestamp);
+    const authResult = await validateWebhookAuth(authHeader, supabase, requestId, timestamp, req.headers);
     
     if (!authResult.success && authResult.error) {
       return createErrorHttpResponse(authResult.error, corsHeaders, authResult.error.code);

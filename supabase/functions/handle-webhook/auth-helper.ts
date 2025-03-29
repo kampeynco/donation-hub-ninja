@@ -10,8 +10,13 @@ export async function validateWebhookAuth(
   authHeader: string | null,
   supabase: ReturnType<typeof createClient>,
   requestId: string,
-  timestamp: string
+  timestamp: string,
+  headers: Headers
 ) {
+  // Extract the Hookdeck source name from headers (contains the user ID)
+  const sourceNameHeader = headers.get("x-hookdeck-source-name");
+  console.log(`[${requestId}] Extracted source name header: ${sourceNameHeader}`);
+  
   // No auth header provided
   if (!authHeader || !authHeader.startsWith("Basic ")) {
     return { 
@@ -25,12 +30,16 @@ export async function validateWebhookAuth(
     const decodedCredentials = atob(encodedCredentials);
     const [username, password] = decodedCredentials.split(":");
     
+    let query = supabase.from("webhooks").select("*").eq("is_active", true);
+    
+    // If source name is provided, use it to find the specific webhook
+    if (sourceNameHeader) {
+      query = query.eq("user_id", sourceNameHeader);
+      console.log(`[${requestId}] Finding webhook by user_id: ${sourceNameHeader}`);
+    }
+    
     // Fetch webhook from database to verify credentials
-    const { data: webhook, error: webhookError } = await supabase
-      .from("webhooks")
-      .select("*")
-      .eq("is_active", true)
-      .maybeSingle();
+    const { data: webhook, error: webhookError } = await query.maybeSingle();
     
     if (webhookError) {
       console.error(`[${requestId}] Database error while fetching webhook:`, webhookError);
@@ -46,7 +55,7 @@ export async function validateWebhookAuth(
     }
     
     if (!webhook) {
-      console.error(`[${requestId}] No active webhook configuration found`);
+      console.error(`[${requestId}] No active webhook configuration found for source: ${sourceNameHeader || 'any'}`);
       return { 
         success: false, 
         error: errorResponses.notFoundError(
@@ -72,7 +81,7 @@ export async function validateWebhookAuth(
       };
     }
     
-    console.log(`[${requestId}] Authentication successful`);
+    console.log(`[${requestId}] Authentication successful for webhook: ${webhook.id}`);
     return { success: true, webhook, error: null };
   } catch (error) {
     console.error(`[${requestId}] Error during authentication:`, error);
