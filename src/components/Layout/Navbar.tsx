@@ -38,7 +38,7 @@ const Navbar = () => {
           {/* Logo and Brand */}
           <Link to="/" className="flex items-center space-x-2 font-bold text-xl">
             <div className="bg-[#007AFF] text-white p-2 rounded-full w-10 h-10 flex items-center justify-center">
-              <IconStar size={24} />
+              <IconStar size={24} stroke={2} color="white" />
             </div>
             <span>Donor Camp</span>
           </Link>
