@@ -1,7 +1,7 @@
 
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.29.0";
-import { ActBlueWebhookPayload } from "../../../src/types/actblue.ts";
+import { ActBlueWebhookPayload } from "./types.ts";
 
 // CORS headers for cross-origin requests
 const corsHeaders = {
