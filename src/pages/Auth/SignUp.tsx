@@ -17,13 +17,19 @@ const SignUp = () => {
         committeeName: data.committeeName,
       });
 
-      // Step 1: Create user account
+      // Step 1: Create user account with committee name
       if (data.currentStep === 1) {
-        console.log("Step 1: Creating user account");
+        console.log("Step 1: Creating user account and setting committee name");
         
+        // Create the user in Auth
         const { data: authData, error: authError } = await supabase.auth.signUp({
           email: data.email,
-          password: data.password
+          password: data.password,
+          options: {
+            data: {
+              committee_name: data.committeeName
+            }
+          }
         });
         
         if (authError) {
@@ -38,26 +44,11 @@ const SignUp = () => {
         
         console.log("User created successfully:", authData.user.id);
         
-        // Generate API password for webhook
-        return;
-      }
-      
-      // Step 2: Update profile with committee name
-      if (data.currentStep === 2) {
-        console.log("Step 2: Updating profile with committee name");
-        
-        const { data: sessionData } = await supabase.auth.getSession();
-        if (!sessionData.session?.user) {
-          throw new Error("No authenticated user found");
-        }
-        
-        const userId = sessionData.session.user.id;
-        
         // Update the profile with committee name
         const { error: profileError } = await supabase
           .from('profiles')
           .update({ committee_name: data.committeeName })
-          .eq('id', userId);
+          .eq('id', authData.user.id);
         
         if (profileError) {
           console.error("Profile update error:", profileError);
@@ -68,7 +59,7 @@ const SignUp = () => {
         
         // Create Hookdeck webhook
         try {
-          const hookdeckUrl = await createHookdeckWebhook(userId, data.email);
+          const hookdeckUrl = await createHookdeckWebhook(authData.user.id, data.email);
           console.log("Hookdeck webhook created:", hookdeckUrl);
         } catch (hookdeckError) {
           console.error("Hookdeck webhook creation error:", hookdeckError);
@@ -79,7 +70,7 @@ const SignUp = () => {
         const { error: webhookError } = await supabase
           .from('webhooks')
           .insert({
-            user_id: userId,
+            user_id: authData.user.id,
             api_username: data.email,
             api_password: data.apiPassword,
             hookdeck_destination_url: "https://igjnhwvtasegwyiwcdkr.supabase.co/functions/v1/handle-webhook"
@@ -94,9 +85,9 @@ const SignUp = () => {
         return;
       }
       
-      // Step 3: Just show webhook details, all changes already done
-      if (data.currentStep === 3) {
-        console.log("Step 3: Completing signup process");
+      // Step 2: Just show webhook details, all changes already done
+      if (data.currentStep === 2) {
+        console.log("Step 2: Completing signup process");
         
         toast({
           title: "Account created successfully",

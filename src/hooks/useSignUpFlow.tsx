@@ -86,7 +86,8 @@ export const useSignUpFlow = ({ onSubmit }: UseSignUpFlowProps) => {
     setError(""); // Clear errors
 
     if (currentStep === 1) {
-      if (!validateEmail() || !validatePassword()) {
+      // Now validating email, password, and committee name in step 1
+      if (!validateEmail() || !validatePassword() || !validateCommitteeName()) {
         return;
       }
       
@@ -109,32 +110,6 @@ export const useSignUpFlow = ({ onSubmit }: UseSignUpFlowProps) => {
         setIsLoading(false);
       }
       return;
-    } 
-    
-    if (currentStep === 2) {
-      if (!validateCommitteeName()) {
-        return;
-      }
-      
-      setIsLoading(true);
-      try {
-        await onSubmit({
-          email,
-          password,
-          confirmPassword,
-          committeeName,
-          apiPassword,
-          currentStep
-        });
-        
-        setCurrentStep(3);
-      } catch (error: any) {
-        console.error("Step 2 error:", error);
-        setError(error.message || "An error occurred during step 2");
-      } finally {
-        setIsLoading(false);
-      }
-      return;
     }
   };
 
@@ -148,14 +123,14 @@ export const useSignUpFlow = ({ onSubmit }: UseSignUpFlowProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Handle "Next" button for steps 1 and 2
-    if (currentStep < 3) {
+    // Handle "Next" button for step 1
+    if (currentStep < 2) {
       await handleNext();
       return;
     }
     
-    // For step 3, complete the process
-    if (currentStep === 3) {
+    // For step 2, complete the process
+    if (currentStep === 2) {
       setIsLoading(true);
       try {
         await onSubmit({
@@ -170,8 +145,8 @@ export const useSignUpFlow = ({ onSubmit }: UseSignUpFlowProps) => {
         // If we reach here, submission was successful
         console.log("Form submission successful");
       } catch (error: any) {
-        console.error("Step 3 error:", error);
-        setError(error.message || "An error occurred during step 3");
+        console.error("Step 2 error:", error);
+        setError(error.message || "An error occurred during step 2");
       } finally {
         setIsLoading(false);
       }

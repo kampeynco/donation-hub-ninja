@@ -3,8 +3,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import StepIndicator from "@/components/Auth/StepIndicator";
 import StepOne from "@/components/Auth/SignUpSteps/StepOne";
-import StepTwo from "@/components/Auth/SignUpSteps/StepTwo";
-import StepThree from "@/components/Auth/SignUpSteps/StepThree";
+import StepTwo from "@/components/Auth/SignUpSteps/StepThree";
 import { useSignUpFlow, SignUpData } from "@/hooks/useSignUpFlow";
 import { IconArrowRight } from "@tabler/icons-react";
 
@@ -14,8 +13,7 @@ interface SignUpFormProps {
 
 const steps = [
   { number: 1, title: "Account" },
-  { number: 2, title: "Committee" },
-  { number: 3, title: "Webhook" }
+  { number: 2, title: "Webhook" }
 ];
 
 const SignUpForm: React.FC<SignUpFormProps> = ({ onSubmit }) => {
@@ -56,26 +54,20 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSubmit }) => {
             setPassword={setPassword}
             confirmPassword={confirmPassword}
             setConfirmPassword={setConfirmPassword}
-            passwordError={error}
-          />
-        )}
-
-        {currentStep === 2 && (
-          <StepTwo 
             committeeName={committeeName}
             setCommitteeName={setCommitteeName}
             error={error}
           />
         )}
 
-        {currentStep === 3 && (
-          <StepThree 
+        {currentStep === 2 && (
+          <StepTwo 
             email={email}
             apiPassword={apiPassword}
           />
         )}
         
-        {error && currentStep === 3 && (
+        {error && currentStep === 2 && (
           <div className="text-red-500 text-sm">{error}</div>
         )}
         
@@ -97,8 +89,8 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSubmit }) => {
             disabled={isLoading}
           >
             {isLoading 
-              ? currentStep < 3 ? "Processing..." : "Creating account..." 
-              : currentStep === 3 
+              ? currentStep < 2 ? "Processing..." : "Creating account..." 
+              : currentStep === 2 
                 ? "Complete Registration" 
                 : <>Next <IconArrowRight className="ml-1 h-4 w-4" /></>
             }

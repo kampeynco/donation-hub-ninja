@@ -2,6 +2,8 @@
 import React from "react";
 import { Input } from "@/components/ui/input";
 import PasswordInput from "../PasswordInput";
+import { FormItem } from "@/components/ui/form";
+import { Label } from "@/components/ui/label";
 
 interface StepOneProps {
   email: string;
@@ -10,7 +12,9 @@ interface StepOneProps {
   setPassword: (password: string) => void;
   confirmPassword: string;
   setConfirmPassword: (confirmPassword: string) => void;
-  passwordError: string;
+  committeeName: string;
+  setCommitteeName: (committeeName: string) => void;
+  error: string;
 }
 
 const StepOne: React.FC<StepOneProps> = ({
@@ -20,7 +24,9 @@ const StepOne: React.FC<StepOneProps> = ({
   setPassword,
   confirmPassword,
   setConfirmPassword,
-  passwordError,
+  committeeName,
+  setCommitteeName,
+  error,
 }) => {
   return (
     <>
@@ -38,6 +44,21 @@ const StepOne: React.FC<StepOneProps> = ({
           className="w-full"
         />
       </div>
+
+      <FormItem className="space-y-2">
+        <Label htmlFor="committeeName" className="block text-sm font-medium text-gray-700">
+          Committee Name
+        </Label>
+        <Input
+          id="committeeName"
+          type="text"
+          value={committeeName}
+          onChange={(e) => setCommitteeName(e.target.value)}
+          placeholder="Your Committee Name"
+          required
+          className="w-full"
+        />
+      </FormItem>
 
       <div className="space-y-2">
         <label htmlFor="password" className="block text-sm font-medium text-gray-700">
@@ -60,9 +81,9 @@ const StepOne: React.FC<StepOneProps> = ({
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           required
-          error={!!passwordError}
+          error={!!error}
         />
-        {passwordError && <p className="text-red-500 text-sm">{passwordError}</p>}
+        {error && <p className="text-red-500 text-sm">{error}</p>}
       </div>
     </>
   );
