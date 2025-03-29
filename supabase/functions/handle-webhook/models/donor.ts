@@ -153,7 +153,15 @@ export async function addDonorLocation(
   donorId: string | null,
   requestId: string
 ): Promise<{success: boolean, locationId: string | null}> {
-  if (!donorId || !donor || !(donor.addr1 || donor.city || donor.state)) {
+  // Return early if any required data is missing
+  if (!donorId || !donor) {
+    return { success: true, locationId: null };
+  }
+  
+  // Check if we have any valid location data to insert
+  // Return early if no location data is present
+  if (!donor.addr1 && !donor.city && !donor.state && !donor.zip && !donor.country) {
+    console.log(`[${requestId}] No location data provided for donor ${donorId}`);
     return { success: true, locationId: null };
   }
 
@@ -200,7 +208,26 @@ export async function addEmployerData(
   donorId: string | null,
   requestId: string
 ): Promise<{success: boolean, employerDataId: string | null}> {
-  if (!donorId || !donor?.employerData || !donor.employerData.employer) {
+  // Return early if required fields are missing
+  if (!donorId || !donor) {
+    return { success: true, employerDataId: null };
+  }
+  
+  // Check if we have any employerData object at all
+  if (!donor.employerData) {
+    console.log(`[${requestId}] No employer data provided for donor ${donorId}`);
+    return { success: true, employerDataId: null };
+  }
+  
+  // Check if we have any valid employer data to insert
+  // Even if employerData object exists, it might have empty fields
+  if (!donor.employerData.employer && 
+      !donor.employerData.occupation && 
+      !donor.employerData.employerAddr1 && 
+      !donor.employerData.employerCity && 
+      !donor.employerData.employerState && 
+      !donor.employerData.employerCountry) {
+    console.log(`[${requestId}] Employer data object exists but contains no data for donor ${donorId}`);
     return { success: true, employerDataId: null };
   }
 
@@ -211,12 +238,12 @@ export async function addEmployerData(
       .from("employer_data")
       .insert({
         donor_id: donorId,
-        employer: donor.employerData.employer,
-        occupation: donor.employerData.occupation,
-        employer_addr1: donor.employerData.employerAddr1,
-        employer_city: donor.employerData.employerCity,
-        employer_state: donor.employerData.employerState,
-        employer_country: donor.employerData.employerCountry
+        employer: donor.employerData.employer || null,
+        occupation: donor.employerData.occupation || null,
+        employer_addr1: donor.employerData.employerAddr1 || null,
+        employer_city: donor.employerData.employerCity || null,
+        employer_state: donor.employerData.employerState || null,
+        employer_country: donor.employerData.employerCountry || null
       })
       .select()
       .single();
