@@ -6,6 +6,7 @@ import StepOne from "@/components/Auth/SignUpSteps/StepOne";
 import StepTwo from "@/components/Auth/SignUpSteps/StepTwo";
 import StepThree from "@/components/Auth/SignUpSteps/StepThree";
 import { useSignUpFlow, SignUpData } from "@/hooks/useSignUpFlow";
+import { IconArrowRight } from "@tabler/icons-react";
 
 interface SignUpFormProps {
   onSubmit: (data: SignUpData) => Promise<void>;
@@ -84,6 +85,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSubmit }) => {
               type="button" 
               variant="outline" 
               onClick={handlePrevious}
+              disabled={isLoading}
             >
               Previous
             </Button>
@@ -98,7 +100,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSubmit }) => {
               ? currentStep < 3 ? "Processing..." : "Creating account..." 
               : currentStep === 3 
                 ? "Complete Registration" 
-                : "Next"
+                : <>Next <IconArrowRight className="ml-1 h-4 w-4" /></>
             }
           </Button>
         </div>

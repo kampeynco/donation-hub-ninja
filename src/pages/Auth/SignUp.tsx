@@ -12,15 +12,14 @@ const SignUp = () => {
 
   const handleSignUp = async (data: SignUpData) => {
     try {
-      console.log("Starting signup process with data:", {
+      console.log("Processing signup step:", data.currentStep, {
         email: data.email,
         committeeName: data.committeeName,
-        // Omitting password for security
       });
 
-      // Step 1: Create user (without committee name in metadata)
+      // Step 1: Create user account
       if (data.currentStep === 1) {
-        console.log("Creating user account");
+        console.log("Step 1: Creating user account");
         
         const { data: authData, error: authError } = await supabase.auth.signUp({
           email: data.email,
@@ -39,39 +38,13 @@ const SignUp = () => {
         
         console.log("User created successfully:", authData.user.id);
         
-        // Create Hookdeck webhook
-        try {
-          const hookdeckUrl = await createHookdeckWebhook(authData.user.id, data.email);
-          console.log("Hookdeck webhook created:", hookdeckUrl);
-        } catch (hookdeckError) {
-          console.error("Hookdeck webhook creation error:", hookdeckError);
-          // Continue even if Hookdeck creation fails, as the user account is already created
-        }
-        
-        // Create webhook credentials 
-        const { error: webhookError } = await supabase
-          .from('webhooks')
-          .insert({
-            user_id: authData.user.id,
-            api_username: data.email,
-            api_password: data.apiPassword,
-            hookdeck_destination_url: "https://igjnhwvtasegwyiwcdkr.supabase.co/functions/v1/handle-webhook"
-          });
-        
-        if (webhookError) {
-          console.error("Webhook creation error:", webhookError);
-          throw webhookError;
-        }
-        
-        console.log("Webhook credentials created");
-        
-        // Already created account, proceed to next step
+        // Generate API password for webhook
         return;
       }
       
       // Step 2: Update profile with committee name
       if (data.currentStep === 2) {
-        console.log("Updating profile with committee name");
+        console.log("Step 2: Updating profile with committee name");
         
         const { data: sessionData } = await supabase.auth.getSession();
         if (!sessionData.session?.user) {
@@ -80,6 +53,7 @@ const SignUp = () => {
         
         const userId = sessionData.session.user.id;
         
+        // Update the profile with committee name
         const { error: profileError } = await supabase
           .from('profiles')
           .update({ committee_name: data.committeeName })
@@ -91,12 +65,38 @@ const SignUp = () => {
         }
         
         console.log("Profile updated with committee name");
+        
+        // Create Hookdeck webhook
+        try {
+          const hookdeckUrl = await createHookdeckWebhook(userId, data.email);
+          console.log("Hookdeck webhook created:", hookdeckUrl);
+        } catch (hookdeckError) {
+          console.error("Hookdeck webhook creation error:", hookdeckError);
+          // Continue even if Hookdeck creation fails
+        }
+        
+        // Create webhook credentials 
+        const { error: webhookError } = await supabase
+          .from('webhooks')
+          .insert({
+            user_id: userId,
+            api_username: data.email,
+            api_password: data.apiPassword,
+            hookdeck_destination_url: "https://igjnhwvtasegwyiwcdkr.supabase.co/functions/v1/handle-webhook"
+          });
+        
+        if (webhookError) {
+          console.error("Webhook creation error:", webhookError);
+          throw webhookError;
+        }
+        
+        console.log("Webhook credentials created");
         return;
       }
       
       // Step 3: Just show webhook details, all changes already done
       if (data.currentStep === 3) {
-        console.log("Completing signup process");
+        console.log("Step 3: Completing signup process");
         
         toast({
           title: "Account created successfully",

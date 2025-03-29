@@ -1,6 +1,5 @@
 
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
 
 export interface SignUpData {
   email: string;
@@ -83,34 +82,9 @@ export const useSignUpFlow = ({ onSubmit }: UseSignUpFlowProps) => {
     return true;
   };
 
-  const handleNext = () => {
-    if (currentStep === 1) {
-      if (!validateEmail() || !validatePassword()) {
-        return;
-      }
-      
-      setCurrentStep(2);
-      setError(""); // Clear errors when moving to next step
-    } else if (currentStep === 2) {
-      if (!validateCommitteeName()) {
-        return;
-      }
-      setCurrentStep(3);
-      setError(""); // Clear errors when moving to next step
-    }
-  };
+  const handleNext = async () => {
+    setError(""); // Clear errors
 
-  const handlePrevious = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-      setError(""); // Clear errors when moving to previous step
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // For step 1, validate email and password
     if (currentStep === 1) {
       if (!validateEmail() || !validatePassword()) {
         return;
@@ -127,7 +101,7 @@ export const useSignUpFlow = ({ onSubmit }: UseSignUpFlowProps) => {
           currentStep
         });
         
-        handleNext();
+        setCurrentStep(2);
       } catch (error: any) {
         console.error("Step 1 error:", error);
         setError(error.message || "An error occurred during step 1");
@@ -135,9 +109,8 @@ export const useSignUpFlow = ({ onSubmit }: UseSignUpFlowProps) => {
         setIsLoading(false);
       }
       return;
-    }
+    } 
     
-    // For step 2, validate committee name
     if (currentStep === 2) {
       if (!validateCommitteeName()) {
         return;
@@ -154,13 +127,30 @@ export const useSignUpFlow = ({ onSubmit }: UseSignUpFlowProps) => {
           currentStep
         });
         
-        handleNext();
+        setCurrentStep(3);
       } catch (error: any) {
         console.error("Step 2 error:", error);
         setError(error.message || "An error occurred during step 2");
       } finally {
         setIsLoading(false);
       }
+      return;
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+      setError(""); // Clear errors when moving to previous step
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Handle "Next" button for steps 1 and 2
+    if (currentStep < 3) {
+      await handleNext();
       return;
     }
     
