@@ -2,6 +2,8 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.29.0";
 import { ActBlueDonor, ActBlueContribution } from "../types.ts";
 import { errorResponses } from "../error-handler.ts";
+import { DonorData, ProcessResult } from "./types.ts";
+import { logDbOperation, handleDatabaseError } from "./utils.ts";
 
 /**
  * Extracts donor information from the ActBlue donor and contribution
@@ -9,7 +11,7 @@ import { errorResponses } from "../error-handler.ts";
 export function extractDonorData(
   donor: ActBlueDonor | undefined,
   contribution: ActBlueContribution
-) {
+): DonorData {
   return {
     first_name: donor?.firstname || null,
     last_name: donor?.lastname || null,
@@ -25,13 +27,13 @@ export function extractDonorData(
 export async function findOrCreateDonor(
   supabase: ReturnType<typeof createClient>,
   donor: ActBlueDonor | undefined,
-  donorData: any,
+  donorData: DonorData,
   requestId: string,
   timestamp: string
-) {
+): Promise<ProcessResult<{donorId: string | null, emailId?: string}>> {
   if (!donor?.email) {
     console.log(`[${requestId}] Anonymous donation - no email provided`);
-    return { success: true, donorId: null };
+    return { success: true, data: { donorId: null } };
   }
 
   try {
@@ -43,16 +45,14 @@ export async function findOrCreateDonor(
       .maybeSingle();
     
     if (emailError) {
-      console.error(`[${requestId}] Database error looking up donor email:`, emailError);
-      return { 
-        success: false, 
-        error: errorResponses.databaseError(
-          "Error looking up donor email",
-          emailError.message,
-          requestId,
-          timestamp
-        )
-      };
+      return handleDatabaseError(
+        emailError, 
+        "looking up", 
+        "donor email", 
+        requestId, 
+        timestamp, 
+        errorResponses.databaseError
+      );
     }
 
     let donorId;
@@ -67,19 +67,17 @@ export async function findOrCreateDonor(
         .eq("id", donorId);
       
       if (donorUpdateError) {
-        console.error(`[${requestId}] Database error updating donor:`, donorUpdateError);
-        return { 
-          success: false, 
-          error: errorResponses.databaseError(
-            "Error updating donor",
-            donorUpdateError.message,
-            requestId,
-            timestamp
-          )
-        };
+        return handleDatabaseError(
+          donorUpdateError, 
+          "updating", 
+          "donor", 
+          requestId, 
+          timestamp, 
+          errorResponses.databaseError
+        );
       }
       
-      console.log(`[${requestId}] Updated existing donor:`, donorId);
+      logDbOperation("Updated existing donor", donorId, requestId);
     } else {
       // Create new donor
       const { data: newDonor, error: donorError } = await supabase
@@ -89,20 +87,18 @@ export async function findOrCreateDonor(
         .single();
 
       if (donorError) {
-        console.error(`[${requestId}] Database error creating donor:`, donorError);
-        return { 
-          success: false, 
-          error: errorResponses.databaseError(
-            "Error creating donor",
-            donorError.message,
-            requestId,
-            timestamp
-          )
-        };
+        return handleDatabaseError(
+          donorError, 
+          "creating", 
+          "donor", 
+          requestId, 
+          timestamp, 
+          errorResponses.databaseError
+        );
       }
 
       donorId = newDonor.id;
-      console.log(`[${requestId}] Created new donor:`, donorId);
+      logDbOperation("Created new donor", donorId, requestId);
 
       // Create email record
       const { data: newEmail, error: emailInsertError } = await supabase
@@ -115,34 +111,30 @@ export async function findOrCreateDonor(
         .single();
         
       if (emailInsertError) {
-        console.error(`[${requestId}] Database error creating email record:`, emailInsertError);
-        return { 
-          success: false, 
-          error: errorResponses.databaseError(
-            "Error creating email record",
-            emailInsertError.message,
-            requestId,
-            timestamp
-          )
-        };
+        return handleDatabaseError(
+          emailInsertError, 
+          "creating", 
+          "email record", 
+          requestId, 
+          timestamp, 
+          errorResponses.databaseError
+        );
       }
       
       emailId = newEmail.id;
-      console.log(`[${requestId}] Created email record:`, emailId);
+      logDbOperation("Created email record", emailId, requestId);
     }
 
-    return { success: true, donorId, emailId };
+    return { success: true, data: { donorId, emailId } };
   } catch (error) {
-    console.error(`[${requestId}] Unexpected error in findOrCreateDonor:`, error);
-    return { 
-      success: false, 
-      error: errorResponses.databaseError(
-        "Error processing donor information",
-        error.message,
-        requestId,
-        timestamp
-      )
-    };
+    return handleDatabaseError(
+      error, 
+      "processing", 
+      "donor information", 
+      requestId, 
+      timestamp, 
+      errorResponses.databaseError
+    );
   }
 }
 
@@ -154,7 +146,7 @@ export async function addDonorLocation(
   donor: ActBlueDonor | undefined,
   donorId: string | null,
   requestId: string
-) {
+): Promise<{success: boolean, locationId: string | null}> {
   if (!donorId || !donor || !(donor.addr1 || donor.city || donor.state)) {
     return { success: true, locationId: null };
   }
@@ -181,7 +173,7 @@ export async function addDonorLocation(
     }
     
     const locationId = newLocation.id;
-    console.log(`[${requestId}] Created location:`, locationId, "for donor:", donorId);
+    logDbOperation("Created location", locationId, requestId, `for donor: ${donorId}`);
     
     return { success: true, locationId };
   } catch (error) {

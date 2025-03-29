@@ -2,6 +2,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.29.0";
 import { ActBlueContribution, ActBlueDonor, ActBlueLineItem } from "../types.ts";
 import { errorResponses } from "../error-handler.ts";
+import { ProcessResult } from "./types.ts";
 
 import { extractDonationData, createDonation } from "./donation.ts";
 import { extractDonorData, findOrCreateDonor, addDonorLocation } from "./donor.ts";
@@ -18,7 +19,7 @@ export async function processDonation(
   lineitems: ActBlueLineItem[] | undefined,
   requestId: string,
   timestamp: string
-) {
+): Promise<ProcessResult> {
   try {
     // Extract donation data
     const extractedDonation = extractDonationData(contribution, lineitems, requestId);
@@ -40,7 +41,7 @@ export async function processDonation(
         return { success: false, error: donorResult.error };
       }
       
-      const { donorId } = donorResult;
+      const { donorId } = donorResult.data;
       
       // Create donation record
       const donationResult = await createDonation(supabase, donationData, donorId, requestId, timestamp);
@@ -48,7 +49,7 @@ export async function processDonation(
         return { success: false, error: donationResult.error };
       }
       
-      const { donationId } = donationResult;
+      const { donationId } = donationResult.data;
       
       // Add location if provided
       const locationResult = await addDonorLocation(supabase, donor, donorId, requestId);
@@ -77,7 +78,7 @@ export async function processDonation(
         return { success: false, error: donationResult.error };
       }
       
-      const { donationId } = donationResult;
+      const { donationId } = donationResult.data;
       
       // Update webhook timestamp (non-critical)
       await updateWebhookTimestamp(supabase, timestamp, requestId);

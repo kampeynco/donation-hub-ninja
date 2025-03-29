@@ -2,6 +2,8 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.29.0";
 import { ActBlueContribution, ActBlueLineItem } from "../types.ts";
 import { errorResponses } from "../error-handler.ts";
+import { DonationData, ProcessResult } from "./types.ts";
+import { logDbOperation, handleDatabaseError } from "./utils.ts";
 
 /**
  * Extracts donation data from the ActBlue contribution and line items
@@ -10,7 +12,7 @@ export function extractDonationData(
   contribution: ActBlueContribution,
   lineitems: ActBlueLineItem[] | undefined,
   requestId: string
-) {
+): ProcessResult<DonationData> {
   // Get the first line item for the amount if not in contribution
   const lineItem = lineitems && lineitems.length > 0 ? lineitems[0] : null;
   
@@ -27,7 +29,7 @@ export function extractDonationData(
   }
   
   // Extract relevant data from the contribution
-  const donationData = {
+  const donationData: DonationData = {
     amount: parseFloat(lineItem?.amount || contribution.amount || "0"),
     paid_at: new Date(lineItem?.paidAt || contribution.paidAt || contribution.createdAt).toISOString(),
     is_mobile: contribution.isMobile || false,
@@ -48,11 +50,11 @@ export function extractDonationData(
  */
 export async function createDonation(
   supabase: ReturnType<typeof createClient>,
-  donationData: any,
+  donationData: DonationData,
   donorId: string | null,
   requestId: string,
   timestamp: string
-) {
+): Promise<ProcessResult<{donationId: string, donationData: any}>> {
   try {
     const { data: newDonation, error: donationError } = await supabase
       .from("donations")
@@ -64,32 +66,28 @@ export async function createDonation(
       .single();
       
     if (donationError) {
-      console.error(`[${requestId}] Database error creating donation:`, donationError);
-      return { 
-        success: false, 
-        error: errorResponses.databaseError(
-          "Error creating donation",
-          donationError.message,
-          requestId,
-          timestamp
-        )
-      };
+      return handleDatabaseError(
+        donationError, 
+        "creating", 
+        "donation", 
+        requestId, 
+        timestamp, 
+        errorResponses.databaseError
+      );
     }
     
     const donationId = newDonation.id;
-    console.log(`[${requestId}] Created donation:`, donationId, donorId ? `for donor: ${donorId}` : 'anonymous');
+    logDbOperation("Created donation", donationId, requestId, donorId ? `for donor: ${donorId}` : 'anonymous');
     
-    return { success: true, donationId, donationData: newDonation };
+    return { success: true, data: { donationId, donationData: newDonation } };
   } catch (error) {
-    console.error(`[${requestId}] Unexpected error in createDonation:`, error);
-    return { 
-      success: false, 
-      error: errorResponses.databaseError(
-        "Error creating donation record",
-        error.message,
-        requestId,
-        timestamp
-      )
-    };
+    return handleDatabaseError(
+      error, 
+      "creating", 
+      "donation record", 
+      requestId, 
+      timestamp, 
+      errorResponses.databaseError
+    );
   }
 }

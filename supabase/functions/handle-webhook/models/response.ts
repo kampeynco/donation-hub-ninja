@@ -1,6 +1,6 @@
 
 import { ActBlueDonor } from "../types.ts";
-import { WebhookSuccessResponse } from "../types.ts";
+import { SuccessResponseData } from "./types.ts";
 
 /**
  * Creates a success response object
@@ -14,7 +14,7 @@ export function createSuccessResponse(
   locationId: string | null,
   requestId: string,
   timestamp: string
-): WebhookSuccessResponse {
+): SuccessResponseData {
   return {
     success: true,
     message: "Donation processed successfully",
