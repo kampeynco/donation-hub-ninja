@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -7,7 +6,7 @@ import NotificationSection from "./NotificationSection";
 import NotificationRow from "./NotificationRow";
 import NotificationsLoading from "./NotificationsLoading";
 import { useAuth } from "@/context/AuthContext";
-import { useNotificationSettings } from "@/hooks/useNotificationSettings";
+import { useNotificationSettings } from "@/hooks/useNotificationSettings"; // This import still works with .tsx extension
 
 const NotificationsTab: React.FC = () => {
   const { user } = useAuth();
