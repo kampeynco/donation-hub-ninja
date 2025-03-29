@@ -1,11 +1,10 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { IconMenu2, IconX, IconStar } from "@tabler/icons-react";
+import { IconMenu2, IconX, IconStarFilled } from "@tabler/icons-react";
 import NotificationBell from '@/components/Notifications/NotificationBell';
 
 const Navbar = () => {
@@ -38,7 +37,7 @@ const Navbar = () => {
           {/* Logo and Brand */}
           <Link to="/" className="flex items-center space-x-2 font-bold text-xl">
             <div className="bg-[#007AFF] text-white p-2 rounded-full w-10 h-10 flex items-center justify-center">
-              <IconStar size={24} stroke={2} color="white" />
+              <IconStarFilled size={24} color="white" />
             </div>
             <span>Donor Camp</span>
           </Link>

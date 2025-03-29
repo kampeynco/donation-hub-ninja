@@ -1,21 +1,22 @@
-
 import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
-import { IconArrowRight, IconCreditCard, IconUsers, IconReportMoney } from "@tabler/icons-react";
+import { IconArrowRight, IconCreditCard, IconUsers, IconReportMoney, IconStarFilled } from "@tabler/icons-react";
+
 const Home = () => {
   const {
     user,
     loading
   } = useAuth();
   const navigate = useNavigate();
+
   useEffect(() => {
     if (!loading && user) {
-      // If user is already logged in, redirect to dashboard
       navigate("/dashboard");
     }
   }, [user, loading, navigate]);
+
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -23,15 +24,13 @@ const Home = () => {
         </div>
       </div>;
   }
+
   return <div className="min-h-screen bg-white">
-      {/* Hero Section */}
       <header className="bg-primary text-white">
         <div className="container mx-auto px-4 py-6 flex justify-between items-center">
           <Link to="/" className="flex items-center gap-2">
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#2563EB" />
-              </svg>
+              <IconStarFilled size={24} color="#007AFF" />
             </div>
             <span className="text-xl font-semibold tracking-tight">Donor Camp</span>
           </Link>
@@ -64,7 +63,6 @@ const Home = () => {
         </div>
       </header>
 
-      {/* Features Section */}
       <section className="py-20">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">
@@ -105,7 +103,6 @@ const Home = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
       <section className="bg-gray-50 py-20">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
@@ -122,15 +119,12 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="bg-gray-900 text-white py-12">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <Link to="/" className="flex items-center gap-2 mb-6 md:mb-0">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#2563EB" />
-                </svg>
+                <IconStarFilled size={24} color="#007AFF" />
               </div>
               <span className="text-xl font-semibold tracking-tight">Donor Camp</span>
             </Link>
@@ -142,4 +136,5 @@ const Home = () => {
       </footer>
     </div>;
 };
+
 export default Home;
