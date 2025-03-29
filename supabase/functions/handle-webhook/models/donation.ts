@@ -28,6 +28,14 @@ export function extractDonationData(
     };
   }
   
+  // Handle "infinite" recurring duration
+  let recurringDuration = contribution.recurringDuration;
+  if (recurringDuration === "infinite" || recurringDuration === Infinity) {
+    // Convert "infinite" to a large integer value (e.g., 9999)
+    console.log(`[${requestId}] Converting "infinite" recurring duration to numeric value`);
+    recurringDuration = 9999;
+  }
+  
   // Extract relevant data from the contribution
   const donationData: DonationData = {
     amount: parseFloat(lineItem?.amount || contribution.amount || "0"),
@@ -35,7 +43,7 @@ export function extractDonationData(
     is_mobile: contribution.isMobile || false,
     recurring_period: contribution.recurringPeriod === 'monthly' ? 'monthly' : 
                      contribution.recurringPeriod === 'weekly' ? 'weekly' : 'once',
-    recurring_duration: contribution.recurringDuration || 0,
+    recurring_duration: recurringDuration || 0,
     express_signup: contribution.expressSignup || false,
     is_express: contribution.isExpress || false,
     is_paypal: contribution.isPaypal || false,

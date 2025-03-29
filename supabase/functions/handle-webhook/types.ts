@@ -1,4 +1,3 @@
-
 export interface ActBlueDonor {
   firstname?: string;
   lastname?: string;
@@ -29,7 +28,7 @@ export interface ActBlueContribution {
   refcode2?: string | null;
   creditCardExpiration?: string;
   recurringPeriod?: string;
-  recurringDuration?: number;
+  recurringDuration?: number | string;
   isRecurring: boolean;
   isPaypal: boolean;
   isMobile: boolean;
@@ -40,25 +39,15 @@ export interface ActBlueContribution {
   status: string;
   paidAt?: string;
   amount?: string;
-  // New fields
   smartBoostAmount?: string;
   giftDeclined?: boolean;
-  giftIdentifier?: number;
+  giftIdentifier?: number | null;
   shippingName?: string;
   shippingAddr1?: string;
   shippingCity?: string;
   shippingState?: string;
   shippingZip?: string;
   shippingCountry?: string;
-  customFields?: Array<{
-    label: string;
-    answer: string;
-  }>;
-  merchandise?: Array<{
-    name: string;
-    itemId: number;
-    details?: any;
-  }>;
 }
 
 export interface ActBlueLineItem {
@@ -86,7 +75,6 @@ export interface ActBlueWebhookPayload {
   };
 }
 
-// New error response interfaces
 export interface WebhookErrorResponse {
   error: string;
   code: number;
