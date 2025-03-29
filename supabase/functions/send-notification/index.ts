@@ -2,17 +2,15 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.29.0";
 import { Resend } from "npm:resend@2.0.0";
-import twilio from "npm:twilio@4.17.0";
 
 // Configure clients
 const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
 const resendApiKey = Deno.env.get("RESEND_API_KEY") || "";
-const twilioAccountSid = Deno.env.get("TWILIO_API_SID") || "";
-const twilioAuthToken = Deno.env.get("TWILIO_AUTH_TOKEN") || "";
+const plivoAuthId = Deno.env.get("PLIVO_API_KEY") || "";
+const plivoAuthToken = Deno.env.get("PLIVO_AUTH_TOKEN") || "";
 
 const resend = new Resend(resendApiKey);
-const twilioClient = twilio(twilioAccountSid, twilioAuthToken);
 
 interface NotificationRequest {
   userId: string;
@@ -156,8 +154,8 @@ serve(async (req) => {
       }
     }
     
-    // Handle SMS notification using Twilio
-    if (textEnabled && twilioAccountSid && twilioAuthToken) {
+    // Handle SMS notification using Plivo instead of Twilio
+    if (textEnabled && plivoAuthId && plivoAuthToken) {
       try {
         // Get user profile for mobile phone
         if (!profile.mobile_phone) {
@@ -167,16 +165,34 @@ serve(async (req) => {
             ? `Donor Camp: Recurring donation of $${amount.toFixed(2)} received from ${donorName || 'Anonymous'}`
             : `Donor Camp: New donation of $${amount.toFixed(2)} received from ${donorName || 'Anonymous'}`;
             
-          const twilioResponse = await twilioClient.messages.create({
-            body: smsMessage,
-            to: profile.mobile_phone,
-            from: '+18445096979' // Replace with your Twilio phone number
+          // Format mobile phone for Plivo (remove any non-digit characters)
+          const formattedPhone = profile.mobile_phone.replace(/\D/g, '');
+          
+          // Construct Plivo API URL
+          const plivoApiUrl = 'https://api.plivo.com/v1/Account/' + plivoAuthId + '/Message/';
+          
+          // Prepare authorization header for Plivo API
+          const authHeader = 'Basic ' + btoa(plivoAuthId + ':' + plivoAuthToken);
+          
+          // Send SMS using Plivo API
+          const plivoResponse = await fetch(plivoApiUrl, {
+            method: 'POST',
+            headers: {
+              'Authorization': authHeader,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              src: '18445096979', // Replace with your Plivo phone number
+              dst: formattedPhone,
+              text: smsMessage
+            })
           });
           
-          console.log(`[${requestId}] SMS sent successfully with SID:`, twilioResponse.sid);
+          const responseData = await plivoResponse.json();
+          console.log(`[${requestId}] SMS sent successfully with Plivo:`, responseData);
         }
       } catch (error) {
-        console.error(`[${requestId}] Error sending SMS:`, error);
+        console.error(`[${requestId}] Error sending SMS with Plivo:`, error);
       }
     }
     
