@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { IconX } from "@tabler/icons-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const Navbar = () => {
   // Define initial notifications
@@ -26,10 +27,32 @@ const Navbar = () => {
 
   // State to manage notifications
   const [notifications, setNotifications] = useState(initialNotifications);
+  const [firstName, setFirstName] = useState<string | null>(null);
+  const [lastName, setLastName] = useState<string | null>(null);
+  
   const {
     user,
     signOut
   } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      const fetchProfile = async () => {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('contact_first_name, contact_last_name')
+          .eq('id', user.id)
+          .single();
+          
+        if (!error && data) {
+          setFirstName(data.contact_first_name);
+          setLastName(data.contact_last_name);
+        }
+      };
+      
+      fetchProfile();
+    }
+  }, [user]);
 
   // Function to remove a notification
   const removeNotification = (id: number) => {
@@ -103,7 +126,11 @@ const Navbar = () => {
             </PopoverTrigger>
             <PopoverContent align="end" className="w-56 p-0 rounded-xl shadow-lg border-gray-200">
               <div className="border-b p-4">
-                <p className="font-medium">{user?.email || "User"}</p>
+                {(firstName || lastName) && (
+                  <p className="font-medium">
+                    {firstName} {lastName}
+                  </p>
+                )}
                 <p className="text-sm text-gray-500">{user?.email}</p>
               </div>
               <div className="p-2">
