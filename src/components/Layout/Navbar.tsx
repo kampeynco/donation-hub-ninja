@@ -23,7 +23,7 @@ const Navbar = () => {
   };
   const handleSignOut = async () => {
     await signOut();
-    navigate("/login");
+    navigate("/auth/signin");
   };
   const getInitials = () => {
     const email = user?.email || "";
@@ -80,7 +80,7 @@ const Navbar = () => {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
-              </> : <Link to="/login" className="text-gray-600 hover:text-gray-800">
+              </> : <Link to="/auth/signin" className="text-gray-600 hover:text-gray-800">
                 Login
               </Link>}
           </div>
@@ -134,7 +134,7 @@ const Navbar = () => {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
-              </> : <Link to="/login" className="text-gray-600 hover:text-gray-800" onClick={closeMobileMenu}>
+              </> : <Link to="/auth/signin" className="text-gray-600 hover:text-gray-800" onClick={closeMobileMenu}>
                 Login
               </Link>}
           </div>
