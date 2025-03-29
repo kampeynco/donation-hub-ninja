@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
@@ -88,7 +88,7 @@ const WebhookConfig = ({
           </div>
         </div>
         <p className="text-xs text-gray-500">
-          This is the secure Hookdeck webhook URL that you'll configure in your ActBlue account settings.
+          Add this webhook URL to your ActBlue account settings to receive donation notifications.
         </p>
       </div>
 

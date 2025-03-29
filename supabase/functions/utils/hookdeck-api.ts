@@ -1,91 +1,22 @@
 
 // Hookdeck API utility module for interacting with Hookdeck services
 
-export interface HookdeckSourceConfig {
-  name: string;
-  url: string;
-  customerId: string;
-}
-
-export interface HookdeckDestinationConfig {
-  name: string;
-  url: string;
-  customerId: string;
-}
-
 export interface HookdeckConnectionConfig {
   name: string;
-  sourceId: string;
+  userId: string;  // Used as the source name
   destinationId: string;
-  customerId: string;
+}
+
+export interface HookdeckSourceAuthConfig {
+  sourceId: string;
+  name: string;
+  username: string;
+  password: string;
 }
 
 /**
- * Creates a new Hookdeck source
- */
-export async function createHookdeckSource(config: HookdeckSourceConfig): Promise<any> {
-  const apiKey = Deno.env.get("HOOKDECK_API_KEY");
-  if (!apiKey) {
-    throw new Error("HOOKDECK_API_KEY is not configured");
-  }
-
-  const response = await fetch("https://api.hookdeck.com/2025-01-01/sources", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${apiKey}`
-    },
-    body: JSON.stringify({
-      name: config.name,
-      url: config.url,
-      type: "webhook",
-      customer_id: config.customerId
-    })
-  });
-
-  if (!response.ok) {
-    const error = await response.text();
-    console.error("Hookdeck source creation failed:", error);
-    throw new Error(`Failed to create Hookdeck source: ${error}`);
-  }
-
-  return await response.json();
-}
-
-/**
- * Creates a new Hookdeck destination
- */
-export async function createHookdeckDestination(config: HookdeckDestinationConfig): Promise<any> {
-  const apiKey = Deno.env.get("HOOKDECK_API_KEY");
-  if (!apiKey) {
-    throw new Error("HOOKDECK_API_KEY is not configured");
-  }
-
-  const response = await fetch("https://api.hookdeck.com/2025-01-01/destinations", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${apiKey}`
-    },
-    body: JSON.stringify({
-      name: config.name,
-      url: config.url,
-      type: "http",
-      customer_id: config.customerId
-    })
-  });
-
-  if (!response.ok) {
-    const error = await response.text();
-    console.error("Hookdeck destination creation failed:", error);
-    throw new Error(`Failed to create Hookdeck destination: ${error}`);
-  }
-
-  return await response.json();
-}
-
-/**
- * Creates a new Hookdeck connection between a source and destination
+ * Creates a new Hookdeck connection with a webhook source
+ * Uses the PUT method as specified in the Hookdeck API
  */
 export async function createHookdeckConnection(config: HookdeckConnectionConfig): Promise<any> {
   const apiKey = Deno.env.get("HOOKDECK_API_KEY");
@@ -93,54 +24,88 @@ export async function createHookdeckConnection(config: HookdeckConnectionConfig)
     throw new Error("HOOKDECK_API_KEY is not configured");
   }
 
+  const hookdeckPayload = {
+    "id": `web_${crypto.randomUUID().replace(/-/g, '').substring(0, 10)}`,
+    "name": config.name,
+    "source": {
+      "name": config.userId,
+      "type": "WEBHOOK"
+    },
+    "destination_id": config.destinationId
+  };
+
+  console.log("Creating Hookdeck connection with payload:", JSON.stringify(hookdeckPayload));
+
   const response = await fetch("https://api.hookdeck.com/2025-01-01/connections", {
-    method: "POST",
+    method: "PUT",
     headers: {
       "Content-Type": "application/json",
       "Authorization": `Bearer ${apiKey}`
     },
-    body: JSON.stringify({
-      name: config.name,
-      source_id: config.sourceId,
-      destination_id: config.destinationId,
-      customer_id: config.customerId
-    })
+    body: JSON.stringify(hookdeckPayload)
   });
 
+  const responseText = await response.text();
+  console.log(`Hookdeck connection creation response (${response.status}):`, responseText);
+
   if (!response.ok) {
-    const error = await response.text();
-    console.error("Hookdeck connection creation failed:", error);
-    throw new Error(`Failed to create Hookdeck connection: ${error}`);
+    console.error("Hookdeck connection creation failed:", responseText);
+    throw new Error(`Failed to create Hookdeck connection: ${responseText}`);
   }
 
-  return await response.json();
+  try {
+    return JSON.parse(responseText);
+  } catch (e) {
+    console.error("Failed to parse Hookdeck response:", e);
+    return { text: responseText };
+  }
 }
 
 /**
- * Updates a Hookdeck source URL
+ * Configures authentication for a Hookdeck source
+ * Uses the PUT method as specified in the Hookdeck API
  */
-export async function updateHookdeckSourceUrl(sourceId: string, url: string): Promise<any> {
+export async function configureHookdeckSourceAuth(config: HookdeckSourceAuthConfig): Promise<any> {
   const apiKey = Deno.env.get("HOOKDECK_API_KEY");
   if (!apiKey) {
     throw new Error("HOOKDECK_API_KEY is not configured");
   }
 
-  const response = await fetch(`https://api.hookdeck.com/2025-01-01/sources/${sourceId}`, {
-    method: "PATCH",
+  const sourceUpdatePayload = {
+    "id": config.sourceId,
+    "name": config.name,
+    "config": {
+      "auth_type": "BASIC_AUTH",
+      "auth": {
+        "username": config.username,
+        "password": config.password
+      }
+    }
+  };
+
+  console.log("Configuring Hookdeck source auth with payload:", JSON.stringify(sourceUpdatePayload));
+
+  const response = await fetch("https://api.hookdeck.com/2025-01-01/sources", {
+    method: "PUT",
     headers: {
       "Content-Type": "application/json",
       "Authorization": `Bearer ${apiKey}`
     },
-    body: JSON.stringify({
-      url: url
-    })
+    body: JSON.stringify(sourceUpdatePayload)
   });
 
+  const responseText = await response.text();
+  console.log(`Hookdeck source auth configuration response (${response.status}):`, responseText);
+
   if (!response.ok) {
-    const error = await response.text();
-    console.error("Hookdeck source update failed:", error);
-    throw new Error(`Failed to update Hookdeck source: ${error}`);
+    console.error("Hookdeck source auth configuration failed:", responseText);
+    throw new Error(`Failed to configure Hookdeck source auth: ${responseText}`);
   }
 
-  return await response.json();
+  try {
+    return JSON.parse(responseText);
+  } catch (e) {
+    console.error("Failed to parse Hookdeck response:", e);
+    return { text: responseText };
+  }
 }

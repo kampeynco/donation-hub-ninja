@@ -2,9 +2,8 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.29.0";
 import { 
-  createHookdeckSource, 
-  createHookdeckDestination, 
-  createHookdeckConnection 
+  createHookdeckConnection, 
+  configureHookdeckSourceAuth 
 } from "../utils/hookdeck-api.ts";
 
 // CORS headers for cross-origin requests
@@ -12,6 +11,16 @@ const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+// Generate a random password
+function generateRandomPassword(length = 16) {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+";
+  let password = "";
+  for (let i = 0; i < length; i++) {
+    password += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return password;
+}
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -42,6 +51,14 @@ serve(async (req) => {
       });
     }
 
+    console.log("Processing request for user:", userId, "email:", email);
+
+    // Generate a password for API authentication
+    const apiPassword = generateRandomPassword();
+    
+    // Create webhook record first
+    let webhookRecord;
+    
     // Check if webhook exists for the user
     const { data: existingWebhook, error: fetchError } = await supabase
       .from("webhooks")
@@ -51,95 +68,96 @@ serve(async (req) => {
 
     if (fetchError && fetchError.code !== 'PGRST116') {
       console.error("Error fetching webhook:", fetchError);
-      return new Response(JSON.stringify({ error: "Error checking webhook configuration" }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 500,
-      });
+      throw new Error("Error checking webhook configuration");
     }
 
     // If no webhook exists yet, create one with default values
     if (!existingWebhook) {
       console.log("No webhook found, creating one for user:", userId);
-      const { error: insertError } = await supabase
+      const { data, error: insertError } = await supabase
         .from("webhooks")
         .insert({
           user_id: userId,
           api_username: email,
-          api_password: generateRandomPassword(),
+          api_password: apiPassword,
           hookdeck_destination_url: "https://igjnhwvtasegwyiwcdkr.supabase.co/functions/v1/handle-webhook"
-        });
-
+        })
+        .select()
+        .single();
+      
       if (insertError) {
         console.error("Error creating initial webhook record:", insertError);
-        return new Response(JSON.stringify({ error: "Failed to initialize webhook configuration" }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-          status: 500,
-        });
+        throw new Error("Failed to initialize webhook configuration");
       }
       
-      // Fetch the newly created webhook
-      const { data: webhook, error: refetchError } = await supabase
-        .from("webhooks")
-        .select("*")
-        .eq("user_id", userId)
-        .single();
-        
-      if (refetchError) {
-        console.error("Error fetching new webhook:", refetchError);
-        return new Response(JSON.stringify({ error: "Error with webhook initialization" }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-          status: 500,
-        });
-      }
-      
-      // Use the newly created webhook for the Hookdeck setup
+      webhookRecord = data;
       console.log("Successfully created webhook record for user:", userId);
+    } else {
+      webhookRecord = existingWebhook;
+      // Update password if it exists
+      if (!webhookRecord.api_password) {
+        const { error: updateError } = await supabase
+          .from("webhooks")
+          .update({ api_password: apiPassword })
+          .eq("id", webhookRecord.id);
+          
+        if (updateError) {
+          console.error("Error updating webhook password:", updateError);
+        } else {
+          webhookRecord.api_password = apiPassword;
+        }
+      }
     }
-
-    // Create a Hookdeck source for the webhook
-    const sourceResponse = await createHookdeckSource({
-      name: `ActBlue Webhook - ${email}`,
-      url: "https://placeholder-url.com", // Will be updated later by the user
-      customerId: userId
-    });
-
-    // Create a Hookdeck destination for our webhook handler
-    const destinationResponse = await createHookdeckDestination({
-      name: `DonorCamp API - ${email}`,
-      url: "https://igjnhwvtasegwyiwcdkr.supabase.co/functions/v1/handle-webhook",
-      customerId: userId
-    });
-
-    // Create a connection between the source and destination
+    
+    // Hard-coded destination ID for our webhook handler
+    const donorCampDestinationId = "des_l3jgFfLpoQ8D";
+    
+    // STEP 1: Create the Hookdeck connection with a new source
     const connectionResponse = await createHookdeckConnection({
-      name: `ActBlue to DonorCamp - ${email}`,
-      sourceId: sourceResponse.id,
-      destinationId: destinationResponse.id,
-      customerId: userId
+      name: "donorcamp",
+      userId: userId,
+      destinationId: donorCampDestinationId
     });
-
-    // Update the webhook record with Hookdeck IDs
+    
+    console.log("Hookdeck connection created:", connectionResponse);
+    
+    // Extract the source ID and URL from the response
+    const sourceId = connectionResponse.source?.id;
+    const sourceUrl = connectionResponse.source?.url;
+    
+    if (!sourceId || !sourceUrl) {
+      throw new Error("Failed to get source ID or URL from Hookdeck response");
+    }
+    
+    // STEP 2: Configure authentication for the source
+    await configureHookdeckSourceAuth({
+      sourceId: sourceId,
+      name: userId,
+      username: email,
+      password: webhookRecord.api_password
+    });
+    
+    console.log("Hookdeck source authentication configured");
+    
+    // Update the webhook record with Hookdeck source ID and URL
     const { error: updateError } = await supabase
       .from("webhooks")
       .update({
-        hookdeck_source_id: sourceResponse.id,
-        hookdeck_connection_id: connectionResponse.id,
+        hookdeck_source_id: sourceId,
+        actblue_webhook_url: sourceUrl,
         last_used_at: new Date().toISOString(),
       })
       .eq("user_id", userId);
 
     if (updateError) {
       console.error("Error updating webhook with Hookdeck IDs:", updateError);
-      return new Response(JSON.stringify({ error: "Error updating webhook configuration" }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 500,
-      });
+      // Continue anyway since the webhook was created
     }
 
     // Return the Hookdeck source URL, which is what the user will configure in ActBlue
     return new Response(JSON.stringify({
       success: true,
-      hookdeckSourceUrl: sourceResponse.url,
+      hookdeckSourceUrl: sourceUrl,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
@@ -152,13 +170,3 @@ serve(async (req) => {
     });
   }
 });
-
-// Helper function to generate a random password
-function generateRandomPassword(length = 16) {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+";
-  let password = "";
-  for (let i = 0; i < length; i++) {
-    password += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return password;
-}

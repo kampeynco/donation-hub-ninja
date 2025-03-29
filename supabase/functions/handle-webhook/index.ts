@@ -41,6 +41,8 @@ serve(async (req) => {
       });
     }
 
+    console.log("Received webhook from Hookdeck source:", sourceId);
+
     // Find the webhook by Hookdeck source ID
     const { data: webhook, error: webhookError } = await supabase
       .from("webhooks")

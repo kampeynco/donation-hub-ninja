@@ -54,23 +54,6 @@ const SignUp = () => {
       
       console.log("Profile updated with committee name");
       
-      // Create webhook credentials first
-      const { error: webhookError } = await supabase
-        .from('webhooks')
-        .insert({
-          user_id: authData.user.id,
-          api_username: data.email,
-          api_password: data.apiPassword,
-          hookdeck_destination_url: "https://igjnhwvtasegwyiwcdkr.supabase.co/functions/v1/handle-webhook"
-        });
-      
-      if (webhookError) {
-        console.error("Webhook creation error:", webhookError);
-        // Continue even if webhook record creation fails, as we'll try again in the edge function
-      } else {
-        console.log("Webhook credentials created");
-      }
-      
       // Create Hookdeck webhook
       try {
         const hookdeckUrl = await createHookdeckWebhook(authData.user.id, data.email);
