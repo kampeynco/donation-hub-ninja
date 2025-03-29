@@ -15,7 +15,6 @@ export interface DonationData {
   recurring_duration: number;
   express_signup: boolean;
   is_express: boolean;
-  payment_type: string;
   is_paypal: boolean;
 }
 

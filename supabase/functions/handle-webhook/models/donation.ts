@@ -38,7 +38,6 @@ export function extractDonationData(
     recurring_duration: contribution.recurringDuration || 0,
     express_signup: contribution.expressSignup || false,
     is_express: contribution.isExpress || false,
-    payment_type: contribution.isPaypal ? 'paypal' : 'credit',
     is_paypal: contribution.isPaypal || false,
   };
 
@@ -54,7 +53,7 @@ export async function createDonation(
   donorId: string | null,
   requestId: string,
   timestamp: string
-): Promise<ProcessResult<{donationId: string, donationData: any}>> {
+): ProcessResult<{donationId: string, donationData: any}>> {
   try {
     const { data: newDonation, error: donationError } = await supabase
       .from("donations")
