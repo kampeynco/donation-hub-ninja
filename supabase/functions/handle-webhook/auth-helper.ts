@@ -14,7 +14,7 @@ export async function validateWebhookAuth(
   headers: Headers
 ) {
   // Extract the Hookdeck source name from headers (contains the user ID)
-  const sourceNameHeader = headers.get("x-hookdeck-source-name");
+  const sourceNameHeader = headers.get("source-name");
   console.log(`[${requestId}] Extracted source name header: ${sourceNameHeader}`);
   
   // No auth header provided
