@@ -52,8 +52,10 @@ const Navbar = () => {
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" className="h-10 w-10 p-0 rounded-full">
-                        <Avatar className="h-10 w-10 bg-[#007AFF] text-white">
-                          <AvatarFallback>{getInitials()}</AvatarFallback>
+                        <Avatar className="h-10 w-10 border-2 border-gray-200">
+                          <AvatarFallback className="bg-primary text-primary-foreground">
+                            {getInitials()}
+                          </AvatarFallback>
                         </Avatar>
                       </Button>
                     </DropdownMenuTrigger>
@@ -104,8 +106,10 @@ const Navbar = () => {
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" className="h-10 w-10 p-0 rounded-full">
-                        <Avatar className="h-10 w-10 bg-[#007AFF] text-white">
-                          <AvatarFallback>{getInitials()}</AvatarFallback>
+                        <Avatar className="h-10 w-10 border-2 border-gray-200">
+                          <AvatarFallback className="bg-primary text-primary-foreground">
+                            {getInitials()}
+                          </AvatarFallback>
                         </Avatar>
                       </Button>
                     </DropdownMenuTrigger>
