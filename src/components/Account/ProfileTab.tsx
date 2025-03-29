@@ -17,6 +17,7 @@ const ProfileTab = () => {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [organization, setOrganization] = useState("");
+  const [mobilePhone, setMobilePhone] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -43,6 +44,7 @@ const ProfileTab = () => {
             setFirstName(data.contact_first_name || "");
             setLastName(data.contact_last_name || "");
             setOrganization(data.committee_name || "");
+            setMobilePhone(data.mobile_phone || "");
           }
         } catch (error) {
           console.error('Error in profile fetch:', error);
@@ -74,6 +76,7 @@ const ProfileTab = () => {
           committee_name: organization,
           contact_first_name: firstName.trim() || null,
           contact_last_name: lastName.trim() || null,
+          mobile_phone: mobilePhone.trim() || null,
         })
         .eq('id', user.id);
         
@@ -156,6 +159,17 @@ const ProfileTab = () => {
                 className="bg-gray-100"
               />
               <p className="text-xs text-muted-foreground mt-1">Email cannot be changed</p>
+            </div>
+            <div className="space-y-2 sm:col-span-2">
+              <Label htmlFor="mobilePhone">Mobile Phone</Label>
+              <Input 
+                id="mobilePhone" 
+                type="tel" 
+                value={mobilePhone}
+                onChange={(e) => setMobilePhone(e.target.value)}
+                placeholder="Enter Mobile Phone Number"
+              />
+              <p className="text-xs text-muted-foreground mt-1">Required for text message notifications</p>
             </div>
             <div className="space-y-2 sm:col-span-2">
               <Label htmlFor="organization">Organization</Label>

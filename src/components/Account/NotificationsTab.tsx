@@ -4,7 +4,7 @@ import { Card, CardHeader, CardContent, CardTitle, CardDescription } from "@/com
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
-import { IconCheck } from "@tabler/icons-react";
+import { IconCheck, IconAlertCircle } from "@tabler/icons-react";
 import NotificationSection from "./NotificationSection";
 import NotificationRow from "./NotificationRow";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,19 +15,25 @@ const NotificationsTab = () => {
   const [settings, setSettings] = useState({
     marketing_web: true,
     marketing_email: true,
+    marketing_text: false,
     reports_web: true,
     reports_email: true,
+    reports_text: false,
     donations_web: true,
     donations_email: true,
+    donations_text: false,
     recurring_web: true,
-    recurring_email: true
+    recurring_email: true,
+    recurring_text: false
   });
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
+  const [hasPhoneNumber, setHasPhoneNumber] = useState(false);
 
   useEffect(() => {
     if (user) {
       fetchSettings();
+      checkPhoneNumber();
     }
   }, [user]);
 
@@ -49,12 +55,16 @@ const NotificationsTab = () => {
         setSettings({
           marketing_web: data.marketing_web,
           marketing_email: data.marketing_email,
+          marketing_text: data.marketing_text || false,
           reports_web: data.reports_web,
           reports_email: data.reports_email,
+          reports_text: data.reports_text || false,
           donations_web: data.donations_web,
           donations_email: data.donations_email,
+          donations_text: data.donations_text || false,
           recurring_web: data.recurring_web,
-          recurring_email: data.recurring_email
+          recurring_email: data.recurring_email,
+          recurring_text: data.recurring_text || false
         });
       }
     } catch (error) {
@@ -64,7 +74,41 @@ const NotificationsTab = () => {
     }
   };
 
+  const checkPhoneNumber = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('mobile_phone')
+        .eq('id', user?.id)
+        .single();
+        
+      if (error) {
+        console.error('Error fetching profile:', error);
+        return;
+      }
+      
+      setHasPhoneNumber(!!data.mobile_phone);
+    } catch (error) {
+      console.error('Error checking phone number:', error);
+    }
+  };
+
   const handleToggle = (key, value) => {
+    // If trying to enable text notifications but no phone number is available
+    if (key.endsWith('_text') && value && !hasPhoneNumber) {
+      toast({
+        title: "Phone Number Required",
+        description: (
+          <div className="flex items-center">
+            <IconAlertCircle className="mr-2 h-4 w-4 text-amber-500" />
+            <span>You need to add a mobile phone number in your profile to receive text notifications.</span>
+          </div>
+        ),
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setSettings(prev => ({
       ...prev,
       [key]: value
@@ -127,8 +171,10 @@ const NotificationsTab = () => {
                 description="Receive tips and updates about DonorCamp features"
                 webChecked={settings.marketing_web}
                 emailChecked={settings.marketing_email}
+                textChecked={settings.marketing_text}
                 onWebChange={(checked) => handleToggle('marketing_web', checked)}
                 onEmailChange={(checked) => handleToggle('marketing_email', checked)}
+                onTextChange={(checked) => handleToggle('marketing_text', checked)}
               />
               
               <NotificationRow
@@ -137,8 +183,10 @@ const NotificationsTab = () => {
                 description="Receive a weekly summary of your account activity"
                 webChecked={settings.reports_web}
                 emailChecked={settings.reports_email}
+                textChecked={settings.reports_text}
                 onWebChange={(checked) => handleToggle('reports_web', checked)}
                 onEmailChange={(checked) => handleToggle('reports_email', checked)}
+                onTextChange={(checked) => handleToggle('reports_text', checked)}
               />
             </NotificationSection>
             
@@ -146,7 +194,7 @@ const NotificationsTab = () => {
             
             <NotificationSection 
               title="ActBlue Notifications" 
-              showHeaders={false}
+              showHeaders={true}
             >
               <NotificationRow
                 id="donations"
@@ -154,8 +202,10 @@ const NotificationsTab = () => {
                 description="Receive a notification when a new donation is made"
                 webChecked={settings.donations_web}
                 emailChecked={settings.donations_email}
+                textChecked={settings.donations_text}
                 onWebChange={(checked) => handleToggle('donations_web', checked)}
                 onEmailChange={(checked) => handleToggle('donations_email', checked)}
+                onTextChange={(checked) => handleToggle('donations_text', checked)}
               />
               
               <NotificationRow
@@ -164,8 +214,10 @@ const NotificationsTab = () => {
                 description="Receive a notification when recurring donations are processed"
                 webChecked={settings.recurring_web}
                 emailChecked={settings.recurring_email}
+                textChecked={settings.recurring_text}
                 onWebChange={(checked) => handleToggle('recurring_web', checked)}
                 onEmailChange={(checked) => handleToggle('recurring_email', checked)}
+                onTextChange={(checked) => handleToggle('recurring_text', checked)}
               />
             </NotificationSection>
             
