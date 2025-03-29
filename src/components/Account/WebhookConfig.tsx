@@ -1,58 +1,33 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { Label } from "@/components/ui/label";
 import CopyableInput from "@/components/Auth/CopyableInput";
 import CopyablePasswordInput from "@/components/Auth/CopyablePasswordInput";
-import { IconRefresh } from "@tabler/icons-react";
+import { IconRefresh, IconExternalLink } from "@tabler/icons-react";
 import { WebhookCredentials, updateWebhookCredentials, regenerateApiPassword, updateActBlueWebhookUrl, testActBlueWebhook } from "@/services/webhookService";
 import { toast } from "@/components/ui/use-toast";
+
 interface WebhookConfigProps {
   webhookCredentials: WebhookCredentials | null;
   setWebhookCredentials: React.Dispatch<React.SetStateAction<WebhookCredentials | null>>;
   actBlueWebhookUrl: string;
   setActBlueWebhookUrl: React.Dispatch<React.SetStateAction<string>>;
 }
+
 const WebhookConfig = ({
   webhookCredentials,
   setWebhookCredentials,
   actBlueWebhookUrl,
   setActBlueWebhookUrl
 }: WebhookConfigProps) => {
-  const [isLoading, setIsLoading] = useState(false);
   const [isRegeneratingPassword, setIsRegeneratingPassword] = useState(false);
   const [isTesting, setIsTesting] = useState(false);
-  const handleSaveWebhookUrl = async () => {
-    if (!webhookCredentials) return;
-    setIsLoading(true);
-    try {
-      const success = await updateActBlueWebhookUrl(webhookCredentials.id, actBlueWebhookUrl);
-      if (success) {
-        setWebhookCredentials({
-          ...webhookCredentials,
-          actblue_webhook_url: actBlueWebhookUrl
-        });
-        toast({
-          title: "Webhook URL updated",
-          description: "Your ActBlue webhook URL has been updated successfully."
-        });
-      } else {
-        throw new Error("Failed to update webhook URL");
-      }
-    } catch (error) {
-      console.error("Error updating webhook URL:", error);
-      toast({
-        title: "Error updating webhook URL",
-        description: error instanceof Error ? error.message : "An unknown error occurred",
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+
   const handleRegeneratePassword = async () => {
     if (!webhookCredentials) return;
+    
     setIsRegeneratingPassword(true);
     try {
       const newPassword = await regenerateApiPassword(webhookCredentials.id);
@@ -79,8 +54,10 @@ const WebhookConfig = ({
       setIsRegeneratingPassword(false);
     }
   };
+
   const handleTestWebhook = async () => {
     if (!webhookCredentials) return;
+    
     setIsTesting(true);
     try {
       await testActBlueWebhook(webhookCredentials.id);
@@ -88,17 +65,27 @@ const WebhookConfig = ({
       setIsTesting(false);
     }
   };
+
   return <div className="space-y-6">
       <div className="space-y-2">
         <Label htmlFor="actBlueWebhookUrl">Endpoint URL</Label>
-        <div className="flex gap-2">
-          <Input id="actBlueWebhookUrl" value={actBlueWebhookUrl} onChange={e => setActBlueWebhookUrl(e.target.value)} placeholder="https://your-actblue-webhook-url.com" className="flex-1" />
-          <Button variant="outline" onClick={handleSaveWebhookUrl} disabled={isLoading || !webhookCredentials}>
-            {isLoading ? "Saving..." : "Save"}
-          </Button>
-          <Button variant="outline" onClick={handleTestWebhook} disabled={isTesting || !webhookCredentials || !actBlueWebhookUrl}>
-            {isTesting ? "Testing..." : "Test"}
-          </Button>
+        <div className="space-y-2">
+          <CopyableInput 
+            id="actBlueWebhookUrl" 
+            value={actBlueWebhookUrl} 
+            readOnly={true}
+            className="w-full"
+          />
+          <div className="flex justify-end">
+            <Button 
+              variant="outline" 
+              onClick={handleTestWebhook} 
+              disabled={isTesting || !webhookCredentials || !actBlueWebhookUrl}
+              size="sm"
+            >
+              {isTesting ? "Testing..." : "Test Connection"}
+            </Button>
+          </div>
         </div>
         <p className="text-xs text-gray-500">
           This is the secure Hookdeck webhook URL that you'll configure in your ActBlue account settings.
@@ -135,4 +122,5 @@ const WebhookConfig = ({
       </div>
     </div>;
 };
+
 export default WebhookConfig;
