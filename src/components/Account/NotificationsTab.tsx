@@ -10,7 +10,6 @@ import {
   TooltipProvider,
   TooltipTrigger 
 } from "@/components/ui/tooltip";
-import { IconInfoCircle } from "@tabler/icons-react";
 
 const NotificationsTab = () => {
   return (
@@ -27,14 +26,11 @@ const NotificationsTab = () => {
           <div className="space-y-4">
             <div className="grid grid-cols-[1fr_100px_100px_100px] items-center">
               <div className="col-span-1"></div>
-              <div className="text-sm font-medium text-center flex items-center justify-center gap-1">
+              <div className="text-sm font-medium text-center">
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <div className="flex items-center">
-                        Email
-                        <IconInfoCircle size={14} className="ml-1 text-muted-foreground" />
-                      </div>
+                      <span className="cursor-help">Email</span>
                     </TooltipTrigger>
                     <TooltipContent>
                       <p>Receive notifications via email</p>
@@ -42,14 +38,11 @@ const NotificationsTab = () => {
                   </Tooltip>
                 </TooltipProvider>
               </div>
-              <div className="text-sm font-medium text-center flex items-center justify-center gap-1">
+              <div className="text-sm font-medium text-center">
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <div className="flex items-center">
-                        Text
-                        <IconInfoCircle size={14} className="ml-1 text-muted-foreground" />
-                      </div>
+                      <span className="cursor-help">Text</span>
                     </TooltipTrigger>
                     <TooltipContent>
                       <p>Receive notifications via SMS</p>
@@ -57,14 +50,11 @@ const NotificationsTab = () => {
                   </Tooltip>
                 </TooltipProvider>
               </div>
-              <div className="text-sm font-medium text-center flex items-center justify-center gap-1">
+              <div className="text-sm font-medium text-center">
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <div className="flex items-center">
-                        Web
-                        <IconInfoCircle size={14} className="ml-1 text-muted-foreground" />
-                      </div>
+                      <span className="cursor-help">Web</span>
                     </TooltipTrigger>
                     <TooltipContent>
                       <p>Receive notifications in the web application</p>
@@ -117,55 +107,6 @@ const NotificationsTab = () => {
         <div>
           <h3 className="font-medium mb-4">ActBlue Notifications</h3>
           <div className="space-y-4">
-            <div className="grid grid-cols-[1fr_100px_100px_100px] items-center">
-              <div className="col-span-1"></div>
-              <div className="text-sm font-medium text-center flex items-center justify-center gap-1">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="flex items-center">
-                        Email
-                        <IconInfoCircle size={14} className="ml-1 text-muted-foreground" />
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Receive notifications via email</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-              <div className="text-sm font-medium text-center flex items-center justify-center gap-1">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="flex items-center">
-                        Text
-                        <IconInfoCircle size={14} className="ml-1 text-muted-foreground" />
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Receive notifications via SMS</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-              <div className="text-sm font-medium text-center flex items-center justify-center gap-1">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="flex items-center">
-                        Web
-                        <IconInfoCircle size={14} className="ml-1 text-muted-foreground" />
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Receive notifications in the web application</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-            </div>
-            
             <div className="grid grid-cols-[1fr_100px_100px_100px] items-center">
               <div className="space-y-0.5">
                 <Label>Donation Received</Label>
