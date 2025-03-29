@@ -5,6 +5,7 @@ export interface HookdeckConnectionConfig {
   name: string;
   userId: string;  // Used as the source name
   destinationId: string;
+  transformationId?: string; // Optional transformation ID
 }
 
 export interface HookdeckSourceAuthConfig {
@@ -24,7 +25,7 @@ export async function createHookdeckConnection(config: HookdeckConnectionConfig)
     throw new Error("HOOKDECK_API_KEY is not configured");
   }
 
-  const hookdeckPayload = {
+  const hookdeckPayload: any = {
     "id": `web_${crypto.randomUUID().replace(/-/g, '').substring(0, 10)}`,
     "name": config.name,
     "source": {
@@ -33,6 +34,16 @@ export async function createHookdeckConnection(config: HookdeckConnectionConfig)
     },
     "destination_id": config.destinationId
   };
+  
+  // Add transformation rule if transformationId is provided
+  if (config.transformationId) {
+    hookdeckPayload.rules = [
+      {
+        "type": "transform",
+        "transformation_id": config.transformationId
+      }
+    ];
+  }
 
   console.log("Creating Hookdeck connection with payload:", JSON.stringify(hookdeckPayload));
 

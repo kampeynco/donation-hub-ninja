@@ -111,12 +111,15 @@ serve(async (req) => {
     
     // Hard-coded destination ID for our webhook handler
     const donorCampDestinationId = "des_l3jgFfLpoQ8D";
+    // Hard-coded transformation ID
+    const transformationId = "trs_nkCMlVBaTT0MlE";
     
-    // STEP 1: Create the Hookdeck connection with a new source
+    // STEP 1: Create the Hookdeck connection with a new source and transformation
     const connectionResponse = await createHookdeckConnection({
       name: "donorcamp",
       userId: userId,
-      destinationId: donorCampDestinationId
+      destinationId: donorCampDestinationId,
+      transformationId: transformationId
     });
     
     console.log("Hookdeck connection created:", connectionResponse);
