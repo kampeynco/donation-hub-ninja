@@ -1,32 +1,17 @@
 
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.29.0";
-import { Resend } from "npm:resend@2.0.0";
-
-// Configure clients
-const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
-const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
-const resendApiKey = Deno.env.get("RESEND_API_KEY") || "";
-const plivoAuthId = Deno.env.get("PLIVO_API_KEY") || "";
-const plivoAuthToken = Deno.env.get("PLIVO_AUTH_TOKEN") || "";
-
-const resend = new Resend(resendApiKey);
-
-interface NotificationRequest {
-  userId: string;
-  donationId: string;
-  amount: number;
-  donorId: string;
-  donorName: string | null;
-  donorEmail: string | undefined;
-  donationType: 'recurring' | 'one_time';
-  requestId: string;
-}
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+import { NotificationRequest } from "./types.ts";
+import { corsHeaders } from "./utils/corsHeaders.ts";
+import { 
+  getUserNotificationSettings, 
+  getUserProfile, 
+  createWebNotification 
+} from "./services/database.ts";
+import { 
+  sendEmailNotification, 
+  getRecipientName 
+} from "./services/email.ts";
+import { sendSmsNotification } from "./services/sms.ts";
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -44,21 +29,11 @@ serve(async (req) => {
     
     console.log(`[${requestId}] Processing notification for ${donationType} donation ${donationId}`);
     
-    if (!supabaseUrl || !supabaseServiceKey) {
-      throw new Error("Missing Supabase environment variables");
-    }
-    
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    
     // Get user notification preferences
-    const { data: notificationSettings, error: settingsError } = await supabase
-      .from('notification_settings')
-      .select('*')
-      .eq('user_id', userId)
-      .single();
+    const notificationSettings = await getUserNotificationSettings(userId);
     
-    if (settingsError) {
-      throw new Error(`Error fetching notification settings: ${settingsError.message}`);
+    if (!notificationSettings) {
+      throw new Error(`Error fetching notification settings for user ${userId}`);
     }
     
     // Based on donationType, determine which notification preferences to use
@@ -75,20 +50,13 @@ serve(async (req) => {
       notificationSettings.donations_text;
     
     // Get user profile for committee name and contact info
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('committee_name, contact_first_name, contact_last_name, mobile_phone')
-      .eq('id', userId)
-      .single();
+    const profile = await getUserProfile(userId);
     
-    if (profileError) {
-      console.error(`[${requestId}] Error fetching user profile:`, profileError);
-      throw new Error(`Error fetching user profile: ${profileError.message}`);
+    if (!profile) {
+      throw new Error(`Error fetching user profile for user ${userId}`);
     }
 
-    const recipientName = profile.contact_first_name 
-      ? `${profile.contact_first_name} ${profile.contact_last_name || ''}`
-      : `${profile.committee_name} Team`;
+    const recipientName = getRecipientName(profile);
     
     // Handle web notification (create entry in notifications table)
     if (webEnabled) {
@@ -96,104 +64,40 @@ serve(async (req) => {
         ? `Recurring donation of $${amount.toFixed(2)} received from ${donorName || 'Anonymous'}`
         : `Donation of $${amount.toFixed(2)} received from ${donorName || 'Anonymous'}`;
         
-      const { error: notificationError } = await supabase
-        .from('notifications')
-        .insert({
-          message,
-          action: donationType === 'recurring' ? 'recurring_donation' : 'donation',
-          donor_id: donorId,
-          is_read: false
-        });
-      
-      if (notificationError) {
-        console.error(`[${requestId}] Error creating web notification:`, notificationError);
-      } else {
-        console.log(`[${requestId}] Web notification created successfully`);
-      }
+      await createWebNotification(
+        message, 
+        donationType === 'recurring' ? 'recurring_donation' : 'donation',
+        donorId,
+        requestId
+      );
     }
     
-    // Handle email notification using Resend
-    if (emailEnabled && resendApiKey) {
-      try {
-        const emailSubject = donationType === 'recurring' 
-          ? `Recurring Donation Received: $${amount.toFixed(2)}`
-          : `New Donation Received: $${amount.toFixed(2)}`;
-          
-        const emailHtml = `
-          <div style="font-family: 'Inter', system-ui, sans-serif; color: #1e293b; max-width: 600px; margin: 0 auto;">
-            <h1 style="color: #007AFF;">Donation Received</h1>
-            <p>Hello ${recipientName},</p>
-            <p>A ${donationType === 'recurring' ? 'recurring' : 'new'} donation of <strong>$${amount.toFixed(2)}</strong> has been received from ${donorName || 'Anonymous'}.</p>
-            <div style="margin: 20px 0; padding: 15px; border-left: 4px solid #007AFF; background-color: #f5f5f7;">
-              <p style="margin: 0 0 10px 0;"><strong>Donation Details:</strong></p>
-              <p style="margin: 0;">Amount: $${amount.toFixed(2)}</p>
-              <p style="margin: 0;">Type: ${donationType === 'recurring' ? 'Recurring' : 'One-time'}</p>
-              <p style="margin: 0;">Donor: ${donorName || 'Anonymous'}</p>
-            </div>
-            <p>Log in to your Donor Camp dashboard to view the full details.</p>
-            <p>Thank you,<br>Donor Camp</p>
-          </div>
-        `;
+    // Handle email notification
+    if (emailEnabled && donorEmail) {
+      const emailSubject = donationType === 'recurring' 
+        ? `Recurring Donation Received: $${amount.toFixed(2)}`
+        : `New Donation Received: $${amount.toFixed(2)}`;
         
-        const emailData = {
-          from: "Donor Camp <notifications@donorcamp.app>",
-          to: donorEmail || '',
-          subject: emailSubject,
-          html: emailHtml
-        };
-
-        // Send email if there's a valid recipient
-        if (donorEmail) {
-          const emailResponse = await resend.emails.send(emailData);
-          console.log(`[${requestId}] Email sent successfully:`, emailResponse);
-        } else {
-          console.log(`[${requestId}] No valid email address to send notification`);
-        }
-      } catch (error) {
-        console.error(`[${requestId}] Error sending email:`, error);
-      }
+      await sendEmailNotification(
+        donorEmail,
+        emailSubject,
+        recipientName,
+        amount,
+        donorName || 'Anonymous',
+        donationType,
+        requestId
+      );
     }
     
-    // Handle SMS notification using Plivo instead of Twilio
-    if (textEnabled && plivoAuthId && plivoAuthToken) {
-      try {
-        // Get user profile for mobile phone
-        if (!profile.mobile_phone) {
-          console.log(`[${requestId}] No mobile phone found for user, skipping SMS notification`);
-        } else {
-          const smsMessage = donationType === 'recurring' 
-            ? `Donor Camp: Recurring donation of $${amount.toFixed(2)} received from ${donorName || 'Anonymous'}`
-            : `Donor Camp: New donation of $${amount.toFixed(2)} received from ${donorName || 'Anonymous'}`;
-            
-          // Format mobile phone for Plivo (remove any non-digit characters)
-          const formattedPhone = profile.mobile_phone.replace(/\D/g, '');
-          
-          // Construct Plivo API URL
-          const plivoApiUrl = 'https://api.plivo.com/v1/Account/' + plivoAuthId + '/Message/';
-          
-          // Prepare authorization header for Plivo API
-          const authHeader = 'Basic ' + btoa(plivoAuthId + ':' + plivoAuthToken);
-          
-          // Send SMS using Plivo API
-          const plivoResponse = await fetch(plivoApiUrl, {
-            method: 'POST',
-            headers: {
-              'Authorization': authHeader,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              src: '18445096979', // Replace with your Plivo phone number
-              dst: formattedPhone,
-              text: smsMessage
-            })
-          });
-          
-          const responseData = await plivoResponse.json();
-          console.log(`[${requestId}] SMS sent successfully with Plivo:`, responseData);
-        }
-      } catch (error) {
-        console.error(`[${requestId}] Error sending SMS with Plivo:`, error);
-      }
+    // Handle SMS notification
+    if (textEnabled) {
+      await sendSmsNotification(
+        profile,
+        amount,
+        donorName || 'Anonymous',
+        donationType,
+        requestId
+      );
     }
     
     return new Response(
