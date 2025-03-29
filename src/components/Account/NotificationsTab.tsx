@@ -16,7 +16,7 @@ const NotificationsTab = () => {
       </CardHeader>
       <CardContent className="space-y-6">
         <div>
-          <h3 className="font-medium mb-4">Account</h3>
+          <h3 className="font-medium mb-4">Account Notifications</h3>
           <div className="space-y-4">
             <div className="grid grid-cols-[1fr_100px_100px] items-center">
               <div className="col-span-1"></div>
@@ -59,7 +59,7 @@ const NotificationsTab = () => {
         <Separator className="my-4" />
         
         <div>
-          <h3 className="font-medium mb-4">Donor</h3>
+          <h3 className="font-medium mb-4">ActBlue Notifications</h3>
           <div className="space-y-4">
             <div className="grid grid-cols-[1fr_100px_100px] items-center">
               <div className="col-span-1"></div>
