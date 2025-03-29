@@ -4,9 +4,10 @@ import { IconBell } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { X } from "lucide-react";
+import { IconX } from "@tabler/icons-react";
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
+
 const Navbar = () => {
   // Define initial notifications
   const initialNotifications = [{
@@ -46,6 +47,7 @@ const Navbar = () => {
     const email = user.email;
     return email.substring(0, 2).toUpperCase();
   };
+  
   return <header className="border-b bg-white shadow-sm">
       <div className="container max-w-7xl mx-auto flex items-center justify-between py-4 px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-8">
@@ -57,15 +59,7 @@ const Navbar = () => {
             </div>
             <span className="text-xl font-semibold tracking-tight">Donor Camp</span>
           </Link>
-          <nav className="hidden md:flex">
-            <ul className="flex gap-8">
-              <li>
-                <Link to="/dashboard" className="border-b-2 border-transparent pb-4 text-sm font-medium text-gray-500 hover:text-gray-900">
-                  Donors
-                </Link>
-              </li>
-            </ul>
-          </nav>
+          {/* Navigation menu has been removed */}
         </div>
         <div className="flex items-center gap-5">
           <Popover>
@@ -87,7 +81,7 @@ const Navbar = () => {
               <div className="max-h-80 overflow-auto">
                 {notifications.length > 0 ? notifications.map(notification => <div key={notification.id} className="border-b p-4 hover:bg-gray-50 relative">
                       <button onClick={() => removeNotification(notification.id)} className="absolute right-4 top-4 text-gray-400 hover:text-gray-600">
-                        <X size={14} />
+                        <IconX size={14} />
                       </button>
                       <p className="text-sm text-gray-700 pr-5">{notification.message}</p>
                       <p className="text-xs text-gray-400 mt-1">{notification.timestamp}</p>
@@ -129,4 +123,5 @@ const Navbar = () => {
       </div>
     </header>;
 };
+
 export default Navbar;
