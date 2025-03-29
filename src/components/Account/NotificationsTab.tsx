@@ -93,7 +93,7 @@ const NotificationsTab = () => {
     }
   };
 
-  const handleToggle = (key, value) => {
+  const handleToggle = (key: string, value: boolean) => {
     // If trying to enable text notifications but no phone number is available
     if (key.endsWith('_text') && value && !hasPhoneNumber) {
       toast({
@@ -137,7 +137,7 @@ const NotificationsTab = () => {
           </div>
         ),
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving notification settings:', error);
       toast({
         title: "Failed to save",
