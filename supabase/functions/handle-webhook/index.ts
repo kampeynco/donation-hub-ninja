@@ -5,7 +5,7 @@ import { ActBlueWebhookPayload } from "./types.ts";
 import { createErrorHttpResponse } from "./error-handler.ts";
 import { errorResponses } from "./error-handler.ts";
 import { validateWebhookAuth } from "./auth-helper.ts";
-import { processDonation } from "./db-operations.ts";
+import { processDonation } from "./models/index.ts";
 
 // CORS headers for cross-origin requests
 const corsHeaders = {
