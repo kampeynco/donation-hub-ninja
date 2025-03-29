@@ -29,9 +29,21 @@ serve(async (req) => {
     
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Parse the request body (ActBlue payload)
-    const payload: ActBlueWebhookPayload = await req.json();
-    console.log("Received ActBlue webhook payload:", JSON.stringify(payload));
+    console.log("Request method:", req.method);
+    console.log("Request headers:", JSON.stringify(Object.fromEntries(req.headers.entries())));
+    
+    let payload: ActBlueWebhookPayload;
+    try {
+      // Parse the request body (ActBlue payload)
+      payload = await req.json();
+      console.log("Received ActBlue webhook payload:", JSON.stringify(payload));
+    } catch (error) {
+      console.error("Error parsing payload:", error);
+      return new Response(JSON.stringify({ error: "Invalid JSON payload" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
 
     // Process ActBlue payload
     if (!payload || !payload.contribution) {
