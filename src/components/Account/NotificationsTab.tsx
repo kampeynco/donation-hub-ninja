@@ -86,8 +86,12 @@ const NotificationsTab = () => {
       
       toast({
         title: "Settings saved",
-        description: "Your notification preferences have been updated",
-        icon: <IconCheck size={18} />,
+        description: (
+          <div className="flex items-center">
+            <IconCheck className="mr-2 h-4 w-4 text-green-500" />
+            <span>Your notification preferences have been updated</span>
+          </div>
+        ),
       });
     } catch (error) {
       console.error('Error saving notification settings:', error);
