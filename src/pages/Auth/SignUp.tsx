@@ -40,7 +40,7 @@ const SignUp = () => {
       
       console.log("User created successfully:", authData.user.id);
       
-      // Update the profile with committee name
+      // Update the profile with committee name - explicitly set the committee_name
       const { error: profileError } = await supabase
         .from('profiles')
         .update({ committee_name: data.committeeName })
