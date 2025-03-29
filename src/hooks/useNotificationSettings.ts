@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -102,16 +101,10 @@ export const useNotificationSettings = (userId: string | undefined) => {
   };
 
   const handleToggle = (key: string, value: boolean) => {
-    // If trying to enable text notifications but no phone number is available
     if (key.endsWith('_text') && value && !hasPhoneNumber) {
       toast({
         title: "Phone Number Required",
-        description: (
-          <div className="flex items-center">
-            <IconAlertCircle className="mr-2 h-4 w-4 text-amber-500" />
-            <span>You need to add a mobile phone number in your profile to receive text notifications.</span>
-          </div>
-        ),
+        description: "You need to add a mobile phone number in your profile to receive text notifications.",
         variant: "destructive",
       });
       return;
@@ -138,12 +131,7 @@ export const useNotificationSettings = (userId: string | undefined) => {
       
       toast({
         title: "Settings saved",
-        description: (
-          <div className="flex items-center">
-            <IconCheck className="mr-2 h-4 w-4 text-green-500" />
-            <span>Your notification preferences have been updated</span>
-          </div>
-        ),
+        description: "Your notification preferences have been updated",
       });
     } catch (error: any) {
       console.error('Error saving notification settings:', error);
