@@ -1,161 +1,148 @@
-
-import { Link } from "react-router-dom";
-import { IconBell } from "@tabler/icons-react";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { IconX } from "@tabler/icons-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { IconMenu2, IconX, IconLogout2 } from "@tabler/icons-react";
+import NotificationBell from '@/components/Notifications/NotificationBell';
 
 const Navbar = () => {
-  // Define initial notifications
-  const initialNotifications = [{
-    id: 1,
-    message: "John Doe donated $50.00",
-    timestamp: "2 minutes ago"
-  }, {
-    id: 2,
-    message: "Jane Smith donated $25.00",
-    timestamp: "1 hour ago"
-  }, {
-    id: 3,
-    message: "Mike Johnson created an account",
-    timestamp: "Yesterday"
-  }];
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // State to manage notifications
-  const [notifications, setNotifications] = useState(initialNotifications);
-  const [firstName, setFirstName] = useState<string | null>(null);
-  const [lastName, setLastName] = useState<string | null>(null);
-  
-  const {
-    user,
-    signOut
-  } = useAuth();
-
-  useEffect(() => {
-    if (user) {
-      const fetchProfile = async () => {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('contact_first_name, contact_last_name')
-          .eq('id', user.id)
-          .single();
-          
-        if (!error && data) {
-          setFirstName(data.contact_first_name);
-          setLastName(data.contact_last_name);
-        }
-      };
-      
-      fetchProfile();
-    }
-  }, [user]);
-
-  // Function to remove a notification
-  const removeNotification = (id: number) => {
-    setNotifications(notifications.filter(notification => notification.id !== id));
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
-  // Function to mark all notifications as read
-  const markAllAsRead = () => {
-    setNotifications([]);
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
   };
 
-  // Get user initials for avatar
-  const getUserInitials = () => {
-    if (firstName && lastName) {
-      return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
-    } else if (firstName) {
-      return firstName.charAt(0).toUpperCase();
-    } else if (lastName) {
-      return lastName.charAt(0).toUpperCase();
-    }
-    
-    if (!user || !user.email) return "U";
-    return user.email.substring(0, 2).toUpperCase();
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/login");
   };
-  
-  return <header className="border-b bg-white shadow-sm">
-      <div className="container max-w-7xl mx-auto flex items-center justify-between py-4 px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-8">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="white" />
-              </svg>
-            </div>
-            <span className="text-xl font-semibold tracking-tight">Donor Camp</span>
+
+  return (
+    <nav className="bg-white border-b shadow-sm sticky top-0 z-50">
+      <div className="container max-w-7xl mx-auto py-3 px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-12">
+          {/* Logo and Brand */}
+          <Link to="/" className="flex items-center font-bold text-xl">
+            DonorCamp
           </Link>
-          {/* Navigation menu has been removed */}
-        </div>
-        <div className="flex items-center gap-5">
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="ghost" size="icon" className="relative rounded-full hover:bg-gray-100">
-                <IconBell className="h-5 w-5 text-gray-600" />
-                {notifications.length > 0 && <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-medium text-white">
-                    {notifications.length}
-                  </span>}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent align="end" className="w-80 p-0 rounded-xl shadow-lg border-gray-200">
-              <div className="border-b p-4 flex justify-between items-center">
-                <p className="font-medium">Notifications</p>
-                {notifications.length > 0 && <button onClick={markAllAsRead} className="text-xs text-primary hover:underline">
-                    Mark all as read
-                  </button>}
-              </div>
-              <div className="max-h-80 overflow-auto">
-                {notifications.length > 0 ? notifications.map(notification => <div key={notification.id} className="border-b p-4 hover:bg-gray-50 relative">
-                      <button onClick={() => removeNotification(notification.id)} className="absolute right-4 top-4 text-gray-400 hover:text-gray-600">
-                        <IconX size={14} />
-                      </button>
-                      <p className="text-sm text-gray-700 pr-5">{notification.message}</p>
-                      <p className="text-xs text-gray-400 mt-1">{notification.timestamp}</p>
-                    </div>) : <div className="p-4 text-center">
-                    <p className="text-sm text-gray-500">No notifications</p>
-                  </div>}
-              </div>
-            </PopoverContent>
-          </Popover>
-          
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="ghost" size="icon" className="rounded-full hover:bg-gray-100">
-                <Avatar className="h-9 w-9 border-2 border-gray-200">
-                  <AvatarImage src="" />
-                  <AvatarFallback className="bg-primary text-primary-foreground">{getUserInitials()}</AvatarFallback>
-                </Avatar>
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent align="end" className="w-56 p-0 rounded-xl shadow-lg border-gray-200">
-              <div className="border-b p-4">
-                {(firstName || lastName) && (
-                  <p className="font-medium">
-                    {firstName} {lastName}
-                  </p>
-                )}
-                <p className="text-sm text-gray-500">{user?.email}</p>
-              </div>
-              <div className="p-2">
-                <Link to="/account" className="block rounded-lg px-2 py-1.5 text-sm hover:bg-gray-100">
-                  Account settings
-                </Link>
-                <Link to="/" className="block rounded-lg px-2 py-1.5 text-sm hover:bg-gray-100">
-                  Help & support
-                </Link>
-                <button onClick={signOut} className="block w-full rounded-lg px-2 py-1.5 text-left text-sm text-red-600 hover:bg-gray-100">
-                  Sign out
-                </button>
-              </div>
-            </PopoverContent>
-          </Popover>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-4">
+            <Link to="/dashboard" className="text-gray-600 hover:text-gray-800">
+              Dashboard
+            </Link>
+            {user ? (
+              <>
+                <div className="hidden md:flex items-center space-x-2">
+                  <NotificationBell />
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="h-8 w-8 p-0 rounded-full">
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src={user?.user_metadata?.avatar_url} alt={user?.email || "Avatar"} />
+                          <AvatarFallback>{user?.email?.substring(0, 2).toUpperCase()}</AvatarFallback>
+                        </Avatar>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-56" align="end" forceMount>
+                      <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link to="/account" className="w-full">
+                          Settings
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
+                        Logout
+                        <IconLogout2 className="ml-auto h-4 w-4" />
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </>
+            ) : (
+              <Link to="/login" className="text-gray-600 hover:text-gray-800">
+                Login
+              </Link>
+            )}
+          </div>
+
+          {/* Mobile Navigation Button */}
+          <div className="md:hidden">
+            <Button variant="ghost" size="icon" onClick={toggleMobileMenu}>
+              {isMobileMenuOpen ? (
+                <IconX className="h-6 w-6" />
+              ) : (
+                <IconMenu2 className="h-6 w-6" />
+              )}
+            </Button>
+          </div>
         </div>
       </div>
-    </header>;
+
+      {/* Mobile Navigation Menu */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden bg-gray-50 py-2 border-b">
+          <div className="container max-w-7xl mx-auto flex flex-col space-y-2 px-4 sm:px-6 lg:px-8">
+            <Link to="/dashboard" className="text-gray-600 hover:text-gray-800" onClick={closeMobileMenu}>
+              Dashboard
+            </Link>
+            {user ? (
+              <>
+                <div className="md:hidden flex items-center space-x-2">
+                  <NotificationBell />
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="h-8 w-8 p-0 rounded-full">
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src={user?.user_metadata?.avatar_url} alt={user?.email || "Avatar"} />
+                          <AvatarFallback>{user?.email?.substring(0, 2).toUpperCase()}</AvatarFallback>
+                        </Avatar>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-56" align="end" forceMount>
+                      <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link to="/account" className="w-full">
+                          Settings
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
+                        Logout
+                        <IconLogout2 className="ml-auto h-4 w-4" />
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </>
+            ) : (
+              <Link to="/login" className="text-gray-600 hover:text-gray-800" onClick={closeMobileMenu}>
+                Login
+              </Link>
+            )}
+          </div>
+        </div>
+      )}
+    </nav>
+  );
 };
 
 export default Navbar;
