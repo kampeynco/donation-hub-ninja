@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -53,7 +54,7 @@ const Home = () => {
             Manage your donors and track donations with ease
           </h1>
           <p className="text-xl md:text-2xl mb-10 max-w-2xl">
-            DonorCamp helps you track donations, manage donor relationships, and grow your fundraising efforts.
+            Donor Camp helps you track donations, manage donor relationships, and grow your fundraising efforts.
           </p>
           <Link to="/auth/signup">
             <Button size="lg" className="bg-white text-primary hover:bg-gray-100 font-semibold px-8">
@@ -111,7 +112,7 @@ const Home = () => {
             Ready to streamline your fundraising?
           </h2>
           <p className="text-xl mb-10 max-w-2xl mx-auto">
-            Join thousands of organizations using DonorCamp to manage their donations and donors.
+            Join thousands of organizations using Donor Camp to manage their donations and donors.
           </p>
           <Link to="/auth/signup">
             <Button size="lg" className="font-semibold px-8">
@@ -131,10 +132,10 @@ const Home = () => {
                   <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#2563EB" />
                 </svg>
               </div>
-              <span className="text-xl font-semibold tracking-tight">DonorCamp</span>
+              <span className="text-xl font-semibold tracking-tight">Donor Camp</span>
             </Link>
             <div className="text-gray-400 text-sm">
-              © {new Date().getFullYear()} DonorCamp. All rights reserved.
+              © {new Date().getFullYear()} Donor Camp. All rights reserved.
             </div>
           </div>
         </div>

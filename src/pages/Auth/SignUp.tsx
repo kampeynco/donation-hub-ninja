@@ -65,7 +65,7 @@ const SignUp = () => {
       
       toast({
         title: "Account created successfully",
-        description: "Welcome to DonorCamp!",
+        description: "Welcome to Donor Camp!",
         duration: 5000,
       });
       
@@ -88,7 +88,7 @@ const SignUp = () => {
       {/* Left Column - Blue Background */}
       <AuthSidebar 
         title="Create an account"
-        description="Join DonorCamp to track donor activity and build deeper relationships with donors."
+        description="Join Donor Camp to track donor activity and build deeper relationships with donors."
         linkLabel="Already have an account?"
         linkUrl="/auth/signin"
         linkText="Sign in"
