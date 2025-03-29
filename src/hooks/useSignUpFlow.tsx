@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 export interface SignUpData {
   email: string;
@@ -7,7 +7,6 @@ export interface SignUpData {
   confirmPassword: string;
   committeeName: string;
   apiPassword: string;
-  currentStep: number;
 }
 
 interface UseSignUpFlowProps {
@@ -15,7 +14,6 @@ interface UseSignUpFlowProps {
 }
 
 export const useSignUpFlow = ({ onSubmit }: UseSignUpFlowProps) => {
-  const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   
@@ -24,21 +22,16 @@ export const useSignUpFlow = ({ onSubmit }: UseSignUpFlowProps) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [committeeName, setCommitteeName] = useState("");
-  const [apiPassword, setApiPassword] = useState("");
-
-  // Generate random API password on component mount
-  useEffect(() => {
-    const generatePassword = () => {
-      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+";
-      let result = "";
-      for (let i = 0; i < 16; i++) {
-        result += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
-      return result;
-    };
-
-    setApiPassword(generatePassword());
-  }, []);
+  
+  // Generate random API password on hook mount
+  const [apiPassword] = useState(() => {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+";
+    let result = "";
+    for (let i = 0; i < 16; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  });
 
   const validateEmail = () => {
     if (!email.trim()) {
@@ -82,79 +75,32 @@ export const useSignUpFlow = ({ onSubmit }: UseSignUpFlowProps) => {
     return true;
   };
 
-  const handleNext = async () => {
-    setError(""); // Clear errors
-
-    if (currentStep === 1) {
-      // Now validating email, password, and committee name in step 1
-      if (!validateEmail() || !validatePassword() || !validateCommitteeName()) {
-        return;
-      }
-      
-      setIsLoading(true);
-      try {
-        await onSubmit({
-          email,
-          password,
-          confirmPassword,
-          committeeName,
-          apiPassword,
-          currentStep
-        });
-        
-        setCurrentStep(2);
-      } catch (error: any) {
-        console.error("Step 1 error:", error);
-        setError(error.message || "An error occurred during step 1");
-      } finally {
-        setIsLoading(false);
-      }
-      return;
-    }
-  };
-
-  const handlePrevious = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-      setError(""); // Clear errors when moving to previous step
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(""); // Clear errors
     
-    // Handle "Next" button for step 1
-    if (currentStep < 2) {
-      await handleNext();
+    if (!validateEmail() || !validatePassword() || !validateCommitteeName()) {
       return;
     }
     
-    // For step 2, complete the process
-    if (currentStep === 2) {
-      setIsLoading(true);
-      try {
-        await onSubmit({
-          email,
-          password,
-          confirmPassword,
-          committeeName,
-          apiPassword,
-          currentStep
-        });
-        
-        // If we reach here, submission was successful
-        console.log("Form submission successful");
-      } catch (error: any) {
-        console.error("Step 2 error:", error);
-        setError(error.message || "An error occurred during step 2");
-      } finally {
-        setIsLoading(false);
-      }
+    setIsLoading(true);
+    try {
+      await onSubmit({
+        email,
+        password,
+        confirmPassword,
+        committeeName,
+        apiPassword
+      });
+    } catch (error: any) {
+      console.error("Signup error:", error);
+      setError(error.message || "An error occurred during signup");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return {
-    currentStep,
     isLoading,
     error,
     email,
@@ -166,8 +112,6 @@ export const useSignUpFlow = ({ onSubmit }: UseSignUpFlowProps) => {
     committeeName,
     setCommitteeName,
     apiPassword,
-    handleNext,
-    handlePrevious,
     handleSubmit
   };
 };

@@ -4,9 +4,12 @@ import React from "react";
 interface StepIndicatorProps {
   currentStep: number;
   steps: { number: number; title: string }[];
+  hidden?: boolean;
 }
 
-const StepIndicator: React.FC<StepIndicatorProps> = ({ currentStep, steps }) => {
+const StepIndicator: React.FC<StepIndicatorProps> = ({ currentStep, steps, hidden = false }) => {
+  if (hidden) return null;
+  
   return (
     <div className="flex items-center space-x-4 mb-6">
       {steps.map((step) => (

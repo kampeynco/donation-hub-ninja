@@ -1,9 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import StepIndicator from "@/components/Auth/StepIndicator";
 import StepOne from "@/components/Auth/SignUpSteps/StepOne";
-import StepTwo from "@/components/Auth/SignUpSteps/StepThree";
 import { useSignUpFlow, SignUpData } from "@/hooks/useSignUpFlow";
 import { IconArrowRight } from "@tabler/icons-react";
 
@@ -11,14 +9,8 @@ interface SignUpFormProps {
   onSubmit: (data: SignUpData) => Promise<void>;
 }
 
-const steps = [
-  { number: 1, title: "Account" },
-  { number: 2, title: "Webhook" }
-];
-
 const SignUpForm: React.FC<SignUpFormProps> = ({ onSubmit }) => {
   const {
-    currentStep,
     isLoading,
     error,
     email,
@@ -29,8 +21,6 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSubmit }) => {
     setConfirmPassword,
     committeeName,
     setCommitteeName,
-    apiPassword,
-    handlePrevious,
     handleSubmit
   } = useSignUpFlow({ onSubmit });
 
@@ -43,59 +33,33 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSubmit }) => {
         </p>
       </div>
       
-      <StepIndicator currentStep={currentStep} steps={steps} />
-      
       <form onSubmit={handleSubmit} className="space-y-6">
-        {currentStep === 1 && (
-          <StepOne 
-            email={email}
-            setEmail={setEmail}
-            password={password}
-            setPassword={setPassword}
-            confirmPassword={confirmPassword}
-            setConfirmPassword={setConfirmPassword}
-            committeeName={committeeName}
-            setCommitteeName={setCommitteeName}
-            error={error}
-          />
-        )}
-
-        {currentStep === 2 && (
-          <StepTwo 
-            email={email}
-            apiPassword={apiPassword}
-          />
-        )}
+        <StepOne 
+          email={email}
+          setEmail={setEmail}
+          password={password}
+          setPassword={setPassword}
+          confirmPassword={confirmPassword}
+          setConfirmPassword={setConfirmPassword}
+          committeeName={committeeName}
+          setCommitteeName={setCommitteeName}
+          error={error}
+        />
         
-        {error && currentStep === 2 && (
+        {error && (
           <div className="text-red-500 text-sm">{error}</div>
         )}
         
-        <div className="flex justify-between">
-          {currentStep > 1 && (
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={handlePrevious}
-              disabled={isLoading}
-            >
-              Previous
-            </Button>
-          )}
-          
-          <Button 
-            type="submit" 
-            className={`${currentStep === 1 && "w-full"}`} 
-            disabled={isLoading}
-          >
-            {isLoading 
-              ? currentStep < 2 ? "Processing..." : "Creating account..." 
-              : currentStep === 2 
-                ? "Complete Registration" 
-                : <>Next <IconArrowRight className="ml-1 h-4 w-4" /></>
-            }
-          </Button>
-        </div>
+        <Button 
+          type="submit" 
+          className="w-full" 
+          disabled={isLoading}
+        >
+          {isLoading 
+            ? "Creating account..." 
+            : <>Create Account <IconArrowRight className="ml-1 h-4 w-4" /></>
+          }
+        </Button>
       </form>
     </div>
   );
