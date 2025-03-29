@@ -42,19 +42,58 @@ serve(async (req) => {
       });
     }
 
-    // Fetch webhook credentials for the user
-    const { data: webhook, error: webhookError } = await supabase
+    // Check if webhook exists for the user
+    const { data: existingWebhook, error: fetchError } = await supabase
       .from("webhooks")
       .select("*")
       .eq("user_id", userId)
-      .single();
+      .maybeSingle();
 
-    if (webhookError) {
-      console.error("Error fetching webhook:", webhookError);
-      return new Response(JSON.stringify({ error: "Error fetching webhook credentials" }), {
+    if (fetchError && fetchError.code !== 'PGRST116') {
+      console.error("Error fetching webhook:", fetchError);
+      return new Response(JSON.stringify({ error: "Error checking webhook configuration" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 500,
       });
+    }
+
+    // If no webhook exists yet, create one with default values
+    if (!existingWebhook) {
+      console.log("No webhook found, creating one for user:", userId);
+      const { error: insertError } = await supabase
+        .from("webhooks")
+        .insert({
+          user_id: userId,
+          api_username: email,
+          api_password: generateRandomPassword(),
+          hookdeck_destination_url: "https://igjnhwvtasegwyiwcdkr.supabase.co/functions/v1/handle-webhook"
+        });
+
+      if (insertError) {
+        console.error("Error creating initial webhook record:", insertError);
+        return new Response(JSON.stringify({ error: "Failed to initialize webhook configuration" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 500,
+        });
+      }
+      
+      // Fetch the newly created webhook
+      const { data: webhook, error: refetchError } = await supabase
+        .from("webhooks")
+        .select("*")
+        .eq("user_id", userId)
+        .single();
+        
+      if (refetchError) {
+        console.error("Error fetching new webhook:", refetchError);
+        return new Response(JSON.stringify({ error: "Error with webhook initialization" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 500,
+        });
+      }
+      
+      // Use the newly created webhook for the Hookdeck setup
+      console.log("Successfully created webhook record for user:", userId);
     }
 
     // Create a Hookdeck source for the webhook
@@ -67,7 +106,7 @@ serve(async (req) => {
     // Create a Hookdeck destination for our webhook handler
     const destinationResponse = await createHookdeckDestination({
       name: `DonorCamp API - ${email}`,
-      url: webhook.hookdeck_destination_url,
+      url: "https://igjnhwvtasegwyiwcdkr.supabase.co/functions/v1/handle-webhook",
       customerId: userId
     });
 
@@ -87,7 +126,7 @@ serve(async (req) => {
         hookdeck_connection_id: connectionResponse.id,
         last_used_at: new Date().toISOString(),
       })
-      .eq("id", webhook.id);
+      .eq("user_id", userId);
 
     if (updateError) {
       console.error("Error updating webhook with Hookdeck IDs:", updateError);
@@ -113,3 +152,13 @@ serve(async (req) => {
     });
   }
 });
+
+// Helper function to generate a random password
+function generateRandomPassword(length = 16) {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+";
+  let password = "";
+  for (let i = 0; i < length; i++) {
+    password += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return password;
+}
