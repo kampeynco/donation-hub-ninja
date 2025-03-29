@@ -1,6 +1,7 @@
 
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.29.0";
+import { ActBlueWebhookPayload } from "../../../src/types/actblue.ts";
 
 // CORS headers for cross-origin requests
 const corsHeaders = {
@@ -29,11 +30,10 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Parse the request body (ActBlue payload)
-    const payload = await req.json();
+    const payload: ActBlueWebhookPayload = await req.json();
     console.log("Received ActBlue webhook payload:", JSON.stringify(payload));
 
     // Process ActBlue payload
-    // The shape of the payload will depend on ActBlue's webhook format
     if (!payload || !payload.contribution) {
       throw new Error("Invalid ActBlue payload format");
     }
@@ -47,8 +47,10 @@ serve(async (req) => {
       is_mobile: contribution.mobileDevice || false,
       recurring_period: contribution.recurringFrequency === 'monthly' ? 'monthly' : 
                         contribution.recurringFrequency === 'weekly' ? 'weekly' : 'once',
+      recurring_duration: contribution.recurringDuration || 0,
       express_signup: contribution.expressSignup || false,
       is_express: contribution.express || false,
+      payment_type: contribution.paymentType || null,
     };
 
     // Extract donor information
@@ -57,6 +59,7 @@ serve(async (req) => {
       last_name: contribution.donor?.lastName || null,
       is_express: contribution.express || false,
       is_mobile: contribution.mobileDevice || false,
+      is_paypal: contribution.paymentType?.toLowerCase().includes('paypal') || false,
     };
 
     // Create or update donor
@@ -107,6 +110,25 @@ serve(async (req) => {
           ...donationData,
           donor_id: donorId,
         });
+        
+      // Handle address if provided
+      if (contribution.donor.address) {
+        const { street1, street2, city, state, zip, country } = contribution.donor.address;
+        
+        if (street1 || city || state) {
+          await supabase
+            .from("locations")
+            .insert({
+              donor_id: donorId,
+              street: street1 + (street2 ? `, ${street2}` : ''),
+              city,
+              state,
+              zip,
+              country,
+              type: 'main'
+            });
+        }
+      }
     } else {
       // Handle anonymous donation (no email)
       await supabase
