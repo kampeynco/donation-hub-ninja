@@ -29,7 +29,7 @@ export async function createHookdeckSource(config: HookdeckSourceConfig): Promis
     throw new Error("HOOKDECK_API_KEY is not configured");
   }
 
-  const response = await fetch("https://api.hookdeck.com/2023-07-01/sources", {
+  const response = await fetch("https://api.hookdeck.com/2025-01-01/sources", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -61,7 +61,7 @@ export async function createHookdeckDestination(config: HookdeckDestinationConfi
     throw new Error("HOOKDECK_API_KEY is not configured");
   }
 
-  const response = await fetch("https://api.hookdeck.com/2023-07-01/destinations", {
+  const response = await fetch("https://api.hookdeck.com/2025-01-01/destinations", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -93,7 +93,7 @@ export async function createHookdeckConnection(config: HookdeckConnectionConfig)
     throw new Error("HOOKDECK_API_KEY is not configured");
   }
 
-  const response = await fetch("https://api.hookdeck.com/2023-07-01/connections", {
+  const response = await fetch("https://api.hookdeck.com/2025-01-01/connections", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -125,7 +125,7 @@ export async function updateHookdeckSourceUrl(sourceId: string, url: string): Pr
     throw new Error("HOOKDECK_API_KEY is not configured");
   }
 
-  const response = await fetch(`https://api.hookdeck.com/2023-07-01/sources/${sourceId}`, {
+  const response = await fetch(`https://api.hookdeck.com/2025-01-01/sources/${sourceId}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
