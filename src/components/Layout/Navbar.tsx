@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
@@ -6,6 +7,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { IconMenu2, IconX, IconStar } from "@tabler/icons-react";
 import NotificationBell from '@/components/Notifications/NotificationBell';
+
 const Navbar = () => {
   const {
     user,

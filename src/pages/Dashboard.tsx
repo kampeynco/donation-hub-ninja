@@ -6,6 +6,7 @@ import DonationsTable from "@/components/Dashboard/DonationsTable";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { fetchRecentDonations, fetchDonationStats } from "@/services/donationService";
 import { useQuery } from "@tanstack/react-query";
+
 const Dashboard = () => {
   const {
     data: donations = [],
@@ -21,12 +22,15 @@ const Dashboard = () => {
     queryKey: ['donationStats'],
     queryFn: fetchDonationStats
   });
+
   if (isStatsLoading || isDonationsLoading) {
     return <div className="flex justify-center p-8">Loading...</div>;
   }
+
   if (!stats) {
     return <div className="flex justify-center p-8">Failed to load donation statistics</div>;
   }
+
   return <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight mb-6">Account Overview</h1>
@@ -47,4 +51,5 @@ const Dashboard = () => {
       </Card>
     </div>;
 };
+
 export default Dashboard;
