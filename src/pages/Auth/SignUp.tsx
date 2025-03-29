@@ -17,7 +17,7 @@ const SignUp = () => {
         committeeName: data.committeeName,
       });
       
-      // Create the user in Auth
+      // Create the user in Auth with committee_name in metadata
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
@@ -40,7 +40,8 @@ const SignUp = () => {
       
       console.log("User created successfully:", authData.user.id);
       
-      // Update the profile with committee name - explicitly set the committee_name
+      // The profile should already have committee_name from the trigger,
+      // but let's explicitly set it again to be extra safe
       const { error: profileError } = await supabase
         .from('profiles')
         .update({ committee_name: data.committeeName })
