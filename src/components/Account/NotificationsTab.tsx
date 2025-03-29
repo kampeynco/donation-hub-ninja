@@ -4,6 +4,13 @@ import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { 
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger 
+} from "@/components/ui/tooltip";
+import { IconInfoCircle } from "@tabler/icons-react";
 
 const NotificationsTab = () => {
   return (
@@ -18,13 +25,56 @@ const NotificationsTab = () => {
         <div>
           <h3 className="font-medium mb-4">Account Notifications</h3>
           <div className="space-y-4">
-            <div className="grid grid-cols-[1fr_100px_100px] items-center">
+            <div className="grid grid-cols-[1fr_100px_100px_100px] items-center">
               <div className="col-span-1"></div>
-              <div className="text-sm font-medium text-center">Email</div>
-              <div className="text-sm font-medium text-center">Text</div>
+              <div className="text-sm font-medium text-center flex items-center justify-center gap-1">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center">
+                        Email
+                        <IconInfoCircle size={14} className="ml-1 text-muted-foreground" />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Receive notifications via email</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+              <div className="text-sm font-medium text-center flex items-center justify-center gap-1">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center">
+                        Text
+                        <IconInfoCircle size={14} className="ml-1 text-muted-foreground" />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Receive notifications via SMS</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+              <div className="text-sm font-medium text-center flex items-center justify-center gap-1">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center">
+                        Web
+                        <IconInfoCircle size={14} className="ml-1 text-muted-foreground" />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Receive notifications in the web application</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
             </div>
             
-            <div className="grid grid-cols-[1fr_100px_100px] items-center">
+            <div className="grid grid-cols-[1fr_100px_100px_100px] items-center">
               <div className="space-y-0.5">
                 <Label>Marketing Updates</Label>
                 <p className="text-sm text-muted-foreground">
@@ -37,9 +87,12 @@ const NotificationsTab = () => {
               <div className="flex justify-center">
                 <Checkbox id="text-marketing" />
               </div>
+              <div className="flex justify-center">
+                <Checkbox id="web-marketing" defaultChecked />
+              </div>
             </div>
             
-            <div className="grid grid-cols-[1fr_100px_100px] items-center">
+            <div className="grid grid-cols-[1fr_100px_100px_100px] items-center">
               <div className="space-y-0.5">
                 <Label>Weekly Reports</Label>
                 <p className="text-sm text-muted-foreground">
@@ -52,6 +105,9 @@ const NotificationsTab = () => {
               <div className="flex justify-center">
                 <Checkbox id="text-reports" />
               </div>
+              <div className="flex justify-center">
+                <Checkbox id="web-reports" defaultChecked />
+              </div>
             </div>
           </div>
         </div>
@@ -61,13 +117,56 @@ const NotificationsTab = () => {
         <div>
           <h3 className="font-medium mb-4">ActBlue Notifications</h3>
           <div className="space-y-4">
-            <div className="grid grid-cols-[1fr_100px_100px] items-center">
+            <div className="grid grid-cols-[1fr_100px_100px_100px] items-center">
               <div className="col-span-1"></div>
-              <div className="text-sm font-medium text-center">Email</div>
-              <div className="text-sm font-medium text-center">Text</div>
+              <div className="text-sm font-medium text-center flex items-center justify-center gap-1">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center">
+                        Email
+                        <IconInfoCircle size={14} className="ml-1 text-muted-foreground" />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Receive notifications via email</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+              <div className="text-sm font-medium text-center flex items-center justify-center gap-1">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center">
+                        Text
+                        <IconInfoCircle size={14} className="ml-1 text-muted-foreground" />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Receive notifications via SMS</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+              <div className="text-sm font-medium text-center flex items-center justify-center gap-1">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center">
+                        Web
+                        <IconInfoCircle size={14} className="ml-1 text-muted-foreground" />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Receive notifications in the web application</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
             </div>
             
-            <div className="grid grid-cols-[1fr_100px_100px] items-center">
+            <div className="grid grid-cols-[1fr_100px_100px_100px] items-center">
               <div className="space-y-0.5">
                 <Label>Donation Received</Label>
                 <p className="text-sm text-muted-foreground">
@@ -80,9 +179,12 @@ const NotificationsTab = () => {
               <div className="flex justify-center">
                 <Checkbox id="text-donations" />
               </div>
+              <div className="flex justify-center">
+                <Checkbox id="web-donations" defaultChecked />
+              </div>
             </div>
             
-            <div className="grid grid-cols-[1fr_100px_100px] items-center">
+            <div className="grid grid-cols-[1fr_100px_100px_100px] items-center">
               <div className="space-y-0.5">
                 <Label>Recurring Donations</Label>
                 <p className="text-sm text-muted-foreground">
@@ -94,6 +196,9 @@ const NotificationsTab = () => {
               </div>
               <div className="flex justify-center">
                 <Checkbox id="text-recurring" />
+              </div>
+              <div className="flex justify-center">
+                <Checkbox id="web-recurring" defaultChecked />
               </div>
             </div>
           </div>
