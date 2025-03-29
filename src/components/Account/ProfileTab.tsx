@@ -103,7 +103,9 @@ const ProfileTab = () => {
     } else if (lastName) {
       return lastName.charAt(0).toUpperCase();
     }
-    return "UC"; // Default: User Contact
+    
+    if (!user || !user.email) return "UC";
+    return user.email.substring(0, 2).toUpperCase();
   };
 
   return (
