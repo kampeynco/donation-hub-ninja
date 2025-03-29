@@ -357,6 +357,51 @@ export type Database = {
           },
         ]
       }
+      notification_settings: {
+        Row: {
+          created_at: string
+          donations_email: boolean
+          donations_web: boolean
+          id: string
+          marketing_email: boolean
+          marketing_web: boolean
+          recurring_email: boolean
+          recurring_web: boolean
+          reports_email: boolean
+          reports_web: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          donations_email?: boolean
+          donations_web?: boolean
+          id?: string
+          marketing_email?: boolean
+          marketing_web?: boolean
+          recurring_email?: boolean
+          recurring_web?: boolean
+          reports_email?: boolean
+          reports_web?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          donations_email?: boolean
+          donations_web?: boolean
+          id?: string
+          marketing_email?: boolean
+          marketing_web?: boolean
+          recurring_email?: boolean
+          recurring_web?: boolean
+          reports_email?: boolean
+          reports_web?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           action: Database["public"]["Enums"]["notification_action"]
