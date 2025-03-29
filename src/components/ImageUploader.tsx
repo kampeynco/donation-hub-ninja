@@ -3,14 +3,16 @@ import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { IconCamera } from "@tabler/icons-react";
 
 interface ImageUploaderProps {
   initialImage?: string;
   onImageChange?: (file: File, dataUrl: string) => void;
   className?: string;
+  initials?: string;
 }
 
-const ImageUploader = ({ initialImage, onImageChange, className }: ImageUploaderProps) => {
+const ImageUploader = ({ initialImage, onImageChange, className, initials = "UC" }: ImageUploaderProps) => {
   const [previewUrl, setPreviewUrl] = useState<string | undefined>(initialImage);
   const [isHovering, setIsHovering] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -33,8 +35,6 @@ const ImageUploader = ({ initialImage, onImageChange, className }: ImageUploader
   const triggerFileInput = () => {
     fileInputRef.current?.click();
   };
-  
-  const initials = "JS"; // Hardcoded for demo, normally would come from user's name
   
   return (
     <div className={cn("flex flex-col items-center", className)}>
@@ -73,6 +73,7 @@ const ImageUploader = ({ initialImage, onImageChange, className }: ImageUploader
         onClick={triggerFileInput}
         size="sm"
       >
+        <IconCamera size={16} className="mr-2" />
         Upload Image
       </Button>
     </div>

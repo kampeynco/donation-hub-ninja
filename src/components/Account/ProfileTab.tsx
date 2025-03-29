@@ -8,6 +8,7 @@ import ImageUploader from "@/components/ImageUploader";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
+import { IconUser } from "@tabler/icons-react";
 
 const ProfileTab = () => {
   const { user } = useAuth();
@@ -39,8 +40,8 @@ const ProfileTab = () => {
           
           if (data) {
             // Set profile data from database
-            setFirstName(data.committee_name.split(' ')[0] || "");
-            setLastName(data.committee_name.split(' ').slice(1).join(' ') || "");
+            setFirstName(data.contact_first_name || "");
+            setLastName(data.contact_last_name || "");
             setOrganization(data.committee_name || "");
           }
         } catch (error) {
@@ -70,7 +71,9 @@ const ProfileTab = () => {
       const { error } = await supabase
         .from('profiles')
         .update({
-          committee_name: organization || `${firstName} ${lastName}`.trim(),
+          committee_name: organization,
+          contact_first_name: firstName.trim() || null,
+          contact_last_name: lastName.trim() || null,
         })
         .eq('id', user.id);
         
@@ -91,6 +94,18 @@ const ProfileTab = () => {
     }
   };
 
+  // Get user initials for avatar fallback
+  const getUserInitials = () => {
+    if (firstName && lastName) {
+      return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+    } else if (firstName) {
+      return firstName.charAt(0).toUpperCase();
+    } else if (lastName) {
+      return lastName.charAt(0).toUpperCase();
+    }
+    return "UC"; // Default: User Contact
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -104,7 +119,8 @@ const ProfileTab = () => {
           <div className="flex justify-center mb-6">
             <ImageUploader 
               initialImage={profileImage} 
-              onImageChange={handleImageChange} 
+              onImageChange={handleImageChange}
+              initials={getUserInitials()}
             />
           </div>
           
@@ -115,6 +131,7 @@ const ProfileTab = () => {
                 id="firstName" 
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
+                placeholder="Enter First Name"
               />
             </div>
             <div className="space-y-2">
@@ -123,6 +140,7 @@ const ProfileTab = () => {
                 id="lastName" 
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
+                placeholder="Enter Last Name"
               />
             </div>
             <div className="space-y-2 sm:col-span-2">
@@ -143,6 +161,7 @@ const ProfileTab = () => {
                 id="organization" 
                 value={organization}
                 onChange={(e) => setOrganization(e.target.value)}
+                placeholder="Enter Organization Name"
               />
             </div>
           </div>

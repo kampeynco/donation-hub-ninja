@@ -433,18 +433,24 @@ export type Database = {
       profiles: {
         Row: {
           committee_name: string
+          contact_first_name: string | null
+          contact_last_name: string | null
           created_at: string
           id: string
           updated_at: string
         }
         Insert: {
           committee_name: string
+          contact_first_name?: string | null
+          contact_last_name?: string | null
           created_at?: string
           id: string
           updated_at?: string
         }
         Update: {
           committee_name?: string
+          contact_first_name?: string | null
+          contact_last_name?: string | null
           created_at?: string
           id?: string
           updated_at?: string
