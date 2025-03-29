@@ -30,6 +30,18 @@ const NotificationsTab = () => {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
+                      <span className="cursor-help">Web</span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Receive notifications in the web application</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+              <div className="text-sm font-medium text-center">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
                       <span className="cursor-help">Email</span>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -50,18 +62,6 @@ const NotificationsTab = () => {
                   </Tooltip>
                 </TooltipProvider>
               </div>
-              <div className="text-sm font-medium text-center">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <span className="cursor-help">Web</span>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Receive notifications in the web application</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
             </div>
             
             <div className="grid grid-cols-[1fr_100px_100px_100px] items-center">
@@ -72,13 +72,13 @@ const NotificationsTab = () => {
                 </p>
               </div>
               <div className="flex justify-center">
+                <Checkbox id="web-marketing" defaultChecked />
+              </div>
+              <div className="flex justify-center">
                 <Checkbox id="email-marketing" defaultChecked />
               </div>
               <div className="flex justify-center">
                 <Checkbox id="text-marketing" />
-              </div>
-              <div className="flex justify-center">
-                <Checkbox id="web-marketing" defaultChecked />
               </div>
             </div>
             
@@ -90,13 +90,13 @@ const NotificationsTab = () => {
                 </p>
               </div>
               <div className="flex justify-center">
+                <Checkbox id="web-reports" defaultChecked />
+              </div>
+              <div className="flex justify-center">
                 <Checkbox id="email-reports" defaultChecked />
               </div>
               <div className="flex justify-center">
                 <Checkbox id="text-reports" />
-              </div>
-              <div className="flex justify-center">
-                <Checkbox id="web-reports" defaultChecked />
               </div>
             </div>
           </div>
@@ -115,13 +115,13 @@ const NotificationsTab = () => {
                 </p>
               </div>
               <div className="flex justify-center">
+                <Checkbox id="web-donations" defaultChecked />
+              </div>
+              <div className="flex justify-center">
                 <Checkbox id="email-donations" defaultChecked />
               </div>
               <div className="flex justify-center">
                 <Checkbox id="text-donations" />
-              </div>
-              <div className="flex justify-center">
-                <Checkbox id="web-donations" defaultChecked />
               </div>
             </div>
             
@@ -133,13 +133,13 @@ const NotificationsTab = () => {
                 </p>
               </div>
               <div className="flex justify-center">
+                <Checkbox id="web-recurring" defaultChecked />
+              </div>
+              <div className="flex justify-center">
                 <Checkbox id="email-recurring" defaultChecked />
               </div>
               <div className="flex justify-center">
                 <Checkbox id="text-recurring" />
-              </div>
-              <div className="flex justify-center">
-                <Checkbox id="web-recurring" defaultChecked />
               </div>
             </div>
           </div>
