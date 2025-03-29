@@ -1,12 +1,12 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import CopyableInput from "@/components/Auth/CopyableInput";
 import CopyablePasswordInput from "@/components/Auth/CopyablePasswordInput";
-import { IconRefresh, IconExternalLink } from "@tabler/icons-react";
-import { WebhookCredentials, updateWebhookCredentials, regenerateApiPassword, updateActBlueWebhookUrl, testActBlueWebhook } from "@/services/webhookService";
+import { IconRefresh } from "@tabler/icons-react";
+import { WebhookCredentials, regenerateApiPassword } from "@/services/webhookService";
 import { toast } from "@/components/ui/use-toast";
 
 interface WebhookConfigProps {
@@ -23,7 +23,6 @@ const WebhookConfig = ({
   setActBlueWebhookUrl
 }: WebhookConfigProps) => {
   const [isRegeneratingPassword, setIsRegeneratingPassword] = useState(false);
-  const [isTesting, setIsTesting] = useState(false);
 
   const handleRegeneratePassword = async () => {
     if (!webhookCredentials) return;
@@ -55,17 +54,6 @@ const WebhookConfig = ({
     }
   };
 
-  const handleTestWebhook = async () => {
-    if (!webhookCredentials) return;
-    
-    setIsTesting(true);
-    try {
-      await testActBlueWebhook(webhookCredentials.id);
-    } finally {
-      setIsTesting(false);
-    }
-  };
-
   return <div className="space-y-6">
       <div className="space-y-2">
         <Label htmlFor="actBlueWebhookUrl">Endpoint URL</Label>
@@ -76,16 +64,6 @@ const WebhookConfig = ({
             readOnly={true}
             className="w-full"
           />
-          <div className="flex justify-end">
-            <Button 
-              variant="outline" 
-              onClick={handleTestWebhook} 
-              disabled={isTesting || !webhookCredentials || !actBlueWebhookUrl}
-              size="sm"
-            >
-              {isTesting ? "Testing..." : "Test Connection"}
-            </Button>
-          </div>
         </div>
         <p className="text-xs text-gray-500">
           Add this webhook URL to your ActBlue account settings to receive donation notifications.
