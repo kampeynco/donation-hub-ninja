@@ -1,33 +1,28 @@
-
 import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { IconArrowRight, IconCreditCard, IconUsers, IconReportMoney } from "@tabler/icons-react";
-
 const Home = () => {
-  const { user, loading } = useAuth();
+  const {
+    user,
+    loading
+  } = useAuth();
   const navigate = useNavigate();
-
   useEffect(() => {
     if (!loading && user) {
       // If user is already logged in, redirect to dashboard
       navigate("/dashboard");
     }
   }, [user, loading, navigate]);
-
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
+    return <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Loading...</h1>
         </div>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className="min-h-screen bg-white">
+  return <div className="min-h-screen bg-white">
       {/* Hero Section */}
       <header className="bg-primary text-white">
         <div className="container mx-auto px-4 py-6 flex justify-between items-center">
@@ -37,7 +32,7 @@ const Home = () => {
                 <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#2563EB" />
               </svg>
             </div>
-            <span className="text-xl font-semibold tracking-tight">DonorCamp</span>
+            <span className="text-xl font-semibold tracking-tight">Donor Camp</span>
           </Link>
           <div className="flex gap-4">
             <Link to="/auth/signin">
@@ -144,8 +139,6 @@ const Home = () => {
           </div>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default Home;
