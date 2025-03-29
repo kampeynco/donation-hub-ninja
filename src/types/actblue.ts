@@ -66,3 +66,22 @@ export interface ActBlueWebhookPayload {
     managingEntityCommitteeName: string | null;
   };
 }
+
+// New error response interfaces
+export interface WebhookErrorResponse {
+  error: string;
+  code: number;
+  message: string;
+  details?: string;
+  request_id?: string;
+  timestamp?: string;
+}
+
+export interface WebhookSuccessResponse {
+  success: boolean;
+  message: string;
+  donation?: any;
+  donor?: any;
+  request_id: string;
+  timestamp: string;
+}
