@@ -1,10 +1,18 @@
 
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.29.0";
+import { Resend } from "npm:resend@2.0.0";
+import twilio from "npm:twilio@4.17.0";
 
-// Configure Supabase client
+// Configure clients
 const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+const resendApiKey = Deno.env.get("RESEND_API_KEY") || "";
+const twilioAccountSid = Deno.env.get("TWILIO_API_SID") || "";
+const twilioAuthToken = Deno.env.get("TWILIO_AUTH_TOKEN") || "";
+
+const resend = new Resend(resendApiKey);
+const twilioClient = twilio(twilioAccountSid, twilioAuthToken);
 
 interface NotificationRequest {
   userId: string;
@@ -68,6 +76,22 @@ serve(async (req) => {
       notificationSettings.recurring_text : 
       notificationSettings.donations_text;
     
+    // Get user profile for committee name and contact info
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('committee_name, contact_first_name, contact_last_name, mobile_phone')
+      .eq('id', userId)
+      .single();
+    
+    if (profileError) {
+      console.error(`[${requestId}] Error fetching user profile:`, profileError);
+      throw new Error(`Error fetching user profile: ${profileError.message}`);
+    }
+
+    const recipientName = profile.contact_first_name 
+      ? `${profile.contact_first_name} ${profile.contact_last_name || ''}`
+      : `${profile.committee_name} Team`;
+    
     // Handle web notification (create entry in notifications table)
     if (webEnabled) {
       const message = donationType === 'recurring' 
@@ -90,65 +114,69 @@ serve(async (req) => {
       }
     }
     
-    // Handle email notification (if enabled and user has profile data)
-    if (emailEnabled) {
-      // Get user profile for committee name
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('committee_name, contact_first_name')
-        .eq('id', userId)
-        .single();
-      
-      if (profileError) {
-        console.error(`[${requestId}] Error fetching user profile:`, profileError);
-      } else {
-        // For demonstration, we'll just log the email that would be sent
-        // In a real implementation, this would call Resend or similar email service
+    // Handle email notification using Resend
+    if (emailEnabled && resendApiKey) {
+      try {
         const emailSubject = donationType === 'recurring' 
           ? `Recurring Donation Received: $${amount.toFixed(2)}`
           : `New Donation Received: $${amount.toFixed(2)}`;
           
-        const emailBody = `
-          Hello ${profile.contact_first_name || `${profile.committee_name} Team`},
-          
-          A ${donationType === 'recurring' ? 'recurring' : 'new'} donation of $${amount.toFixed(2)} has been received from ${donorName || 'Anonymous'}.
-          
-          Log in to your Donor Camp dashboard to view the details.
-          
-          Thank you,
-          Donor Camp Team
+        const emailHtml = `
+          <div style="font-family: 'Inter', system-ui, sans-serif; color: #1e293b; max-width: 600px; margin: 0 auto;">
+            <h1 style="color: #007AFF;">Donation Received</h1>
+            <p>Hello ${recipientName},</p>
+            <p>A ${donationType === 'recurring' ? 'recurring' : 'new'} donation of <strong>$${amount.toFixed(2)}</strong> has been received from ${donorName || 'Anonymous'}.</p>
+            <div style="margin: 20px 0; padding: 15px; border-left: 4px solid #007AFF; background-color: #f5f5f7;">
+              <p style="margin: 0 0 10px 0;"><strong>Donation Details:</strong></p>
+              <p style="margin: 0;">Amount: $${amount.toFixed(2)}</p>
+              <p style="margin: 0;">Type: ${donationType === 'recurring' ? 'Recurring' : 'One-time'}</p>
+              <p style="margin: 0;">Donor: ${donorName || 'Anonymous'}</p>
+            </div>
+            <p>Log in to your Donor Camp dashboard to view the full details.</p>
+            <p>Thank you,<br>Donor Camp</p>
+          </div>
         `;
         
-        console.log(`[${requestId}] Email notification would be sent:`, {
-          to: donorEmail,
+        const emailData = {
+          from: "Donor Camp <notifications@donorcamp.app>",
+          to: donorEmail || '',
           subject: emailSubject,
-          body: emailBody
-        });
+          html: emailHtml
+        };
+
+        // Send email if there's a valid recipient
+        if (donorEmail) {
+          const emailResponse = await resend.emails.send(emailData);
+          console.log(`[${requestId}] Email sent successfully:`, emailResponse);
+        } else {
+          console.log(`[${requestId}] No valid email address to send notification`);
+        }
+      } catch (error) {
+        console.error(`[${requestId}] Error sending email:`, error);
       }
     }
     
-    // Handle SMS notification (if enabled and user has mobile phone)
-    if (textEnabled) {
-      // Get user profile for mobile phone
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('mobile_phone')
-        .eq('id', userId)
-        .single();
-      
-      if (profileError || !profile.mobile_phone) {
-        console.error(`[${requestId}] Error fetching user mobile phone or phone not set:`, profileError);
-      } else {
-        // For demonstration, we'll just log the SMS that would be sent
-        // In a real implementation, this would call Twilio or similar SMS service
-        const smsMessage = donationType === 'recurring' 
-          ? `Recurring donation of $${amount.toFixed(2)} received from ${donorName || 'Anonymous'}`
-          : `New donation of $${amount.toFixed(2)} received from ${donorName || 'Anonymous'}`;
+    // Handle SMS notification using Twilio
+    if (textEnabled && twilioAccountSid && twilioAuthToken) {
+      try {
+        // Get user profile for mobile phone
+        if (!profile.mobile_phone) {
+          console.log(`[${requestId}] No mobile phone found for user, skipping SMS notification`);
+        } else {
+          const smsMessage = donationType === 'recurring' 
+            ? `Donor Camp: Recurring donation of $${amount.toFixed(2)} received from ${donorName || 'Anonymous'}`
+            : `Donor Camp: New donation of $${amount.toFixed(2)} received from ${donorName || 'Anonymous'}`;
+            
+          const twilioResponse = await twilioClient.messages.create({
+            body: smsMessage,
+            to: profile.mobile_phone,
+            from: '+18445096979' // Replace with your Twilio phone number
+          });
           
-        console.log(`[${requestId}] SMS notification would be sent:`, {
-          to: profile.mobile_phone,
-          message: smsMessage
-        });
+          console.log(`[${requestId}] SMS sent successfully with SID:`, twilioResponse.sid);
+        }
+      } catch (error) {
+        console.error(`[${requestId}] Error sending SMS:`, error);
       }
     }
     
