@@ -1,40 +1,32 @@
 
 import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
-import { IconArrowRight } from "@tabler/icons-react";
 
 const WebhookInstructions = () => {
   return (
     <div className="space-y-4">
       <h3 className="font-medium">ActBlue Integration Instructions</h3>
+      <p className="text-sm text-gray-500 mb-2">
+        Use the information below to configure ActBlue to receive real-time notifications.
+      </p>
       <div className="space-y-4 rounded-lg border p-4">
-        <h4 className="font-medium">Step 1: Access ActBlue Dashboard</h4>
-        <p className="text-sm text-gray-500">
-          Log into your ActBlue account and navigate to the Webhook settings section.
-        </p>
-        
-        <h4 className="font-medium">Step 2: Configure Webhook</h4>
-        <p className="text-sm text-gray-500">
-          Enter your ActBlue webhook URL, Username, and Password from above into ActBlue's webhook configuration.
-          This secure URL routes through Hookdeck for better reliability and monitoring.
-        </p>
-        
-        <h4 className="font-medium">Step 3: Select Events</h4>
-        <p className="text-sm text-gray-500">
-          Enable webhook notifications for donation events in ActBlue's settings.
-        </p>
-        
-        <h4 className="font-medium">Step 4: Test Integration</h4>
-        <p className="text-sm text-gray-500">
-          Use the "Test" button above or ActBlue's test feature to verify the webhook is properly configured.
-        </p>
-        
-        <div className="mt-4">
-          <Button variant="outline" className="w-full">
-            <span>View ActBlue Integration Guide</span>
-            <IconArrowRight size={16} className="ml-2" />
-          </Button>
-        </div>
+        <h4 className="font-medium">Setup Instructions</h4>
+        <ol className="space-y-3 text-sm text-gray-500">
+          <li>
+            <span className="font-medium">Step 1.</span> Log into your ActBlue account, navigate to the left sidebar and click on "Integrations".
+          </li>
+          <li>
+            <span className="font-medium">Step 2.</span> Click the "Manage" link inside the Webhooks card.
+          </li>
+          <li>
+            <span className="font-medium">Step 3.</span> Click the "Request a new webhook" button on the right side of the Webhooks page.
+          </li>
+          <li>
+            <span className="font-medium">Step 4.</span> Select "ActBlue Default" in the dropdown menu, then click the "Next" button.
+          </li>
+          <li>
+            <span className="font-medium">Step 5.</span> Copy and paste the details on the right into the fields on the New Webhook page, then click the "Submit request" button.
+          </li>
+        </ol>
       </div>
     </div>
   );
