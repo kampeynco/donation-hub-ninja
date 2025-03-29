@@ -3,11 +3,12 @@ import { useState, useEffect } from "react";
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PhoneInput } from "@/components/ui/phone-input";
 import { Label } from "@/components/ui/label";
 import ImageUploader from "@/components/ImageUploader";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 import { IconUser } from "@tabler/icons-react";
 
 const ProfileTab = () => {
@@ -70,13 +71,16 @@ const ProfileTab = () => {
     
     try {
       // Update the profile in the database
+      // Strip formatting before saving to the database
+      const formattedPhone = mobilePhone.replace(/\D/g, "");
+      
       const { error } = await supabase
         .from('profiles')
         .update({
           committee_name: organization,
           contact_first_name: firstName.trim() || null,
           contact_last_name: lastName.trim() || null,
-          mobile_phone: mobilePhone.trim() || null,
+          mobile_phone: formattedPhone || null,
         })
         .eq('id', user.id);
         
@@ -162,12 +166,11 @@ const ProfileTab = () => {
             </div>
             <div className="space-y-2 sm:col-span-2">
               <Label htmlFor="mobilePhone">Mobile Phone</Label>
-              <Input 
-                id="mobilePhone" 
-                type="tel" 
+              <PhoneInput 
+                id="mobilePhone"
                 value={mobilePhone}
-                onChange={(e) => setMobilePhone(e.target.value)}
-                placeholder="Enter Mobile Phone Number"
+                onChange={setMobilePhone}
+                placeholder="(555) 123-4567"
               />
               <p className="text-xs text-muted-foreground mt-1">Required for text message notifications</p>
             </div>
