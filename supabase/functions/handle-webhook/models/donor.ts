@@ -18,6 +18,8 @@ export function extractDonorData(
     is_express: contribution.isExpress || false,
     is_mobile: contribution.isMobile || false,
     is_paypal: contribution.isPaypal || false,
+    // New field
+    is_eligible_for_express_lane: donor?.isEligibleForExpressLane || false
   };
 }
 
@@ -186,5 +188,52 @@ export async function addDonorLocation(
     // Log error but continue - address is not critical
     console.error(`[${requestId}] Unexpected error in addDonorLocation:`, error);
     return { success: true, locationId: null };
+  }
+}
+
+/**
+ * Adds employer information for a donor if provided
+ */
+export async function addEmployerData(
+  supabase: ReturnType<typeof createClient>,
+  donor: ActBlueDonor | undefined,
+  donorId: string | null,
+  requestId: string
+): Promise<{success: boolean, employerDataId: string | null}> {
+  if (!donorId || !donor?.employerData || !donor.employerData.employer) {
+    return { success: true, employerDataId: null };
+  }
+
+  try {
+    console.log(`[${requestId}] Adding employer data for donor ${donorId}`);
+    
+    const { data: newEmployerData, error: employerError } = await supabase
+      .from("employer_data")
+      .insert({
+        donor_id: donorId,
+        employer: donor.employerData.employer,
+        occupation: donor.employerData.occupation,
+        employer_addr1: donor.employerData.employerAddr1,
+        employer_city: donor.employerData.employerCity,
+        employer_state: donor.employerData.employerState,
+        employer_country: donor.employerData.employerCountry
+      })
+      .select()
+      .single();
+      
+    if (employerError) {
+      // Log error but continue - employer data is not critical
+      console.error(`[${requestId}] Database error creating employer data:`, employerError);
+      return { success: true, employerDataId: null };
+    }
+    
+    const employerDataId = newEmployerData.id;
+    logDbOperation("Created employer data", employerDataId, requestId, `for donor: ${donorId}`);
+    
+    return { success: true, employerDataId: employerDataId };
+  } catch (error) {
+    // Log error but continue - employer data is not critical
+    console.error(`[${requestId}] Unexpected error in addEmployerData:`, error);
+    return { success: true, employerDataId: null };
   }
 }

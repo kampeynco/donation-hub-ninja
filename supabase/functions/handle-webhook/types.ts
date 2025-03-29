@@ -40,6 +40,25 @@ export interface ActBlueContribution {
   status: string;
   paidAt?: string;
   amount?: string;
+  // New fields
+  smartBoostAmount?: string;
+  giftDeclined?: boolean;
+  giftIdentifier?: number;
+  shippingName?: string;
+  shippingAddr1?: string;
+  shippingCity?: string;
+  shippingState?: string;
+  shippingZip?: string;
+  shippingCountry?: string;
+  customFields?: Array<{
+    label: string;
+    answer: string;
+  }>;
+  merchandise?: Array<{
+    name: string;
+    itemId: number;
+    details?: any;
+  }>;
 }
 
 export interface ActBlueLineItem {

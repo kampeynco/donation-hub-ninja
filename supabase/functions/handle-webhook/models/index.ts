@@ -4,8 +4,8 @@ import { ActBlueContribution, ActBlueDonor, ActBlueLineItem } from "../types.ts"
 import { errorResponses } from "../error-handler.ts";
 import { ProcessResult } from "./types.ts";
 
-import { extractDonationData, createDonation } from "./donation.ts";
-import { extractDonorData, findOrCreateDonor, addDonorLocation } from "./donor.ts";
+import { extractDonationData, createDonation, processCustomFields, processMerchandise } from "./donation.ts";
+import { extractDonorData, findOrCreateDonor, addDonorLocation, addEmployerData } from "./donor.ts";
 import { updateWebhookTimestamp } from "./webhook.ts";
 import { createSuccessResponse } from "./response.ts";
 
@@ -40,6 +40,7 @@ export async function processDonation(
     // Find or create donor
     let donorId = null;
     let locationId = null;
+    let employerDataId = null;
     
     if (donor?.email) {
       console.log(`[${requestId}] Processing donor with email: ${donor.email}`);
@@ -55,6 +56,10 @@ export async function processDonation(
       if (donorId) {
         const locationResult = await addDonorLocation(supabase, donor, donorId, requestId);
         locationId = locationResult.locationId;
+        
+        // Add employer data if provided
+        const employerResult = await addEmployerData(supabase, donor, donorId, requestId);
+        employerDataId = employerResult.employerDataId;
       }
     } else {
       console.log(`[${requestId}] Processing anonymous donation (no email provided)`);
@@ -69,6 +74,12 @@ export async function processDonation(
     
     const { donationId, donationData: savedDonation } = donationResult.data;
     console.log(`[${requestId}] Successfully created donation with ID: ${donationId}`);
+    
+    // Process custom fields (non-critical)
+    await processCustomFields(supabase, contribution, donationId, requestId);
+    
+    // Process merchandise items (non-critical)
+    await processMerchandise(supabase, contribution, donationId, requestId);
     
     // Update webhook timestamp (non-critical)
     try {
@@ -85,7 +96,8 @@ export async function processDonation(
       donorId, 
       donorData, 
       donor, 
-      locationId, 
+      locationId,
+      employerDataId,
       requestId, 
       timestamp
     );

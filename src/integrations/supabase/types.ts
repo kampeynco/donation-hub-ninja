@@ -9,22 +9,65 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      custom_fields: {
+        Row: {
+          answer: string | null
+          created_at: string
+          donation_id: string | null
+          id: string
+          label: string
+        }
+        Insert: {
+          answer?: string | null
+          created_at?: string
+          donation_id?: string | null
+          id?: string
+          label: string
+        }
+        Update: {
+          answer?: string | null
+          created_at?: string
+          donation_id?: string | null
+          id?: string
+          label?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "custom_fields_donation_id_fkey"
+            columns: ["donation_id"]
+            isOneToOne: false
+            referencedRelation: "donations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       donations: {
         Row: {
           amount: number
+          committee_name: string | null
+          contribution_form: string | null
           created_at: string
           credit_card_expiration: string | null
           donor_id: string | null
+          entity_id: number | null
           express_signup: boolean | null
+          gift_declined: boolean | null
+          gift_identifier: number | null
           id: string
           is_express: boolean | null
           is_mobile: boolean | null
           is_paypal: boolean | null
+          lineitem_id: number | null
+          order_number: string | null
           paid_at: string | null
           recurring_duration: number | null
           recurring_period:
             | Database["public"]["Enums"]["recurring_period"]
             | null
+          refcodes: Json | null
+          shipping_info: Json | null
+          smart_boost_amount: number | null
+          status: string | null
           text_message_option:
             | Database["public"]["Enums"]["text_message_option"]
             | null
@@ -33,19 +76,30 @@ export type Database = {
         }
         Insert: {
           amount: number
+          committee_name?: string | null
+          contribution_form?: string | null
           created_at?: string
           credit_card_expiration?: string | null
           donor_id?: string | null
+          entity_id?: number | null
           express_signup?: boolean | null
+          gift_declined?: boolean | null
+          gift_identifier?: number | null
           id?: string
           is_express?: boolean | null
           is_mobile?: boolean | null
           is_paypal?: boolean | null
+          lineitem_id?: number | null
+          order_number?: string | null
           paid_at?: string | null
           recurring_duration?: number | null
           recurring_period?:
             | Database["public"]["Enums"]["recurring_period"]
             | null
+          refcodes?: Json | null
+          shipping_info?: Json | null
+          smart_boost_amount?: number | null
+          status?: string | null
           text_message_option?:
             | Database["public"]["Enums"]["text_message_option"]
             | null
@@ -54,19 +108,30 @@ export type Database = {
         }
         Update: {
           amount?: number
+          committee_name?: string | null
+          contribution_form?: string | null
           created_at?: string
           credit_card_expiration?: string | null
           donor_id?: string | null
+          entity_id?: number | null
           express_signup?: boolean | null
+          gift_declined?: boolean | null
+          gift_identifier?: number | null
           id?: string
           is_express?: boolean | null
           is_mobile?: boolean | null
           is_paypal?: boolean | null
+          lineitem_id?: number | null
+          order_number?: string | null
           paid_at?: string | null
           recurring_duration?: number | null
           recurring_period?:
             | Database["public"]["Enums"]["recurring_period"]
             | null
+          refcodes?: Json | null
+          shipping_info?: Json | null
+          smart_boost_amount?: number | null
+          status?: string | null
           text_message_option?:
             | Database["public"]["Enums"]["text_message_option"]
             | null
@@ -88,6 +153,7 @@ export type Database = {
           created_at: string
           first_name: string | null
           id: string
+          is_eligible_for_express_lane: boolean | null
           is_express: boolean | null
           is_mobile: boolean | null
           is_paypal: boolean | null
@@ -101,6 +167,7 @@ export type Database = {
           created_at?: string
           first_name?: string | null
           id?: string
+          is_eligible_for_express_lane?: boolean | null
           is_express?: boolean | null
           is_mobile?: boolean | null
           is_paypal?: boolean | null
@@ -114,6 +181,7 @@ export type Database = {
           created_at?: string
           first_name?: string | null
           id?: string
+          is_eligible_for_express_lane?: boolean | null
           is_express?: boolean | null
           is_mobile?: boolean | null
           is_paypal?: boolean | null
@@ -153,6 +221,53 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "emails_donor_id_fkey"
+            columns: ["donor_id"]
+            isOneToOne: false
+            referencedRelation: "donors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      employer_data: {
+        Row: {
+          created_at: string
+          donor_id: string | null
+          employer: string | null
+          employer_addr1: string | null
+          employer_city: string | null
+          employer_country: string | null
+          employer_state: string | null
+          id: string
+          occupation: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          donor_id?: string | null
+          employer?: string | null
+          employer_addr1?: string | null
+          employer_city?: string | null
+          employer_country?: string | null
+          employer_state?: string | null
+          id?: string
+          occupation?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          donor_id?: string | null
+          employer?: string | null
+          employer_addr1?: string | null
+          employer_city?: string | null
+          employer_country?: string | null
+          employer_state?: string | null
+          id?: string
+          occupation?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employer_data_donor_id_fkey"
             columns: ["donor_id"]
             isOneToOne: false
             referencedRelation: "donors"
@@ -203,6 +318,41 @@ export type Database = {
             columns: ["donor_id"]
             isOneToOne: false
             referencedRelation: "donors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      merchandise: {
+        Row: {
+          created_at: string
+          details: Json | null
+          donation_id: string | null
+          id: string
+          item_id: number | null
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          details?: Json | null
+          donation_id?: string | null
+          id?: string
+          item_id?: number | null
+          name: string
+        }
+        Update: {
+          created_at?: string
+          details?: Json | null
+          donation_id?: string | null
+          id?: string
+          item_id?: number | null
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "merchandise_donation_id_fkey"
+            columns: ["donation_id"]
+            isOneToOne: false
+            referencedRelation: "donations"
             referencedColumns: ["id"]
           },
         ]

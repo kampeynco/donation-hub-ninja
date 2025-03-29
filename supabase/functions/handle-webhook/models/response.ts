@@ -12,6 +12,7 @@ export function createSuccessResponse(
   donorData: any,
   donor: ActBlueDonor | undefined,
   locationId: string | null,
+  employerDataId: string | null,
   requestId: string,
   timestamp: string
 ): SuccessResponseData {
@@ -32,6 +33,10 @@ export function createSuccessResponse(
         state: donor?.state,
         zip: donor?.zip,
         country: donor?.country
+      } : null,
+      employer_data: employerDataId && donor?.employerData ? {
+        employer: donor.employerData.employer,
+        occupation: donor.employerData.occupation
       } : null
     } : null,
     request_id: requestId,
