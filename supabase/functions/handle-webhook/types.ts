@@ -1,3 +1,4 @@
+
 export interface ActBlueDonor {
   firstname?: string;
   lastname?: string;
@@ -48,6 +49,15 @@ export interface ActBlueContribution {
   shippingState?: string;
   shippingZip?: string;
   shippingCountry?: string;
+  customFields?: Array<{
+    label: string;
+    answer: string;
+  }>;
+  merchandise?: Array<{
+    name: string;
+    itemId: number;
+    details?: any;
+  }>;
 }
 
 export interface ActBlueLineItem {
