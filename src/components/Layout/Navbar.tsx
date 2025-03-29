@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { IconMenu2, IconX, IconLogout2 } from "@tabler/icons-react";
+import { IconMenu2, IconX, IconStar } from "@tabler/icons-react";
 import NotificationBell from '@/components/Notifications/NotificationBell';
 
 const Navbar = () => {
@@ -33,13 +33,25 @@ const Navbar = () => {
     navigate("/login");
   };
 
+  const getInitials = () => {
+    const email = user?.email || "";
+    return email.substring(0, 2).toUpperCase();
+  };
+
+  const getUserDisplayName = () => {
+    return user?.user_metadata?.committee_name || "Demo Committee";
+  };
+
   return (
     <nav className="bg-white border-b shadow-sm sticky top-0 z-50">
       <div className="container max-w-7xl mx-auto py-3 px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-12">
           {/* Logo and Brand */}
-          <Link to="/" className="flex items-center font-bold text-xl">
-            DonorCamp
+          <Link to="/" className="flex items-center space-x-2 font-bold text-xl">
+            <div className="bg-[#007AFF] text-white p-2 rounded-full w-10 h-10 flex items-center justify-center">
+              <IconStar size={24} />
+            </div>
+            <span>Donor Camp</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -49,30 +61,34 @@ const Navbar = () => {
             </Link>
             {user ? (
               <>
-                <div className="hidden md:flex items-center space-x-2">
+                <div className="hidden md:flex items-center space-x-4">
                   <NotificationBell />
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0 rounded-full">
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage src={user?.user_metadata?.avatar_url} alt={user?.email || "Avatar"} />
-                          <AvatarFallback>{user?.email?.substring(0, 2).toUpperCase()}</AvatarFallback>
+                      <Button variant="ghost" className="h-10 w-10 p-0 rounded-full">
+                        <Avatar className="h-10 w-10 bg-[#007AFF] text-white">
+                          <AvatarFallback>{getInitials()}</AvatarFallback>
                         </Avatar>
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-56" align="end" forceMount>
-                      <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem asChild>
-                        <Link to="/account" className="w-full">
-                          Settings
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
-                        Logout
-                        <IconLogout2 className="ml-auto h-4 w-4" />
-                      </DropdownMenuItem>
+                    <DropdownMenuContent className="w-56 rounded-lg" align="end" forceMount>
+                      <div className="p-4 border-b">
+                        <p className="text-lg font-semibold">{getUserDisplayName()}</p>
+                        <p className="text-gray-500 text-sm">{user?.email}</p>
+                      </div>
+                      <div className="p-2">
+                        <DropdownMenuItem asChild className="py-2">
+                          <Link to="/account" className="w-full cursor-pointer">
+                            Account settings
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="py-2 cursor-pointer">
+                          Help & support
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={handleSignOut} className="py-2 text-red-500 cursor-pointer">
+                          Sign out
+                        </DropdownMenuItem>
+                      </div>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
@@ -110,26 +126,30 @@ const Navbar = () => {
                   <NotificationBell />
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0 rounded-full">
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage src={user?.user_metadata?.avatar_url} alt={user?.email || "Avatar"} />
-                          <AvatarFallback>{user?.email?.substring(0, 2).toUpperCase()}</AvatarFallback>
+                      <Button variant="ghost" className="h-10 w-10 p-0 rounded-full">
+                        <Avatar className="h-10 w-10 bg-[#007AFF] text-white">
+                          <AvatarFallback>{getInitials()}</AvatarFallback>
                         </Avatar>
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-56" align="end" forceMount>
-                      <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem asChild>
-                        <Link to="/account" className="w-full">
-                          Settings
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
-                        Logout
-                        <IconLogout2 className="ml-auto h-4 w-4" />
-                      </DropdownMenuItem>
+                    <DropdownMenuContent className="w-56 rounded-lg" align="end" forceMount>
+                      <div className="p-4 border-b">
+                        <p className="text-lg font-semibold">{getUserDisplayName()}</p>
+                        <p className="text-gray-500 text-sm">{user?.email}</p>
+                      </div>
+                      <div className="p-2">
+                        <DropdownMenuItem asChild className="py-2">
+                          <Link to="/account" className="w-full cursor-pointer">
+                            Account settings
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="py-2 cursor-pointer">
+                          Help & support
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={handleSignOut} className="py-2 text-red-500 cursor-pointer">
+                          Sign out
+                        </DropdownMenuItem>
+                      </div>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>

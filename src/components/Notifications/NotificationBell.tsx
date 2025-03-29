@@ -130,15 +130,15 @@ const NotificationBell = () => {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button className="relative p-2 rounded-full hover:bg-gray-100 focus:outline-none">
-          <IconBell size={20} className="text-gray-600" />
+          <IconBell size={24} className="text-gray-600" />
           {unreadCount > 0 && (
-            <Badge variant="destructive" className="absolute -top-1 -right-1 px-1.5 py-0.5 min-w-[18px] h-[18px] flex items-center justify-center text-[10px]">
+            <Badge variant="destructive" className="absolute -top-1 -right-1 min-w-[20px] h-[20px] flex items-center justify-center text-xs rounded-full">
               {unreadCount}
             </Badge>
           )}
         </button>
       </PopoverTrigger>
-      <PopoverContent className="w-80 p-0" align="end">
+      <PopoverContent className="w-80 p-0 rounded-lg" align="end">
         <NotificationsList
           notifications={notifications}
           loading={loading}
