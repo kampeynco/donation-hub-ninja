@@ -1,49 +1,36 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { IconMenu2, IconX, IconStar } from "@tabler/icons-react";
 import NotificationBell from '@/components/Notifications/NotificationBell';
-
 const Navbar = () => {
-  const { user, signOut } = useAuth();
+  const {
+    user,
+    signOut
+  } = useAuth();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
-
   const closeMobileMenu = () => {
     setIsMobileMenuOpen(false);
   };
-
   const handleSignOut = async () => {
     await signOut();
     navigate("/login");
   };
-
   const getInitials = () => {
     const email = user?.email || "";
     return email.substring(0, 2).toUpperCase();
   };
-
   const getUserDisplayName = () => {
     return user?.user_metadata?.committee_name || "Demo Committee";
   };
-
-  return (
-    <nav className="bg-white border-b shadow-sm sticky top-0 z-50">
+  return <nav className="bg-white border-b shadow-sm sticky top-0 z-50">
       <div className="container max-w-7xl mx-auto py-3 px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-12">
           {/* Logo and Brand */}
@@ -56,11 +43,8 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link to="/dashboard" className="text-gray-600 hover:text-gray-800">
-              Dashboard
-            </Link>
-            {user ? (
-              <>
+            
+            {user ? <>
                 <div className="hidden md:flex items-center space-x-4">
                   <NotificationBell />
                   <DropdownMenu>
@@ -92,36 +76,27 @@ const Navbar = () => {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
-              </>
-            ) : (
-              <Link to="/login" className="text-gray-600 hover:text-gray-800">
+              </> : <Link to="/login" className="text-gray-600 hover:text-gray-800">
                 Login
-              </Link>
-            )}
+              </Link>}
           </div>
 
           {/* Mobile Navigation Button */}
           <div className="md:hidden">
             <Button variant="ghost" size="icon" onClick={toggleMobileMenu}>
-              {isMobileMenuOpen ? (
-                <IconX className="h-6 w-6" />
-              ) : (
-                <IconMenu2 className="h-6 w-6" />
-              )}
+              {isMobileMenuOpen ? <IconX className="h-6 w-6" /> : <IconMenu2 className="h-6 w-6" />}
             </Button>
           </div>
         </div>
       </div>
 
       {/* Mobile Navigation Menu */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden bg-gray-50 py-2 border-b">
+      {isMobileMenuOpen && <div className="md:hidden bg-gray-50 py-2 border-b">
           <div className="container max-w-7xl mx-auto flex flex-col space-y-2 px-4 sm:px-6 lg:px-8">
             <Link to="/dashboard" className="text-gray-600 hover:text-gray-800" onClick={closeMobileMenu}>
               Dashboard
             </Link>
-            {user ? (
-              <>
+            {user ? <>
                 <div className="md:hidden flex items-center space-x-2">
                   <NotificationBell />
                   <DropdownMenu>
@@ -153,17 +128,11 @@ const Navbar = () => {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
-              </>
-            ) : (
-              <Link to="/login" className="text-gray-600 hover:text-gray-800" onClick={closeMobileMenu}>
+              </> : <Link to="/login" className="text-gray-600 hover:text-gray-800" onClick={closeMobileMenu}>
                 Login
-              </Link>
-            )}
+              </Link>}
           </div>
-        </div>
-      )}
-    </nav>
-  );
+        </div>}
+    </nav>;
 };
-
 export default Navbar;
