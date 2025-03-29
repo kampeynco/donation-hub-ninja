@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,22 +6,14 @@ import { Separator } from "@/components/ui/separator";
 import CopyableInput from "@/components/Auth/CopyableInput";
 import CopyablePasswordInput from "@/components/Auth/CopyablePasswordInput";
 import { IconRefresh } from "@tabler/icons-react";
-import { 
-  WebhookCredentials, 
-  updateWebhookCredentials, 
-  regenerateApiPassword, 
-  updateActBlueWebhookUrl,
-  testActBlueWebhook
-} from "@/services/webhookService";
+import { WebhookCredentials, updateWebhookCredentials, regenerateApiPassword, updateActBlueWebhookUrl, testActBlueWebhook } from "@/services/webhookService";
 import { toast } from "@/components/ui/use-toast";
-
 interface WebhookConfigProps {
   webhookCredentials: WebhookCredentials | null;
   setWebhookCredentials: React.Dispatch<React.SetStateAction<WebhookCredentials | null>>;
   actBlueWebhookUrl: string;
   setActBlueWebhookUrl: React.Dispatch<React.SetStateAction<string>>;
 }
-
 const WebhookConfig = ({
   webhookCredentials,
   setWebhookCredentials,
@@ -32,20 +23,16 @@ const WebhookConfig = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isRegeneratingPassword, setIsRegeneratingPassword] = useState(false);
   const [isTesting, setIsTesting] = useState(false);
-
   const handleSaveWebhookUrl = async () => {
     if (!webhookCredentials) return;
-    
     setIsLoading(true);
     try {
       const success = await updateActBlueWebhookUrl(webhookCredentials.id, actBlueWebhookUrl);
-      
       if (success) {
         setWebhookCredentials({
           ...webhookCredentials,
           actblue_webhook_url: actBlueWebhookUrl
         });
-        
         toast({
           title: "Webhook URL updated",
           description: "Your ActBlue webhook URL has been updated successfully."
@@ -58,26 +45,22 @@ const WebhookConfig = ({
       toast({
         title: "Error updating webhook URL",
         description: error instanceof Error ? error.message : "An unknown error occurred",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setIsLoading(false);
     }
   };
-  
   const handleRegeneratePassword = async () => {
     if (!webhookCredentials) return;
-    
     setIsRegeneratingPassword(true);
     try {
       const newPassword = await regenerateApiPassword(webhookCredentials.id);
-      
       if (newPassword) {
         setWebhookCredentials({
           ...webhookCredentials,
           api_password: newPassword
         });
-        
         toast({
           title: "API Password regenerated",
           description: "Your new API password has been generated. Make sure to update your ActBlue webhook settings."
@@ -90,16 +73,14 @@ const WebhookConfig = ({
       toast({
         title: "Error regenerating password",
         description: error instanceof Error ? error.message : "An unknown error occurred",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setIsRegeneratingPassword(false);
     }
   };
-  
   const handleTestWebhook = async () => {
     if (!webhookCredentials) return;
-    
     setIsTesting(true);
     try {
       await testActBlueWebhook(webhookCredentials.id);
@@ -107,31 +88,15 @@ const WebhookConfig = ({
       setIsTesting(false);
     }
   };
-
-  return (
-    <div className="space-y-6">
+  return <div className="space-y-6">
       <div className="space-y-2">
-        <Label htmlFor="actBlueWebhookUrl">ActBlue Webhook URL</Label>
+        <Label htmlFor="actBlueWebhookUrl">Endpoint URL</Label>
         <div className="flex gap-2">
-          <Input
-            id="actBlueWebhookUrl"
-            value={actBlueWebhookUrl}
-            onChange={(e) => setActBlueWebhookUrl(e.target.value)}
-            placeholder="https://your-actblue-webhook-url.com"
-            className="flex-1"
-          />
-          <Button 
-            variant="outline" 
-            onClick={handleSaveWebhookUrl}
-            disabled={isLoading || !webhookCredentials}
-          >
+          <Input id="actBlueWebhookUrl" value={actBlueWebhookUrl} onChange={e => setActBlueWebhookUrl(e.target.value)} placeholder="https://your-actblue-webhook-url.com" className="flex-1" />
+          <Button variant="outline" onClick={handleSaveWebhookUrl} disabled={isLoading || !webhookCredentials}>
             {isLoading ? "Saving..." : "Save"}
           </Button>
-          <Button 
-            variant="outline" 
-            onClick={handleTestWebhook}
-            disabled={isTesting || !webhookCredentials || !actBlueWebhookUrl}
-          >
+          <Button variant="outline" onClick={handleTestWebhook} disabled={isTesting || !webhookCredentials || !actBlueWebhookUrl}>
             {isTesting ? "Testing..." : "Test"}
           </Button>
         </div>
@@ -143,50 +108,31 @@ const WebhookConfig = ({
       <Separator className="my-6" />
 
       <div className="space-y-4">
-        <h3 className="font-medium">DonorCamp API Credentials</h3>
+        <h3 className="font-medium">Webhook Credentials</h3>
         <p className="text-sm text-gray-500 mb-4">
           Use these credentials in your ActBlue webhook settings to authenticate requests to DonorCamp.
         </p>
         
-        {webhookCredentials ? (
-          <div className="space-y-4">
-            <CopyableInput 
-              id="apiUsername" 
-              value={webhookCredentials.api_username} 
-              label="API Username" 
-            />
+        {webhookCredentials ? <div className="space-y-4">
+            <CopyableInput id="apiUsername" value={webhookCredentials.api_username} label="API Username" />
             
             <div className="flex flex-col space-y-2">
               <div className="flex justify-between items-center">
                 <Label htmlFor="apiPassword">API Password</Label>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={handleRegeneratePassword}
-                  disabled={isRegeneratingPassword}
-                  className="h-8 px-2 text-xs"
-                >
+                <Button variant="ghost" size="sm" onClick={handleRegeneratePassword} disabled={isRegeneratingPassword} className="h-8 px-2 text-xs">
                   <IconRefresh size={16} className="mr-1" />
                   {isRegeneratingPassword ? "Regenerating..." : "Regenerate"}
                 </Button>
               </div>
-              <CopyablePasswordInput 
-                id="apiPassword" 
-                value={webhookCredentials.api_password} 
-              />
+              <CopyablePasswordInput id="apiPassword" value={webhookCredentials.api_password} />
               <p className="text-xs text-gray-500">
                 For security reasons, we recommend regenerating your API password periodically.
               </p>
             </div>
-          </div>
-        ) : (
-          <div className="py-4 text-center text-gray-500">
+          </div> : <div className="py-4 text-center text-gray-500">
             Loading webhook credentials...
-          </div>
-        )}
+          </div>}
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default WebhookConfig;
