@@ -4,7 +4,7 @@ import { Donation, DonationStats } from "@/types/donation";
 import StatCard from "@/components/Dashboard/StatCard";
 import DonationsTable from "@/components/Dashboard/DonationsTable";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { fetchRecentDonations, fetchDonationStats } from "@/services/donationService";
+import { fetchRecentDonations, fetchDonationStats } from "@/services/donations";
 import { useQuery } from "@tanstack/react-query";
 
 const Dashboard = () => {
