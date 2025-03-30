@@ -72,14 +72,14 @@ serve(async (req) => {
       );
     }
     
-    // Handle email notification
-    if (emailEnabled && donorEmail) {
+    // Handle email notification - FIXED: Now using the committee owner's email from profile
+    if (emailEnabled && profile.contact_email) {
       const emailSubject = donationType === 'recurring' 
         ? `Recurring Donation Received: $${amount.toFixed(2)}`
         : `New Donation Received: $${amount.toFixed(2)}`;
         
       await sendEmailNotification(
-        donorEmail,
+        profile.contact_email, // Use committee owner's email instead of donor's email
         emailSubject,
         recipientName,
         amount,
@@ -87,6 +87,9 @@ serve(async (req) => {
         donationType,
         requestId
       );
+    } else if (emailEnabled) {
+      // Log error if email notification is enabled but no contact email is available
+      console.error(`[${requestId}] Email notification enabled but no contact email found for user ${userId}`);
     }
     
     // Handle SMS notification

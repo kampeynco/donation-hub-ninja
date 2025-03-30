@@ -24,9 +24,10 @@ export async function getUserNotificationSettings(userId: string): Promise<Notif
 }
 
 export async function getUserProfile(userId: string): Promise<UserProfile | null> {
+  // Updated to include contact_email in the select query
   const { data, error } = await supabase
     .from('profiles')
-    .select('committee_name, contact_first_name, contact_last_name, mobile_phone')
+    .select('committee_name, contact_first_name, contact_last_name, mobile_phone, contact_email')
     .eq('id', userId)
     .single();
   

@@ -20,6 +20,11 @@ export async function sendEmailNotification(
     return false;
   }
 
+  if (!recipientEmail) {
+    console.log(`[${requestId}] No recipient email provided, skipping email notification`);
+    return false;
+  }
+
   try {
     const emailHtml = `
       <div style="font-family: 'Inter', system-ui, sans-serif; color: #1e293b; max-width: 600px; margin: 0 auto;">
