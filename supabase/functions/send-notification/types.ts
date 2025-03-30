@@ -17,7 +17,6 @@ export interface UserProfile {
   contact_first_name: string | null;
   contact_last_name: string | null;
   mobile_phone: string | null;
-  contact_email: string | null; // Added contact_email field
 }
 
 export interface NotificationSettings {

@@ -24,10 +24,9 @@ export async function getUserNotificationSettings(userId: string): Promise<Notif
 }
 
 export async function getUserProfile(userId: string): Promise<UserProfile | null> {
-  // Updated to include contact_email in the select query
   const { data, error } = await supabase
     .from('profiles')
-    .select('committee_name, contact_first_name, contact_last_name, mobile_phone, contact_email')
+    .select('committee_name, contact_first_name, contact_last_name, mobile_phone')
     .eq('id', userId)
     .single();
   
@@ -37,6 +36,21 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
   }
   
   return data;
+}
+
+export async function getUserEmail(userId: string): Promise<string | null> {
+  // Get user email from auth.users table
+  const { data, error } = await supabase
+    .auth
+    .admin
+    .getUserById(userId);
+  
+  if (error) {
+    console.error(`Error fetching user email: ${error.message}`);
+    return null;
+  }
+  
+  return data.user?.email || null;
 }
 
 export async function createWebNotification(

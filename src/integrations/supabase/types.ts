@@ -490,6 +490,7 @@ export type Database = {
       profiles: {
         Row: {
           committee_name: string
+          contact_email: string | null
           contact_first_name: string | null
           contact_last_name: string | null
           created_at: string
@@ -499,6 +500,7 @@ export type Database = {
         }
         Insert: {
           committee_name: string
+          contact_email?: string | null
           contact_first_name?: string | null
           contact_last_name?: string | null
           created_at?: string
@@ -508,6 +510,7 @@ export type Database = {
         }
         Update: {
           committee_name?: string
+          contact_email?: string | null
           contact_first_name?: string | null
           contact_last_name?: string | null
           created_at?: string
