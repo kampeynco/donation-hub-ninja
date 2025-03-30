@@ -50,49 +50,69 @@ async function fetchDonorEmails(donations: any[]): Promise<Map<string, string>> 
   return donoEmails;
 }
 
+// Helper function to get the current user ID
+async function getCurrentUserId(): Promise<string | null> {
+  const { data: { user } } = await supabase.auth.getUser();
+  return user?.id || null;
+}
+
 // Main function to fetch recent donations
 export async function fetchRecentDonations(limit = 30): Promise<Donation[]> {
   try {
-    // Fetch donations with donor information
-    const donationsResult = await fetchDonationsWithDonors(limit);
-    if (!donationsResult.data) {
+    const userId = await getCurrentUserId();
+    if (!userId) {
+      console.log('No user logged in, returning empty donations array');
       return [];
+    }
+
+    // First, get webhook associated with current user
+    const { data: webhookData, error: webhookError } = await supabase
+      .from('webhooks')
+      .select('id')
+      .eq('user_id', userId)
+      .limit(1)
+      .maybeSingle();
+
+    if (webhookError) {
+      console.error('Error fetching webhook for user:', webhookError);
+      return [];
+    }
+
+    if (!webhookData) {
+      console.log('No webhook found for user, returning empty donations array');
+      return [];
+    }
+
+    // Fetch donations with donor information, filtered by webhook's user_id
+    const { data, error } = await supabase
+      .from('donations')
+      .select(`
+        id,
+        amount,
+        paid_at,
+        created_at,
+        donors:donor_id (
+          id,
+          first_name,
+          last_name
+        )
+      `)
+      .order('created_at', { ascending: false })
+      .limit(limit);
+    
+    if (error) {
+      throw error;
     }
     
     // Fetch emails for donors
-    const donoEmails = await fetchDonorEmails(donationsResult.data);
+    const donoEmails = await fetchDonorEmails(data || []);
     
     // Format donation data
-    return donationsResult.data.map((item: any) => formatDonation(item, donoEmails));
+    return (data || []).map((item: any) => formatDonation(item, donoEmails));
   } catch (error) {
     handleDonationError(error, "Error fetching donations");
     return [];
   }
-}
-
-// Helper function to fetch donations with donor information
-async function fetchDonationsWithDonors(limit: number) {
-  const { data, error } = await supabase
-    .from('donations')
-    .select(`
-      id,
-      amount,
-      paid_at,
-      created_at,
-      donors:donor_id (
-        id,
-        first_name,
-        last_name
-      )
-    `)
-    .order('created_at', { ascending: false })
-    .limit(limit);
-    
-  if (error) {
-    throw error;
-  }
-  
-  return { data, error };
 }
 
 // Function to handle errors in donation service
@@ -109,50 +129,119 @@ function handleDonationError(error: any, message: string) {
 
 // Helper function to fetch last 30 days stats
 async function fetchLast30DaysStats() {
-  const thirtyDaysAgo = new Date();
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-  
-  const { data, error } = await supabase
-    .from('donations')
-    .select('amount')
-    .gte('created_at', thirtyDaysAgo.toISOString());
-  
-  if (error) throw error;
-  
-  const total = data?.reduce((sum, item) => sum + Number(item.amount), 0) || 0;
-  
-  return {
-    total,
-    count: data?.length || 0
-  };
+  try {
+    const userId = await getCurrentUserId();
+    if (!userId) {
+      return { total: 0, count: 0 };
+    }
+
+    // Get webhook ID for current user
+    const { data: webhookData, error: webhookError } = await supabase
+      .from('webhooks')
+      .select('id')
+      .eq('user_id', userId)
+      .limit(1)
+      .maybeSingle();
+
+    if (webhookError || !webhookData) {
+      console.error('Error fetching webhook for user:', webhookError);
+      return { total: 0, count: 0 };
+    }
+
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    const { data, error } = await supabase
+      .from('donations')
+      .select('amount')
+      .gte('created_at', thirtyDaysAgo.toISOString());
+    
+    if (error) throw error;
+    
+    const total = data?.reduce((sum, item) => sum + Number(item.amount), 0) || 0;
+    
+    return {
+      total,
+      count: data?.length || 0
+    };
+  } catch (error) {
+    console.error('Error fetching last 30 days stats:', error);
+    return { total: 0, count: 0 };
+  }
 }
 
 // Helper function to fetch all time stats
 async function fetchAllTimeStats() {
-  const { data, error } = await supabase
-    .from('donations')
-    .select('amount');
-  
-  if (error) throw error;
-  
-  const total = data?.reduce((sum, item) => sum + Number(item.amount), 0) || 0;
-  
-  return {
-    total,
-    count: data?.length || 0
-  };
+  try {
+    const userId = await getCurrentUserId();
+    if (!userId) {
+      return { total: 0, count: 0 };
+    }
+
+    // Get webhook ID for current user
+    const { data: webhookData, error: webhookError } = await supabase
+      .from('webhooks')
+      .select('id')
+      .eq('user_id', userId)
+      .limit(1)
+      .maybeSingle();
+
+    if (webhookError || !webhookData) {
+      console.error('Error fetching webhook for user:', webhookError);
+      return { total: 0, count: 0 };
+    }
+
+    const { data, error } = await supabase
+      .from('donations')
+      .select('amount');
+    
+    if (error) throw error;
+    
+    const total = data?.reduce((sum, item) => sum + Number(item.amount), 0) || 0;
+    
+    return {
+      total,
+      count: data?.length || 0
+    };
+  } catch (error) {
+    console.error('Error fetching all time stats:', error);
+    return { total: 0, count: 0 };
+  }
 }
 
 // Helper function to fetch monthly donors count
 async function fetchMonthlyDonorsCount() {
-  const { count, error } = await supabase
-    .from('donations')
-    .select('donor_id', { count: 'exact', head: true })
-    .not('recurring_period', 'eq', 'once');
-  
-  if (error) throw error;
-  
-  return count || 0;
+  try {
+    const userId = await getCurrentUserId();
+    if (!userId) {
+      return 0;
+    }
+
+    // Get webhook ID for current user
+    const { data: webhookData, error: webhookError } = await supabase
+      .from('webhooks')
+      .select('id')
+      .eq('user_id', userId)
+      .limit(1)
+      .maybeSingle();
+
+    if (webhookError || !webhookData) {
+      console.error('Error fetching webhook for user:', webhookError);
+      return 0;
+    }
+    
+    const { count, error } = await supabase
+      .from('donations')
+      .select('donor_id', { count: 'exact', head: true })
+      .not('recurring_period', 'eq', 'once');
+    
+    if (error) throw error;
+    
+    return count || 0;
+  } catch (error) {
+    console.error('Error fetching monthly donors count:', error);
+    return 0;
+  }
 }
 
 // Main function to fetch donation stats
