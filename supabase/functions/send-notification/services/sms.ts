@@ -4,6 +4,7 @@ import { UserProfile } from "../types.ts";
 // Configure Plivo client
 const plivoAuthId = Deno.env.get("PLIVO_API_KEY") || "";
 const plivoAuthToken = Deno.env.get("PLIVO_AUTH_TOKEN") || "";
+const plivoPhoneNumber = Deno.env.get("PLIVO_PHONE_NUMBER") || "18445096979"; // Use environment variable with fallback
 
 export async function sendSmsNotification(
   profile: UserProfile,
@@ -36,6 +37,9 @@ export async function sendSmsNotification(
     // Prepare authorization header for Plivo API
     const authHeader = 'Basic ' + btoa(plivoAuthId + ':' + plivoAuthToken);
     
+    // Log the phone number being used (for debugging)
+    console.log(`[${requestId}] Using Plivo phone number: ${plivoPhoneNumber}`);
+    
     // Send SMS using Plivo API
     const plivoResponse = await fetch(plivoApiUrl, {
       method: 'POST',
@@ -44,7 +48,7 @@ export async function sendSmsNotification(
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        src: '18445096979', // Your Plivo phone number
+        src: plivoPhoneNumber, // Use the environment variable instead of hardcoded number
         dst: formattedPhone,
         text: smsMessage
       })
