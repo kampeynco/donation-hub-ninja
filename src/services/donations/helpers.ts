@@ -24,31 +24,42 @@ export function formatDonation(item: any, donoEmails: Map<string, string>): Dona
 
 /**
  * Helper function to fetch donor emails
+ * Optimized to use a single query instead of multiple queries in a loop
  */
 export async function fetchDonorEmails(donations: any[]): Promise<Map<string, string>> {
   const donoEmails = new Map();
   
-  for (const donation of donations) {
-    if (donation.donors && donation.donors.id) {
-      try {
-        const { data: emailData, error } = await supabase
-          .from('emails')
-          .select('email')
-          .eq('donor_id', donation.donors.id)
-          .limit(1);
-          
-        if (error) {
-          console.error('Error fetching donor email:', error);
-          continue;
-        }
-          
-        if (emailData && emailData.length > 0) {
-          donoEmails.set(donation.donors.id, emailData[0].email);
-        }
-      } catch (error) {
-        console.error('Error in email fetch for donor:', donation.donors.id, error);
-      }
+  // Extract unique donor IDs
+  const donorIds = [...new Set(
+    donations
+      .filter(donation => donation.donors && donation.donors.id)
+      .map(donation => donation.donors.id)
+  )];
+  
+  if (donorIds.length === 0) {
+    return donoEmails;
+  }
+  
+  try {
+    // Fetch all emails with a single query
+    const { data: emailData, error } = await supabase
+      .from('emails')
+      .select('email, donor_id')
+      .in('donor_id', donorIds);
+      
+    if (error) {
+      console.error('Error fetching donor emails:', error);
+      return donoEmails;
     }
+      
+    // Build the map from the results
+    if (emailData && emailData.length > 0) {
+      emailData.forEach(item => {
+        donoEmails.set(item.donor_id, item.email);
+      });
+    }
+  } catch (error) {
+    console.error('Error in bulk email fetch:', error);
   }
   
   return donoEmails;
