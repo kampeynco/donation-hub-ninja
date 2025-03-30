@@ -65,25 +65,8 @@ export async function fetchRecentDonations(limit = 30): Promise<Donation[]> {
       return [];
     }
 
-    // First, get webhook associated with current user
-    const { data: webhookData, error: webhookError } = await supabase
-      .from('webhooks')
-      .select('id')
-      .eq('user_id', userId)
-      .limit(1)
-      .maybeSingle();
-
-    if (webhookError) {
-      console.error('Error fetching webhook for user:', webhookError);
-      return [];
-    }
-
-    if (!webhookData) {
-      console.log('No webhook found for user, returning empty donations array');
-      return [];
-    }
-
-    // Fetch donations with donor information, filtered by webhook's user_id
+    // Fetch donations with donor information
+    // Thanks to RLS, this query will only return donations associated with the current user
     const { data, error } = await supabase
       .from('donations')
       .select(`
@@ -135,19 +118,7 @@ async function fetchLast30DaysStats() {
       return { total: 0, count: 0 };
     }
 
-    // Get webhook ID for current user
-    const { data: webhookData, error: webhookError } = await supabase
-      .from('webhooks')
-      .select('id')
-      .eq('user_id', userId)
-      .limit(1)
-      .maybeSingle();
-
-    if (webhookError || !webhookData) {
-      console.error('Error fetching webhook for user:', webhookError);
-      return { total: 0, count: 0 };
-    }
-
+    // Thanks to RLS, this query will only return donations associated with the current user
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     
@@ -178,19 +149,7 @@ async function fetchAllTimeStats() {
       return { total: 0, count: 0 };
     }
 
-    // Get webhook ID for current user
-    const { data: webhookData, error: webhookError } = await supabase
-      .from('webhooks')
-      .select('id')
-      .eq('user_id', userId)
-      .limit(1)
-      .maybeSingle();
-
-    if (webhookError || !webhookData) {
-      console.error('Error fetching webhook for user:', webhookError);
-      return { total: 0, count: 0 };
-    }
-
+    // Thanks to RLS, this query will only return donations associated with the current user
     const { data, error } = await supabase
       .from('donations')
       .select('amount');
@@ -217,19 +176,7 @@ async function fetchMonthlyDonorsCount() {
       return 0;
     }
 
-    // Get webhook ID for current user
-    const { data: webhookData, error: webhookError } = await supabase
-      .from('webhooks')
-      .select('id')
-      .eq('user_id', userId)
-      .limit(1)
-      .maybeSingle();
-
-    if (webhookError || !webhookData) {
-      console.error('Error fetching webhook for user:', webhookError);
-      return 0;
-    }
-    
+    // Thanks to RLS, this query will only return donations associated with the current user
     const { count, error } = await supabase
       .from('donations')
       .select('donor_id', { count: 'exact', head: true })
