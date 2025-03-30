@@ -43,7 +43,7 @@ export async function sendEmailNotification(
     `;
     
     const emailData = {
-      from: "Donor Camp <notifications@donorcamp.app>",
+      from: "Donor Camp <no-reply@alerts.donorcamp.pro>",
       to: recipientEmail,
       subject: subject,
       html: emailHtml
