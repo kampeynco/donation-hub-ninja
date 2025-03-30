@@ -45,6 +45,10 @@ export async function handleRequest(req: Request): Promise<Response> {
     
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+    // Extract the source-name header which contains the user ID
+    const userId = req.headers.get("source-name");
+    console.log(`[${requestId}] Extracted source name header: ${userId}`);
+
     // Authentication check (using basic auth headers when present)
     const authHeader = req.headers.get("authorization");
     const authResult = await validateWebhookAuth(authHeader, supabase, requestId, timestamp, req.headers);
@@ -97,14 +101,15 @@ export async function handleRequest(req: Request): Promise<Response> {
       );
     }
 
-    // Process the donation
+    // Process the donation, passing the user ID from the source-name header
     const processResult = await processDonation(
       supabase, 
       payload.contribution, 
       payload.donor, 
       payload.lineitems,
       requestId,
-      timestamp
+      timestamp,
+      userId || undefined
     );
     
     if (!processResult.success) {

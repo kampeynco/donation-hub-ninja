@@ -1,3 +1,4 @@
+
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.29.0";
 import { ActBlueContribution, ActBlueDonor, ActBlueLineItem } from "../types.ts";
 import { errorResponses } from "../error-handler.ts";
@@ -19,7 +20,8 @@ export async function processDonation(
   donor: ActBlueDonor | undefined,
   lineitems: ActBlueLineItem[] | undefined,
   requestId: string,
-  timestamp: string
+  timestamp: string,
+  userId?: string
 ): Promise<ProcessResult> {
   try {
     console.log(`[${requestId}] Starting donation processing with contribution ID: ${contribution.orderNumber}`);
@@ -45,7 +47,8 @@ export async function processDonation(
     
     if (donor?.email) {
       console.log(`[${requestId}] Processing donor with email: ${donor.email}`);
-      const donorResult = await findOrCreateDonor(supabase, donor, donorData, requestId, timestamp);
+      // Pass the user ID from the webhook to link donors to users
+      const donorResult = await findOrCreateDonor(supabase, donor, donorData, requestId, timestamp, userId);
       if (!donorResult.success) {
         console.error(`[${requestId}] Failed to process donor:`, donorResult.error);
         return { success: false, error: donorResult.error };

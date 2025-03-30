@@ -13,7 +13,8 @@ export async function findOrCreateDonor(
   donor: ActBlueDonor | undefined,
   donorData: DonorData,
   requestId: string,
-  timestamp: string
+  timestamp: string,
+  userId?: string
 ): Promise<ProcessResult<{donorId: string | null, emailId?: string}>> {
   if (!donor?.email) {
     console.log(`[${requestId}] Anonymous donation - no email provided`);
@@ -68,9 +69,12 @@ export async function findOrCreateDonor(
       // Create new donor
       console.log(`[${requestId}] No existing donor found for email ${donor.email}, creating new donor`);
       
+      // Add user_id to donor data if provided
+      const donorDataWithUserId = userId ? { ...donorData, user_id: userId } : donorData;
+      
       const { data: newDonor, error: donorError } = await supabase
         .from("donors")
-        .insert(donorData)
+        .insert(donorDataWithUserId)
         .select()
         .single();
 
