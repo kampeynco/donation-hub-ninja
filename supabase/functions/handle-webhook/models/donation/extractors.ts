@@ -60,20 +60,14 @@ export function extractDonationData(
       }
     }
     
-    // Handle boolean/string for isRecurring
-    let isRecurring = false;
-    if (typeof contribution.isRecurring === 'string') {
-      isRecurring = contribution.isRecurring.toLowerCase() === 'true';
-    } else {
-      isRecurring = !!contribution.isRecurring;
-    }
-    
-    // Determine recurring period
+    // Determine recurring period based solely on the recurringPeriod value
     let recurringPeriod: 'monthly' | 'weekly' | 'once' = 'once';
-    if (isRecurring && contribution.recurringPeriod) {
-      if (contribution.recurringPeriod.toLowerCase() === 'monthly') {
+    
+    if (contribution.recurringPeriod) {
+      const period = contribution.recurringPeriod.toLowerCase();
+      if (period === 'monthly') {
         recurringPeriod = 'monthly';
-      } else if (contribution.recurringPeriod.toLowerCase() === 'weekly') {
+      } else if (period === 'weekly') {
         recurringPeriod = 'weekly';
       }
     }

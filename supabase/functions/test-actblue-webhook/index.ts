@@ -100,9 +100,9 @@ serve(async (req) => {
         orderNumber: `TEST-${Date.now()}`,
         contributionForm: "Test Form",
         refcodes: {},
-        recurringPeriod: "once",
-        recurringDuration: 1,
-        isRecurring: false,
+        recurringPeriod: "weekly", // Set to weekly to test weekly recurring donations
+        recurringDuration: 12,     // Set valid duration to ensure it's recognized as recurring
+        isRecurring: true,         // Keep this for backward compatibility, but not used
         isPaypal: false,
         isMobile: false,
         isExpress: false,

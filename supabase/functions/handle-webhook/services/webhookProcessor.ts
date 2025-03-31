@@ -64,8 +64,8 @@ export async function processActBlueWebhook(
   // Send notification for the donation if donor exists and userId is provided
   // We only want to send notifications if we have both a donor ID and a user ID
   if (donorResult?.donorId && userId) {
-    // Determine if this is a recurring donation
-    const isRecurring = donation.recurringDuration && donation.recurringPeriod !== 'once';
+    // Determine if this is a recurring donation by checking recurringPeriod
+    const isRecurring = donationData.recurring_period && donationData.recurring_period !== 'once';
     
     // Extract actual donation amount from the lineitem or contribution
     const donationAmount = lineItems && lineItems.length > 0 
