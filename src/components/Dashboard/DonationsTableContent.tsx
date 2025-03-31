@@ -22,20 +22,31 @@ const DonationsTableContent = ({ donations }: DonationsTableContentProps) => {
       return <Badge variant="outline" className="bg-gray-100">One-time</Badge>;
     }
 
-    // Infinite recurring donation
-    if (donation.recurringDuration === 9999) {
-      return <Badge className="bg-donor-green text-white">Infinite {donation.recurringPeriod}</Badge>;
+    // Recurring donation badge
+    return <Badge className="bg-donor-blue text-white">Recurring</Badge>;
+  };
+
+  // Function to render duration badge for recurring donations
+  const renderDurationBadge = (donation: Donation) => {
+    if (!donation.recurringPeriod) {
+      return null; // No duration badge for one-time donations
     }
 
-    // Regular recurring donation
-    return (
-      <Badge className="bg-donor-blue text-white">
-        {donation.recurringPeriod} 
-        {donation.recurringDuration && donation.recurringDuration > 0 
-          ? ` (${donation.recurringDuration} months)` 
-          : ''}
-      </Badge>
-    );
+    // Infinite recurring donation
+    if (donation.recurringDuration === 9999) {
+      return <Badge variant="outline" className="bg-donor-green text-white ml-2">Infinite</Badge>;
+    }
+
+    // Regular recurring donation with duration
+    if (donation.recurringDuration && donation.recurringDuration > 0) {
+      return (
+        <Badge variant="outline" className="bg-gray-100 ml-2">
+          For {donation.recurringDuration} months
+        </Badge>
+      );
+    }
+
+    return null;
   };
 
   return (
@@ -61,7 +72,10 @@ const DonationsTableContent = ({ donations }: DonationsTableContentProps) => {
                 <TableCell className="px-6 py-4">{donation.name || "Anonymous"}</TableCell>
                 <TableCell className="px-6 py-4 text-blue-500">{donation.email || "---"}</TableCell>
                 <TableCell className="px-6 py-4">
-                  {renderDonationTypeBadge(donation)}
+                  <div className="flex items-center">
+                    {renderDonationTypeBadge(donation)}
+                    {renderDurationBadge(donation)}
+                  </div>
                 </TableCell>
                 <TableCell className="px-6 py-4 text-right font-medium">${donation.amount.toFixed(2)}</TableCell>
               </TableRow>
