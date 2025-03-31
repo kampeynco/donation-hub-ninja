@@ -26,7 +26,7 @@ export async function createDonationNotification(
     
     // Check if this is a recurring donation
     const isRecurring = contribution.recurringDuration && contribution.recurringPeriod !== 'once';
-    const action = isRecurring ? 'recurring_donation' : 'donation';
+    const action = 'donor'; // Use 'donor' action type for all donation notifications
     
     // Build message based on donation type
     let message = '';
@@ -54,7 +54,7 @@ export async function createDonationNotification(
       return { success: true, data: { id: '' }}; // Non-critical error, still return success
     }
     
-    console.log(`[${requestId}] Created ${action} notification for donor ${donorId}`);
+    console.log(`[${requestId}] Created ${isRecurring ? 'recurring donation' : 'donation'} notification for donor ${donorId}`);
     return { success: true, data: { id: data.id }};
   } catch (error) {
     console.error(`[${requestId}] Error in createDonationNotification:`, error);

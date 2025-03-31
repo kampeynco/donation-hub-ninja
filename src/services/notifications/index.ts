@@ -12,7 +12,7 @@ export async function createNotification({
   donorId = null
 }: {
   message: string;
-  action: 'donation' | 'recurring_donation' | 'marketing_update' | 'weekly_report';
+  action: 'user' | 'system' | 'donor';
   donorId?: string | null;
 }): Promise<Notification | null> {
   try {

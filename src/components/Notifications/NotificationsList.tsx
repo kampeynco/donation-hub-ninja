@@ -3,7 +3,7 @@ import { Notification } from './NotificationBell';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { IconCalendar, IconCreditCard } from '@tabler/icons-react';
+import { IconCalendar, IconCreditCard, IconUser } from '@tabler/icons-react';
 import { format } from 'date-fns';
 
 interface NotificationsListProps {
@@ -23,12 +23,13 @@ const NotificationsList = ({
 }: NotificationsListProps) => {
   const getNotificationIcon = (action: string) => {
     switch (action) {
-      case 'recurring_donation':
+      case 'donor':
         return <IconCalendar className="w-5 h-5 text-blue-500" />;
-      case 'donation':
-        return <IconCreditCard className="w-5 h-5 text-green-500" />;
+      case 'user':
+        return <IconUser className="w-5 h-5 text-primary" />;
+      case 'system':
       default:
-        return <IconCreditCard className="w-5 h-5 text-gray-500" />;
+        return <IconCreditCard className="w-5 h-5 text-green-500" />;
     }
   };
 

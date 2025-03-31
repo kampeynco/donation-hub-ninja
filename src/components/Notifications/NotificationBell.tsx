@@ -22,7 +22,7 @@ export interface Notification {
   message: string;
   is_read: boolean;
   date: string;
-  action: 'donation' | 'recurring_donation' | 'marketing_update' | 'weekly_report' | string;
+  action: 'user' | 'system' | 'donor';
   donor_id: string | null;
 }
 

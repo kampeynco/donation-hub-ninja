@@ -24,7 +24,7 @@ export function useNotifications() {
       const message = `${donorName} donated $${amount.toFixed(2)}`;
       return await createNotification({
         message,
-        action: 'donation',
+        action: 'donor',
         donorId
       });
     } finally {
@@ -46,7 +46,7 @@ export function useNotifications() {
       const message = `${donorName} set up a ${period} donation of $${amount.toFixed(2)}`;
       return await createNotification({
         message,
-        action: 'recurring_donation',
+        action: 'donor',
         donorId
       });
     } finally {
