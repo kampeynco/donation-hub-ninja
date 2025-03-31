@@ -29,7 +29,7 @@ export async function createDonationNotification(
     const action = 'donor'; // Use 'donor' action type for all donation notifications
     
     // Parse amount correctly to avoid NaN
-    const amount = contribution.amount ? parseFloat(contribution.amount) : 0;
+    const amount = parseFloat(contribution.amount || '0');
     const formattedAmount = amount.toFixed(2);
     
     // Build message based on donation type

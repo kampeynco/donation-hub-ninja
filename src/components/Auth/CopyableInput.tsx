@@ -2,6 +2,7 @@
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { IconCopy } from "@tabler/icons-react";
+import { toast } from "@/hooks/use-toast";
 
 interface CopyableInputProps {
   id: string;
@@ -20,6 +21,11 @@ const CopyableInput: React.FC<CopyableInputProps> = ({
 }) => {
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
+    toast({
+      title: "Copied!",
+      description: "Text copied to clipboard",
+      duration: 2000,
+    });
   };
 
   return (

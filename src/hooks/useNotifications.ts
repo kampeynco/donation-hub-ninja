@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { 
   createNotification,
@@ -22,7 +21,8 @@ export function useNotifications() {
   ) => {
     setIsLoading(true);
     try {
-      const message = `${donorName} donated $${amount.toFixed(2)}`;
+      const formattedAmount = amount.toFixed(2);
+      const message = `${donorName} donated $${formattedAmount}`;
       return await createNotification({
         message,
         action: 'donor',
@@ -44,7 +44,8 @@ export function useNotifications() {
   ) => {
     setIsLoading(true);
     try {
-      const message = `${donorName} set up a ${period} donation of $${amount.toFixed(2)}`;
+      const formattedAmount = amount.toFixed(2);
+      const message = `${donorName} set up a ${period} donation of $${formattedAmount}`;
       return await createNotification({
         message,
         action: 'donor',

@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { IconEye, IconEyeOff, IconCopy } from "@tabler/icons-react";
+import { toast } from "@/hooks/use-toast";
 
 interface CopyablePasswordInputProps {
   id: string;
@@ -20,6 +21,11 @@ const CopyablePasswordInput: React.FC<CopyablePasswordInputProps> = ({
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
+    toast({
+      title: "Copied!",
+      description: "Password copied to clipboard",
+      duration: 2000,
+    });
   };
 
   return (
