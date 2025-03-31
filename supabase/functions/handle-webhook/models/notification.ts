@@ -19,22 +19,28 @@ export async function createDonationNotification(
       return { success: true, data: { id: '' }};
     }
     
-    // Build the donor name or use "Anonymous"
-    const donorName = donor?.firstName && donor?.lastName 
-      ? `${donor.firstName} ${donor.lastName}`
-      : donor?.firstName || donor?.lastName || "Anonymous";
+    // Build the donor name or use "Anonymous" - fix casing issue (firstname vs firstName)
+    const donorName = donor?.firstname && donor?.lastname 
+      ? `${donor.firstname} ${donor.lastname}`
+      : donor?.firstname || donor?.lastname || "Anonymous";
     
     // Check if this is a recurring donation
     const isRecurring = contribution.recurringDuration && contribution.recurringPeriod !== 'once';
     const action = 'donor'; // Use 'donor' action type for all donation notifications
     
+    // Parse amount correctly to avoid NaN
+    const amount = contribution.amount ? parseFloat(contribution.amount) : 0;
+    const formattedAmount = amount.toFixed(2);
+    
     // Build message based on donation type
     let message = '';
     if (isRecurring) {
-      message = `${donorName} set up a ${contribution.recurringPeriod} donation of $${Number(contribution.amount).toFixed(2)}`;
+      message = `${donorName} set up a ${contribution.recurringPeriod} donation of $${formattedAmount}`;
     } else {
-      message = `${donorName} donated $${Number(contribution.amount).toFixed(2)}`;
+      message = `${donorName} donated $${formattedAmount}`;
     }
+    
+    console.log(`[${requestId}] Creating notification with message: ${message}`);
     
     // Create the notification
     const { data, error } = await supabase
