@@ -2,19 +2,20 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.29.0";
 import { corsHeaders } from "./utils/corsHeaders.ts";
-import { RequestHandler } from "./utils/requestHandler.ts";
 import { verifyCredentials } from "./auth-helper.ts";
 import { errorResponses } from "./error-handler.ts";
 import { ActBlueRequest } from "./types.ts";
 import { 
-  extractContributionData, 
+  extractDonationData, 
   extractDonorData, 
   findOrCreateDonor,
   addDonorLocation,
   addEmployerData,
-  processContribution,
-  handleResponse,
-  createDonationNotification
+  createDonation,
+  createDonationNotification,
+  processCustomFields,
+  processMerchandise,
+  updateWebhookTimestamp
 } from "./models/index.ts";
 
 serve(async (req) => {
@@ -34,12 +35,9 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    // Create request handler with functions to invoke
-    const handler = new RequestHandler();
-
     // Extract and verify userId from Hookdeck headers
     const hd_user_id = req.headers.get("X-HD-Userid");
-    const userId = hd_user_id || null;
+    const userId = hd_user_id || req.headers.get("source-name") || null;
     
     if (userId) {
       console.log(`[${requestId}] Request associated with user: ${userId}`);
@@ -48,103 +46,201 @@ serve(async (req) => {
     }
 
     // Authenticate the request
-    const authResult = await handler.handleStep(
-      "auth",
-      async () => await verifyCredentials(req, supabaseAdmin, requestId, timestamp),
-      requestId,
-      timestamp
-    );
+    const authResult = await verifyCredentials(req, supabaseAdmin, requestId, timestamp);
 
     if (!authResult.success) {
-      return handleResponse(authResult, requestId, timestamp);
+      return new Response(JSON.stringify(authResult.error), {
+        status: authResult.error.code,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      });
     }
     
     // Parse request body
-    const data = await handler.handleStep(
-      "parse_body",
-      async () => {
-        const body = await req.json();
-        return { success: true, data: body as ActBlueRequest };
-      },
-      requestId,
-      timestamp
-    );
-
-    if (!data.success) {
-      return handleResponse(data, requestId, timestamp);
+    let data;
+    try {
+      const body = await req.json();
+      data = body as ActBlueRequest;
+    } catch (error) {
+      console.error(`[${requestId}] Error parsing request body:`, error);
+      return new Response(
+        JSON.stringify(errorResponses.invalidPayload(
+          "Invalid JSON payload", 
+          error.message, 
+          requestId, 
+          timestamp
+        )),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, "Content-Type": "application/json" } 
+        }
+      );
     }
 
-    // Extract contribution and donor data
-    const contribution = data.data.contribution;
-    const lineItems = data.data.lineItems || [];
-    const donor = data.data.donor;
+    // Extract donation and donor data
+    const donation = data.contribution;
+    const lineItems = data.lineItems || [];
+    const donor = data.donor;
     
-    if (!contribution) {
-      console.error(`[${requestId}] No contribution data found in request body`);
-      return handleResponse(
-        { success: false, code: 400, message: "No contribution data provided" },
-        requestId,
-        timestamp
+    if (!donation) {
+      console.error(`[${requestId}] No donation data found in request body`);
+      return new Response(
+        JSON.stringify(errorResponses.invalidPayloadStructure(
+          "No donation data provided", 
+          "Missing contribution data", 
+          requestId, 
+          timestamp
+        )),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, "Content-Type": "application/json" } 
+        }
       );
     }
 
     // Process donor information
-    const donorData = extractDonorData(donor);
-    const donorResult = await handler.handleStep(
-      "process_donor",
-      async () => await findOrCreateDonor(supabaseAdmin, donor, donorData, requestId, timestamp, userId),
-      requestId,
-      timestamp
-    );
+    const donorData = extractDonorData(donor, donation);
+    const donorResult = await findOrCreateDonor(supabaseAdmin, donor, donorData, requestId, timestamp, userId);
 
     if (!donorResult.success) {
-      return handleResponse(donorResult, requestId, timestamp);
+      return new Response(
+        JSON.stringify(donorResult.error),
+        { 
+          status: donorResult.error.code, 
+          headers: { ...corsHeaders, "Content-Type": "application/json" } 
+        }
+      );
     }
 
     // Only proceed with location if we have a valid donor
+    let locationId = null;
+    let employerDataId = null;
+
     if (donorResult.data?.donorId) {
-      await handler.handleStep(
-        "add_donor_location",
-        async () => await addDonorLocation(supabaseAdmin, donor, donorResult.data.donorId!, requestId, timestamp),
-        requestId,
+      const locationResult = await addDonorLocation(
+        supabaseAdmin, 
+        donor, 
+        donorResult.data.donorId, 
+        requestId, 
         timestamp
       );
+      
+      if (locationResult.success && locationResult.data) {
+        locationId = locationResult.data.locationId;
+      }
 
-      await handler.handleStep(
-        "add_employer_data",
-        async () => await addEmployerData(supabaseAdmin, donor, donorResult.data.donorId!, requestId, timestamp),
-        requestId,
+      const employerResult = await addEmployerData(
+        supabaseAdmin, 
+        donor, 
+        donorResult.data.donorId, 
+        requestId, 
         timestamp
+      );
+      
+      if (employerResult.success && employerResult.data) {
+        employerDataId = employerResult.data.employerDataId;
+      }
+    }
+
+    // Extract donation data
+    const donationDataResult = extractDonationData(donation, lineItems, requestId);
+    
+    if (!donationDataResult.success) {
+      return new Response(
+        JSON.stringify(donationDataResult.error),
+        { 
+          status: donationDataResult.error.code, 
+          headers: { ...corsHeaders, "Content-Type": "application/json" } 
+        }
       );
     }
 
-    // Extract contribution data
-    const { contributionData, customFields } = extractContributionData(contribution, lineItems, donorResult.data?.donorId);
-
     // Process donation 
-    const contributionResult = await handler.handleStep(
-      "process_contribution",
-      async () => await processContribution(supabaseAdmin, contributionData, customFields, requestId, timestamp),
-      requestId,
+    const donationResult = await createDonation(
+      supabaseAdmin, 
+      donationDataResult.data, 
+      donorResult.data?.donorId || null, 
+      requestId, 
       timestamp
     );
+
+    if (!donationResult.success) {
+      return new Response(
+        JSON.stringify(donationResult.error),
+        { 
+          status: donationResult.error.code, 
+          headers: { ...corsHeaders, "Content-Type": "application/json" } 
+        }
+      );
+    }
+
+    // Process custom fields if any
+    if (donation.customFields && donation.customFields.length > 0) {
+      await processCustomFields(
+        supabaseAdmin,
+        donation,
+        donationResult.data.donationId,
+        requestId
+      );
+    }
+
+    // Process merchandise if any
+    if (donation.merchandise && donation.merchandise.length > 0) {
+      await processMerchandise(
+        supabaseAdmin,
+        donation,
+        donationResult.data.donationId,
+        requestId
+      );
+    }
 
     // Create notification for the donation
-    await handler.handleStep(
-      "create_notification",
-      async () => await createDonationNotification(
-        supabaseAdmin, 
-        contribution, 
-        donor, 
-        donorResult.data?.donorId || null, 
-        requestId
-      ),
-      requestId,
-      timestamp
+    await createDonationNotification(
+      supabaseAdmin, 
+      donation, 
+      donor, 
+      donorResult.data?.donorId || null, 
+      requestId
     );
 
-    // Return response based on contribution processing result
-    return handleResponse(contributionResult, requestId, timestamp);
+    // Update webhook last_used_at timestamp
+    await updateWebhookTimestamp(supabaseAdmin, timestamp, requestId);
+
+    // Return success response
+    const successResponse = {
+      success: true,
+      message: "Donation processed successfully",
+      donation: {
+        id: donationResult.data.donationId,
+        ...donationResult.data.donationData
+      },
+      donor: donorResult.data?.donorId ? { 
+        id: donorResult.data.donorId, 
+        ...donorResult.data.donorData,
+        email: donor?.email,
+        location: locationId ? {
+          street: donor?.addr1,
+          city: donor?.city,
+          state: donor?.state,
+          zip: donor?.zip,
+          country: donor?.country
+        } : null,
+        employer_data: employerDataId && donor?.employerData ? {
+          employer: donor.employerData.employer,
+          occupation: donor.employerData.occupation
+        } : null
+      } : null,
+      request_id: requestId,
+      timestamp: timestamp
+    };
+
+    console.log(`[${requestId}] Webhook processed successfully`);
+    return new Response(
+      JSON.stringify(successResponse),
+      { 
+        status: 200, 
+        headers: { ...corsHeaders, "Content-Type": "application/json" } 
+      }
+    );
   } catch (error) {
     console.error("Unhandled error in webhook handler:", error);
     return new Response(
