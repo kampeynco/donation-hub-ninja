@@ -59,11 +59,15 @@ export async function createWebNotification(
   donorId: string,
   requestId: string
 ): Promise<boolean> {
+  // Map the action type to match the database enum values
+  // The notification_action enum in the database has: 'donor', 'system', 'user'
+  const dbAction = 'donor'; // All donation notifications are of type 'donor'
+  
   const { error } = await supabase
     .from('notifications')
     .insert({
       message,
-      action,
+      action: dbAction,
       donor_id: donorId,
       is_read: false
     });

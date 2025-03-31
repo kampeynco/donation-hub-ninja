@@ -28,10 +28,7 @@ export async function createDonationNotification(
     // Check if this is a recurring donation
     const isRecurring = contribution.recurringDuration && contribution.recurringPeriod !== 'once';
     
-    // Determine the appropriate action type based on the donation type
-    const action = isRecurring ? 'recurring_donation' : 'donation';
-    
-    // Use the validated amount from the donation data
+    // Extract donation amount from the DonationData
     const amount = donationData.amount;
     const formattedAmount = amount.toFixed(2);
     
@@ -45,12 +42,12 @@ export async function createDonationNotification(
     
     console.log(`[${requestId}] Creating notification with message: ${message}`);
     
-    // Create the notification
+    // Create the notification with the donor action type (matches the enum in the database)
     const { data, error } = await supabase
       .from('notifications')
       .insert({
         message,
-        action,
+        action: 'donor', // Updated to match the notification_action enum in the database
         donor_id: donorId,
         date: new Date().toISOString(),
         is_read: false

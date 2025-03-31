@@ -34,11 +34,11 @@ serve(async (req) => {
       donorName, 
       donorEmail, 
       donationType, 
-      actionType = donationType === 'recurring' ? 'recurring_donation' : 'donation', // Default if not provided
+      actionType = donationType === 'recurring' ? 'recurring_donation' : 'donation', 
       requestId 
     } = payload;
     
-    console.log(`[${requestId}] Processing notification for ${donationType} donation ${donationId} with action type ${actionType}`);
+    console.log(`[${requestId}] Processing notification for ${donationType} donation ${donationId} with action type ${actionType} and amount ${amount}`);
     
     // Get user notification preferences
     const notificationSettings = await getUserNotificationSettings(userId);
@@ -83,7 +83,7 @@ serve(async (req) => {
       );
     }
     
-    // Handle email notification - Now using the user's email from auth.users
+    // Handle email notification - Using the user's email from auth.users
     if (emailEnabled) {
       // Get the user's email from auth.users
       const userEmail = await getUserEmail(userId);
@@ -94,13 +94,13 @@ serve(async (req) => {
           : `New Donation Received: $${amount.toFixed(2)}`;
           
         await sendEmailNotification(
-          userEmail, // Use the user's email from auth
+          userEmail,
           emailSubject,
           recipientName,
           amount,
           donorName || 'Anonymous',
           donationType,
-          actionType, // Pass the action type to determine sender email
+          actionType,
           requestId
         );
       } else {

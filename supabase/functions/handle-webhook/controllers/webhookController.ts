@@ -190,6 +190,49 @@ export function formatDonorResponse(
 }
 
 /**
+ * Send a notification for the donation
+ */
+async function sendNotification(
+  supabase: ReturnType<typeof createClient>,
+  userId: string,
+  donationId: string,
+  amount: number,
+  donorId: string,
+  donorName: string | null,
+  donorEmail: string | undefined,
+  donationType: 'recurring' | 'one_time',
+  requestId: string
+) {
+  try {
+    // Call the send-notification function
+    const { error } = await supabase.functions.invoke('send-notification', {
+      body: {
+        userId,
+        donationId,
+        amount,
+        donorId,
+        donorName,
+        donorEmail,
+        donationType,
+        actionType: donationType === 'recurring' ? 'recurring_donation' : 'donation',
+        requestId
+      }
+    });
+
+    if (error) {
+      console.error(`[${requestId}] Error sending notification:`, error);
+      return { success: false };
+    }
+
+    console.log(`[${requestId}] Notification sent successfully for ${donationType} donation`);
+    return { success: true };
+  } catch (err) {
+    console.error(`[${requestId}] Exception in sendNotification:`, err);
+    return { success: false };
+  }
+}
+
+/**
  * Process ActBlue webhook
  */
 export async function processActBlueWebhook(
@@ -243,17 +286,40 @@ export async function processActBlueWebhook(
   }
 
   // Create notification for the donation if donor exists
-  if (donorResult?.donorId) {
+  if (donorResult?.donorId && userId) {
     // Determine if this is a recurring donation
     const isRecurring = donation.recurringDuration && donation.recurringPeriod !== 'once';
-    const actionType = isRecurring ? 'recurring_donation' : 'donation';
     
+    // Create a donation notification entry in the notifications table
     await createDonationNotification(
       supabase, 
       donation, 
       donor, 
       donorResult.donorId,
       donationData, // Pass the processed donation data
+      requestId
+    );
+    
+    // Extract actual donation amount from the lineitem or contribution
+    const donationAmount = lineItems && lineItems.length > 0 
+      ? parseFloat(lineItems[0].amount) 
+      : donationData.amount;
+
+    // Get the donor name or default to Anonymous
+    const fullDonorName = donor?.firstname && donor?.lastname 
+      ? `${donor.firstname} ${donor.lastname}` 
+      : donor?.firstname || donor?.lastname || "Anonymous";
+      
+    // Send notification via edge function
+    await sendNotification(
+      supabase,
+      userId,
+      donationResult.donationId,
+      donationAmount,
+      donorResult.donorId,
+      fullDonorName,
+      donor?.email,
+      isRecurring ? 'recurring' : 'one_time',
       requestId
     );
   }
