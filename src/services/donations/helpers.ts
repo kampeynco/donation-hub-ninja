@@ -18,7 +18,9 @@ export function formatDonation(item: any, donoEmails: Map<string, string>): Dona
       `${item.donors.first_name || ''} ${item.donors.last_name || ''}`.trim() || 'Anonymous' 
       : 'Anonymous',
     email: item.donors ? donoEmails.get(item.donors.id) || null : null,
-    amount: Number(item.amount)
+    amount: Number(item.amount),
+    recurringPeriod: item.recurring_period || null,
+    recurringDuration: item.recurring_duration !== undefined ? Number(item.recurring_duration) : undefined
   };
 }
 

@@ -5,6 +5,8 @@ export interface Donation {
   name: string | null;
   email: string | null;
   amount: number;
+  recurringPeriod?: string;
+  recurringDuration?: number;
 }
 
 export interface DonationStats {

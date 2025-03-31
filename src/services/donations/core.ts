@@ -37,7 +37,7 @@ export async function fetchRecentDonations(limit = 30): Promise<Donation[]> {
       return [];
     }
     
-    // Query donations using the extracted donor IDs array
+    // Query donations using the extracted donor IDs array and include recurring info
     const { data, error } = await supabase
       .from('donations')
       .select(`
@@ -45,6 +45,8 @@ export async function fetchRecentDonations(limit = 30): Promise<Donation[]> {
         amount,
         paid_at,
         created_at,
+        recurring_period,
+        recurring_duration,
         donors:donor_id (
           id,
           first_name,
