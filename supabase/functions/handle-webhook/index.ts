@@ -2,7 +2,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.29.0";
 import { corsHeaders } from "./utils/corsHeaders.ts";
-import { verifyCredentials } from "./auth-helper.ts";
+import { validateWebhookAuth } from "./auth-helper.ts";
 import { errorResponses } from "./error-handler.ts";
 import { ActBlueRequest } from "./types.ts";
 import { 
@@ -46,7 +46,7 @@ serve(async (req) => {
     }
 
     // Authenticate the request
-    const authResult = await verifyCredentials(req, supabaseAdmin, requestId, timestamp);
+    const authResult = await validateWebhookAuth(req.headers.get("Authorization"), supabaseAdmin, requestId, timestamp, req.headers);
 
     if (!authResult.success) {
       return new Response(JSON.stringify(authResult.error), {
