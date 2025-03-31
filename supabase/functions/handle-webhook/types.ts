@@ -72,10 +72,10 @@ export interface ActBlueLineItem {
   lineitemId: number;
 }
 
-export interface ActBlueWebhookPayload {
+export interface ActBlueRequest {
   donor?: ActBlueDonor;
   contribution: ActBlueContribution;
-  lineitems?: ActBlueLineItem[];
+  lineItems?: ActBlueLineItem[];
   form?: {
     name: string;
     kind: string;

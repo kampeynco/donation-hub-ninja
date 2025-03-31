@@ -60,6 +60,7 @@ serve(async (req) => {
     try {
       const body = await req.json();
       data = body as ActBlueRequest;
+      console.log(`[${requestId}] Received payload:`, JSON.stringify(data, null, 2).substring(0, 500) + '...');
     } catch (error) {
       console.error(`[${requestId}] Error parsing request body:`, error);
       return new Response(
@@ -97,154 +98,241 @@ serve(async (req) => {
       );
     }
 
+    console.log(`[${requestId}] Starting donation processing with contribution ID: ${donation.orderNumber}`);
+
     // Process donor information
-    const donorData = extractDonorData(donor, donation);
-    const donorResult = await findOrCreateDonor(supabaseAdmin, donor, donorData, requestId, timestamp, userId);
+    if (donor) {
+      console.log(`[${requestId}] Processing donor with email: ${donor.email}`);
+      const donorData = extractDonorData(donor, donation);
+      console.log(`[${requestId}] Processed donor data: ${JSON.stringify(donorData)}`);
+      
+      const donorResult = await findOrCreateDonor(supabaseAdmin, donor, donorData, requestId, timestamp, userId);
 
-    if (!donorResult.success) {
-      return new Response(
-        JSON.stringify(donorResult.error),
-        { 
-          status: donorResult.error.code, 
-          headers: { ...corsHeaders, "Content-Type": "application/json" } 
+      if (!donorResult.success) {
+        return new Response(
+          JSON.stringify(donorResult.error),
+          { 
+            status: donorResult.error.code, 
+            headers: { ...corsHeaders, "Content-Type": "application/json" } 
+          }
+        );
+      }
+
+      // Only proceed with location if we have a valid donor
+      let locationId = null;
+      let employerDataId = null;
+
+      if (donorResult.data?.donorId) {
+        const locationResult = await addDonorLocation(
+          supabaseAdmin, 
+          donor, 
+          donorResult.data.donorId, 
+          requestId, 
+          timestamp
+        );
+        
+        if (locationResult.success && locationResult.data) {
+          locationId = locationResult.data.locationId;
         }
-      );
-    }
 
-    // Only proceed with location if we have a valid donor
-    let locationId = null;
-    let employerDataId = null;
+        const employerResult = await addEmployerData(
+          supabaseAdmin, 
+          donor, 
+          donorResult.data.donorId, 
+          requestId, 
+          timestamp
+        );
+        
+        if (employerResult.success && employerResult.data) {
+          employerDataId = employerResult.data.employerDataId;
+        }
+      }
 
-    if (donorResult.data?.donorId) {
-      const locationResult = await addDonorLocation(
+      // Extract donation data
+      const donationDataResult = extractDonationData(donation, lineItems, requestId);
+      
+      if (!donationDataResult.success) {
+        return new Response(
+          JSON.stringify(donationDataResult.error),
+          { 
+            status: donationDataResult.error.code, 
+            headers: { ...corsHeaders, "Content-Type": "application/json" } 
+          }
+        );
+      }
+
+      // Process donation 
+      const donationResult = await createDonation(
         supabaseAdmin, 
-        donor, 
-        donorResult.data.donorId, 
+        donationDataResult.data, 
+        donorResult.data?.donorId || null, 
         requestId, 
         timestamp
       );
-      
-      if (locationResult.success && locationResult.data) {
-        locationId = locationResult.data.locationId;
+
+      if (!donationResult.success) {
+        return new Response(
+          JSON.stringify(donationResult.error),
+          { 
+            status: donationResult.error.code, 
+            headers: { ...corsHeaders, "Content-Type": "application/json" } 
+          }
+        );
       }
 
-      const employerResult = await addEmployerData(
+      // Process custom fields if any
+      if (donation.customFields && donation.customFields.length > 0) {
+        await processCustomFields(
+          supabaseAdmin,
+          donation,
+          donationResult.data.donationId,
+          requestId
+        );
+      }
+
+      // Process merchandise if any
+      if (donation.merchandise && donation.merchandise.length > 0) {
+        await processMerchandise(
+          supabaseAdmin,
+          donation,
+          donationResult.data.donationId,
+          requestId
+        );
+      }
+
+      // Create notification for the donation
+      await createDonationNotification(
         supabaseAdmin, 
+        donation, 
         donor, 
-        donorResult.data.donorId, 
-        requestId, 
-        timestamp
-      );
-      
-      if (employerResult.success && employerResult.data) {
-        employerDataId = employerResult.data.employerDataId;
-      }
-    }
-
-    // Extract donation data
-    const donationDataResult = extractDonationData(donation, lineItems, requestId);
-    
-    if (!donationDataResult.success) {
-      return new Response(
-        JSON.stringify(donationDataResult.error),
-        { 
-          status: donationDataResult.error.code, 
-          headers: { ...corsHeaders, "Content-Type": "application/json" } 
-        }
-      );
-    }
-
-    // Process donation 
-    const donationResult = await createDonation(
-      supabaseAdmin, 
-      donationDataResult.data, 
-      donorResult.data?.donorId || null, 
-      requestId, 
-      timestamp
-    );
-
-    if (!donationResult.success) {
-      return new Response(
-        JSON.stringify(donationResult.error),
-        { 
-          status: donationResult.error.code, 
-          headers: { ...corsHeaders, "Content-Type": "application/json" } 
-        }
-      );
-    }
-
-    // Process custom fields if any
-    if (donation.customFields && donation.customFields.length > 0) {
-      await processCustomFields(
-        supabaseAdmin,
-        donation,
-        donationResult.data.donationId,
+        donorResult.data?.donorId || null, 
         requestId
       );
-    }
 
-    // Process merchandise if any
-    if (donation.merchandise && donation.merchandise.length > 0) {
-      await processMerchandise(
-        supabaseAdmin,
-        donation,
-        donationResult.data.donationId,
-        requestId
-      );
-    }
+      // Update webhook last_used_at timestamp
+      await updateWebhookTimestamp(supabaseAdmin, timestamp, requestId);
 
-    // Create notification for the donation
-    await createDonationNotification(
-      supabaseAdmin, 
-      donation, 
-      donor, 
-      donorResult.data?.donorId || null, 
-      requestId
-    );
-
-    // Update webhook last_used_at timestamp
-    await updateWebhookTimestamp(supabaseAdmin, timestamp, requestId);
-
-    // Return success response
-    const successResponse = {
-      success: true,
-      message: "Donation processed successfully",
-      donation: {
-        id: donationResult.data.donationId,
-        ...donationResult.data.donationData
-      },
-      donor: donorResult.data?.donorId ? { 
-        id: donorResult.data.donorId, 
-        ...donorResult.data.donorData,
-        email: donor?.email,
-        location: locationId ? {
-          street: donor?.addr1,
-          city: donor?.city,
-          state: donor?.state,
-          zip: donor?.zip,
-          country: donor?.country
+      // Return success response
+      const successResponse = {
+        success: true,
+        message: "Donation processed successfully",
+        donation: {
+          id: donationResult.data.donationId,
+          ...donationResult.data.donationData
+        },
+        donor: donorResult.data?.donorId ? { 
+          id: donorResult.data.donorId, 
+          ...donorResult.data.donorData,
+          email: donor?.email,
+          location: locationId ? {
+            street: donor?.addr1,
+            city: donor?.city,
+            state: donor?.state,
+            zip: donor?.zip,
+            country: donor?.country
+          } : null,
+          employer_data: employerDataId && donor?.employerData ? {
+            employer: donor.employerData.employer,
+            occupation: donor.employerData.occupation
+          } : null
         } : null,
-        employer_data: employerDataId && donor?.employerData ? {
-          employer: donor.employerData.employer,
-          occupation: donor.employerData.occupation
-        } : null
-      } : null,
-      request_id: requestId,
-      timestamp: timestamp
-    };
+        request_id: requestId,
+        timestamp: timestamp
+      };
 
-    console.log(`[${requestId}] Webhook processed successfully`);
-    return new Response(
-      JSON.stringify(successResponse),
-      { 
-        status: 200, 
-        headers: { ...corsHeaders, "Content-Type": "application/json" } 
+      console.log(`[${requestId}] Webhook processed successfully`);
+      return new Response(
+        JSON.stringify(successResponse),
+        { 
+          status: 200, 
+          headers: { ...corsHeaders, "Content-Type": "application/json" } 
+        }
+      );
+    } else {
+      // Handle anonymous donations (no donor data)
+      const donationDataResult = extractDonationData(donation, lineItems, requestId);
+      
+      if (!donationDataResult.success) {
+        return new Response(
+          JSON.stringify(donationDataResult.error),
+          { 
+            status: donationDataResult.error.code, 
+            headers: { ...corsHeaders, "Content-Type": "application/json" } 
+          }
+        );
       }
-    );
+
+      // Process donation without donor
+      const donationResult = await createDonation(
+        supabaseAdmin, 
+        donationDataResult.data, 
+        null, // no donor ID for anonymous donation
+        requestId, 
+        timestamp
+      );
+
+      if (!donationResult.success) {
+        return new Response(
+          JSON.stringify(donationResult.error),
+          { 
+            status: donationResult.error.code, 
+            headers: { ...corsHeaders, "Content-Type": "application/json" } 
+          }
+        );
+      }
+
+      // Process custom fields if any
+      if (donation.customFields && donation.customFields.length > 0) {
+        await processCustomFields(
+          supabaseAdmin,
+          donation,
+          donationResult.data.donationId,
+          requestId
+        );
+      }
+
+      // Process merchandise if any
+      if (donation.merchandise && donation.merchandise.length > 0) {
+        await processMerchandise(
+          supabaseAdmin,
+          donation,
+          donationResult.data.donationId,
+          requestId
+        );
+      }
+
+      // Update webhook last_used_at timestamp
+      await updateWebhookTimestamp(supabaseAdmin, timestamp, requestId);
+
+      // Return success response for anonymous donation
+      const successResponse = {
+        success: true,
+        message: "Anonymous donation processed successfully",
+        donation: {
+          id: donationResult.data.donationId,
+          ...donationResult.data.donationData
+        },
+        donor: null,
+        request_id: requestId,
+        timestamp: timestamp
+      };
+
+      console.log(`[${requestId}] Anonymous webhook processed successfully`);
+      return new Response(
+        JSON.stringify(successResponse),
+        { 
+          status: 200, 
+          headers: { ...corsHeaders, "Content-Type": "application/json" } 
+        }
+      );
+    }
   } catch (error) {
     console.error("Unhandled error in webhook handler:", error);
     return new Response(
-      JSON.stringify(errorResponses.serverError),
+      JSON.stringify(errorResponses.serverError(
+        "Internal server error", 
+        error.message
+      )),
       {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
