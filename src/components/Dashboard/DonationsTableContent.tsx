@@ -23,7 +23,7 @@ const DonationsTableContent = ({ donations }: DonationsTableContentProps) => {
     }
 
     // Recurring donation badge for Monthly or Weekly
-    return <Badge className="bg-donor-green text-white whitespace-nowrap">Recurring</Badge>;
+    return <Badge className="bg-donor-green whitespace-nowrap">Recurring</Badge>;
   };
 
   // Function to render duration badge for recurring donations
