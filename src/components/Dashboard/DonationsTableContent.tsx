@@ -1,4 +1,3 @@
-
 import { Donation } from "@/types/donation";
 import {
   Table,
@@ -18,17 +17,17 @@ interface DonationsTableContentProps {
 const DonationsTableContent = ({ donations }: DonationsTableContentProps) => {
   // Function to render donation type badge
   const renderDonationTypeBadge = (donation: Donation) => {
-    if (!donation.recurringPeriod) {
+    if (!donation.recurringPeriod || donation.recurringPeriod === 'once') {
       return <Badge variant="outline" className="bg-gray-100 whitespace-nowrap">One-time</Badge>;
     }
 
-    // Recurring donation badge
+    // Recurring donation badge for Monthly or Weekly
     return <Badge className="bg-donor-blue text-white whitespace-nowrap">Recurring</Badge>;
   };
 
   // Function to render duration badge for recurring donations
   const renderDurationBadge = (donation: Donation) => {
-    if (!donation.recurringPeriod) {
+    if (!donation.recurringPeriod || donation.recurringPeriod === 'once') {
       return null; // No duration badge for one-time donations
     }
 
@@ -39,11 +38,19 @@ const DonationsTableContent = ({ donations }: DonationsTableContentProps) => {
 
     // Regular recurring donation with duration
     if (donation.recurringDuration && donation.recurringDuration > 0) {
-      return (
-        <Badge variant="outline" className="bg-gray-100 ml-2 whitespace-nowrap">
-          For {donation.recurringDuration} months
-        </Badge>
-      );
+      if (donation.recurringPeriod === 'Monthly') {
+        return (
+          <Badge variant="outline" className="bg-gray-100 ml-2 whitespace-nowrap">
+            Monthly = {donation.recurringDuration} Months
+          </Badge>
+        );
+      } else if (donation.recurringPeriod === 'Weekly') {
+        return (
+          <Badge variant="outline" className="bg-gray-100 ml-2 whitespace-nowrap">
+            Weekly = {donation.recurringDuration} Weeks
+          </Badge>
+        );
+      }
     }
 
     return null;
