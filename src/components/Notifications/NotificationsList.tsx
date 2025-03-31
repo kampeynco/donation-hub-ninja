@@ -3,7 +3,7 @@ import { Notification } from './NotificationBell';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { IconCalendar, IconCreditCard, IconUser } from '@tabler/icons-react';
+import { IconCalendar, IconCreditCard, IconUser, IconX } from '@tabler/icons-react';
 import { format } from 'date-fns';
 
 interface NotificationsListProps {
@@ -11,6 +11,7 @@ interface NotificationsListProps {
   loading: boolean;
   markAsRead: (id: string) => void;
   markAllAsRead: () => void;
+  deleteNotification: (id: string) => void;
   onClose: () => void;
 }
 
@@ -19,6 +20,7 @@ const NotificationsList = ({
   loading,
   markAsRead,
   markAllAsRead,
+  deleteNotification,
   onClose
 }: NotificationsListProps) => {
   const getNotificationIcon = (action: string) => {
@@ -65,7 +67,7 @@ const NotificationsList = ({
             {notifications.map((notification) => (
               <div 
                 key={notification.id}
-                className={`px-4 py-3 hover:bg-gray-50 ${notification.is_read ? '' : 'bg-blue-50'}`}
+                className={`px-4 py-3 hover:bg-gray-50 ${notification.is_read ? '' : 'bg-blue-50'} relative`}
                 onClick={() => !notification.is_read && markAsRead(notification.id)}
               >
                 <div className="flex items-start gap-3">
@@ -78,6 +80,15 @@ const NotificationsList = ({
                       {format(new Date(notification.date), 'MMM d, yyyy h:mm a')}
                     </p>
                   </div>
+                  <button 
+                    className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 p-1"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteNotification(notification.id);
+                    }}
+                  >
+                    <IconX size={16} />
+                  </button>
                 </div>
               </div>
             ))}

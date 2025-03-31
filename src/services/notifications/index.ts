@@ -1,7 +1,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { Notification } from "@/components/Notifications/NotificationBell";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 
 /**
  * Creates a new notification in the database
@@ -103,6 +103,33 @@ export async function markAllNotificationsAsRead(): Promise<boolean> {
     return true;
   } catch (error) {
     console.error('Error in markAllNotificationsAsRead:', error);
+    return false;
+  }
+}
+
+/**
+ * Deletes a notification
+ */
+export async function deleteNotification(id: string): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from('notifications')
+      .delete()
+      .eq('id', id);
+      
+    if (error) {
+      console.error('Error deleting notification:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to delete notification',
+        variant: 'destructive'
+      });
+      return false;
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('Error in deleteNotification:', error);
     return false;
   }
 }

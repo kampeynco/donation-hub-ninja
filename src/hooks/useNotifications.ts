@@ -4,7 +4,8 @@ import {
   createNotification,
   markNotificationAsRead,
   markAllNotificationsAsRead,
-  fetchRecentNotifications
+  fetchRecentNotifications,
+  deleteNotification
 } from '@/services/notifications';
 import { Notification } from '@/components/Notifications/NotificationBell';
 
@@ -79,6 +80,18 @@ export function useNotifications() {
   };
 
   /**
+   * Delete a notification
+   */
+  const deleteNotificationById = async (id: string) => {
+    setIsLoading(true);
+    try {
+      return await deleteNotification(id);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  /**
    * Fetch recent notifications
    */
   const fetchNotifications = async (limit = 10): Promise<Notification[]> => {
@@ -96,6 +109,7 @@ export function useNotifications() {
     createRecurringDonationNotification,
     markAsRead,
     markAllAsRead,
+    deleteNotification: deleteNotificationById,
     fetchNotifications
   };
 }

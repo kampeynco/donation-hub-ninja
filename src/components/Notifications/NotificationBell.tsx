@@ -14,7 +14,8 @@ import NotificationsList from './NotificationsList';
 import { 
   fetchRecentNotifications, 
   markNotificationAsRead, 
-  markAllNotificationsAsRead 
+  markAllNotificationsAsRead,
+  deleteNotification
 } from '@/services/notifications';
 
 export interface Notification {
@@ -96,6 +97,17 @@ const NotificationBell = () => {
     }
   };
 
+  const handleDeleteNotification = async (id: string) => {
+    const success = await deleteNotification(id);
+    if (success) {
+      setNotifications(prev => prev.filter(n => n.id !== id));
+      toast({
+        title: 'Success',
+        description: 'Notification deleted',
+      });
+    }
+  };
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -114,6 +126,7 @@ const NotificationBell = () => {
           loading={loading}
           markAsRead={handleMarkAsRead}
           markAllAsRead={handleMarkAllAsRead}
+          deleteNotification={handleDeleteNotification}
           onClose={() => setOpen(false)}
         />
       </PopoverContent>
