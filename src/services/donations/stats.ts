@@ -13,7 +13,7 @@ async function fetchLast30DaysStats() {
       return { total: 0, count: 0 };
     }
 
-    // Thanks to RLS, this query will only return donations associated with the current user
+    // With RLS in place, this query will only return donations associated with the current user
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     
@@ -46,7 +46,7 @@ async function fetchAllTimeStats() {
       return { total: 0, count: 0 };
     }
 
-    // Thanks to RLS, this query will only return donations associated with the current user
+    // With RLS in place, this query will only return donations associated with the current user
     const { data, error } = await supabase
       .from('donations')
       .select('amount');
@@ -75,7 +75,7 @@ async function fetchMonthlyDonorsCount() {
       return 0;
     }
 
-    // Thanks to RLS, this query will only return donations associated with the current user
+    // With RLS in place, this query will only return donations associated with the current user
     const { count, error } = await supabase
       .from('donations')
       .select('donor_id', { count: 'exact', head: true })

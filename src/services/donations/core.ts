@@ -19,8 +19,8 @@ export async function fetchRecentDonations(limit = 30): Promise<Donation[]> {
       return [];
     }
 
-    // Modified query to use the junction table for RLS
-    // Donations are now filtered by user-donor associations
+    // Query using the user_donors junction table to enforce RLS
+    // This ensures we only get donations for donors associated with the current user
     const { data, error } = await supabase
       .from('donations')
       .select(`
