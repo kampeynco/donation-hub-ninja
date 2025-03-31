@@ -9,6 +9,7 @@ interface CopyablePasswordInputProps {
   value: string;
   label?: string;
   className?: string;
+  copyMessage?: string;
 }
 
 const CopyablePasswordInput: React.FC<CopyablePasswordInputProps> = ({
@@ -16,6 +17,7 @@ const CopyablePasswordInput: React.FC<CopyablePasswordInputProps> = ({
   value,
   label,
   className = "",
+  copyMessage = "Password copied to clipboard"
 }) => {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -23,7 +25,7 @@ const CopyablePasswordInput: React.FC<CopyablePasswordInputProps> = ({
     navigator.clipboard.writeText(text);
     toast({
       title: "Copied!",
-      description: "Password copied to clipboard",
+      description: copyMessage,
       duration: 2000,
     });
   };

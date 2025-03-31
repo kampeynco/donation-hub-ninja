@@ -10,6 +10,7 @@ interface CopyableInputProps {
   label?: string;
   className?: string;
   readOnly?: boolean;
+  copyMessage?: string;
 }
 
 const CopyableInput: React.FC<CopyableInputProps> = ({
@@ -18,12 +19,13 @@ const CopyableInput: React.FC<CopyableInputProps> = ({
   label,
   className = "",
   readOnly = true,
+  copyMessage = "Text copied to clipboard"
 }) => {
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     toast({
       title: "Copied!",
-      description: "Text copied to clipboard",
+      description: copyMessage,
       duration: 2000,
     });
   };

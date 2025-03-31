@@ -21,9 +21,18 @@ const StepThree: React.FC<StepThreeProps> = ({
       </p>
 
       <div className="space-y-4">
-        <CopyableInput id="username" value={email} label="Username" />
+        <CopyableInput 
+          id="username" 
+          value={email} 
+          label="Username" 
+          copyMessage="Username copied to clipboard"
+        />
         
-        <CopyablePasswordInput id="apiPassword" value={apiPassword} label="Password" />
+        <CopyablePasswordInput 
+          id="apiPassword" 
+          value={apiPassword} 
+          label="Password" 
+        />
 
         <div className="mt-3 text-xs text-gray-500">
           Your secure webhook URL will be generated and available in your account settings
