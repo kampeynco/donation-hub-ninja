@@ -3,7 +3,8 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
+import { deleteHookdeckSource } from "@/services/webhookService";
 
 interface AuthContextType {
   session: Session | null;
@@ -12,6 +13,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  deleteAccount: (reason: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -100,7 +102,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signOut = async () => {
     try {
       await supabase.auth.signOut();
-      navigate("/auth/signin"); // Changed from "/" to "/auth/signin"
+      navigate("/auth/signin");
     } catch (error: any) {
       toast({
         title: "Sign out failed",
@@ -110,8 +112,66 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const deleteAccount = async (reason: string) => {
+    if (!user) {
+      throw new Error("No user is logged in");
+    }
+    
+    try {
+      // First, check if the user has a Hookdeck source and delete it
+      const { data: webhook } = await supabase
+        .from('webhooks')
+        .select('hookdeck_source_id')
+        .eq('user_id', user.id)
+        .single();
+      
+      if (webhook?.hookdeck_source_id) {
+        console.log("Deleting Hookdeck source:", webhook.hookdeck_source_id);
+        await deleteHookdeckSource(webhook.hookdeck_source_id, user.id);
+      }
+      
+      // Log the reason for deletion (in a real app, you might want to store this)
+      console.log(`User ${user.id} is deleting their account. Reason: ${reason}`);
+      
+      // Delete the user account from Supabase Auth
+      const { error } = await supabase.auth.admin.deleteUser(user.id);
+      
+      if (error) {
+        throw error;
+      }
+      
+      // Sign out from the client side
+      await supabase.auth.signOut();
+      
+      toast({
+        title: "Account deleted",
+        description: "Your account has been successfully deleted.",
+      });
+      
+      // Redirect to the home page
+      navigate("/");
+      
+    } catch (error: any) {
+      console.error("Error deleting account:", error);
+      toast({
+        title: "Account deletion failed",
+        description: error.message || "There was an error deleting your account.",
+        variant: "destructive",
+      });
+      throw error;
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ session, user, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ 
+      session, 
+      user, 
+      loading, 
+      signIn, 
+      signUp, 
+      signOut, 
+      deleteAccount 
+    }}>
       {children}
     </AuthContext.Provider>
   );
