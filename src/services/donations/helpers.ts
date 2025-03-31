@@ -25,6 +25,7 @@ export function formatDonation(item: any, donoEmails: Map<string, string>): Dona
 /**
  * Helper function to fetch donor emails
  * Optimized to use a single query instead of multiple queries in a loop
+ * And now ensures we only get emails for donors associated with the current user
  */
 export async function fetchDonorEmails(donations: any[]): Promise<Map<string, string>> {
   const donoEmails = new Map();
@@ -41,11 +42,23 @@ export async function fetchDonorEmails(donations: any[]): Promise<Map<string, st
   }
   
   try {
-    // Fetch all emails with a single query
+    // Get current user ID to ensure we only fetch emails for donors associated with this user
+    const userId = await getCurrentUserId();
+    if (!userId) {
+      return donoEmails;
+    }
+
+    // Fetch all emails with a single query, ensuring they belong to the current user's donors
     const { data: emailData, error } = await supabase
       .from('emails')
       .select('email, donor_id')
-      .in('donor_id', donorIds);
+      .in('donor_id', donorIds)
+      .in('donor_id', function(builder) {
+        builder
+          .select('donor_id')
+          .from('user_donors')
+          .eq('user_id', userId);
+      });
       
     if (error) {
       console.error('Error fetching donor emails:', error);

@@ -13,13 +13,19 @@ async function fetchLast30DaysStats() {
       return { total: 0, count: 0 };
     }
 
-    // With RLS in place, this query will only return donations associated with the current user
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     
+    // Use user_donors junction table to ensure we only get donations for the current user
     const { data, error } = await supabase
       .from('donations')
       .select('amount')
+      .in('donor_id', function(builder) {
+        builder
+          .select('donor_id')
+          .from('user_donors')
+          .eq('user_id', userId);
+      })
       .gte('created_at', thirtyDaysAgo.toISOString());
     
     if (error) throw error;
@@ -46,10 +52,16 @@ async function fetchAllTimeStats() {
       return { total: 0, count: 0 };
     }
 
-    // With RLS in place, this query will only return donations associated with the current user
+    // Use user_donors junction table to ensure we only get donations for the current user
     const { data, error } = await supabase
       .from('donations')
-      .select('amount');
+      .select('amount')
+      .in('donor_id', function(builder) {
+        builder
+          .select('donor_id')
+          .from('user_donors')
+          .eq('user_id', userId);
+      });
     
     if (error) throw error;
     
@@ -75,10 +87,16 @@ async function fetchMonthlyDonorsCount() {
       return 0;
     }
 
-    // With RLS in place, this query will only return donations associated with the current user
+    // Use user_donors junction table to ensure we only get donors for the current user
     const { count, error } = await supabase
       .from('donations')
       .select('donor_id', { count: 'exact', head: true })
+      .in('donor_id', function(builder) {
+        builder
+          .select('donor_id')
+          .from('user_donors')
+          .eq('user_id', userId);
+      })
       .not('recurring_period', 'eq', 'once');
     
     if (error) throw error;

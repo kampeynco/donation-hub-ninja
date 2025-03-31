@@ -34,6 +34,12 @@ export async function fetchRecentDonations(limit = 30): Promise<Donation[]> {
           last_name
         )
       `)
+      .in('donor_id', function(builder) {
+        builder
+          .select('donor_id')
+          .from('user_donors')
+          .eq('user_id', userId);
+      })
       .order('created_at', { ascending: false })
       .limit(limit);
     
