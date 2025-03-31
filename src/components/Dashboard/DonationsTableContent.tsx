@@ -28,7 +28,7 @@ const DonationsTableContent = ({ donations }: DonationsTableContentProps) => {
 
   // Function to render duration badge for recurring donations
   const renderDurationBadge = (donation: Donation) => {
-    // Only show duration badge for recurring donations
+    // Only show duration badge for recurring donations with a valid recurringPeriod
     if (!donation.recurringPeriod || donation.recurringPeriod === 'once') {
       return null; // No duration badge for one-time donations
     }
@@ -40,23 +40,26 @@ const DonationsTableContent = ({ donations }: DonationsTableContentProps) => {
 
     // Regular recurring donation with duration
     if (donation.recurringDuration && donation.recurringDuration > 0) {
-      if (donation.recurringPeriod === 'Monthly') {
+      // Check for Monthly period
+      if (donation.recurringPeriod.toLowerCase() === 'monthly') {
         return (
           <Badge variant="outline" className="bg-gray-100 ml-2 whitespace-nowrap">
-            {donation.recurringDuration} Months
+            {donation.recurringDuration} {donation.recurringDuration === 1 ? 'Month' : 'Months'}
           </Badge>
         );
-      } else if (donation.recurringPeriod === 'Weekly') {
+      }
+      // Check for Weekly period
+      else if (donation.recurringPeriod.toLowerCase() === 'weekly') {
         return (
           <Badge variant="outline" className="bg-gray-100 ml-2 whitespace-nowrap">
-            {donation.recurringDuration} Weeks
+            {donation.recurringDuration} {donation.recurringDuration === 1 ? 'Week' : 'Weeks'}
           </Badge>
         );
       }
     }
 
-    // No duration badge for other cases
-    return null;
+    // Default badge for other recurring cases
+    return <Badge variant="outline" className="bg-gray-100 ml-2 whitespace-nowrap">Recurring</Badge>;
   };
 
   return (
