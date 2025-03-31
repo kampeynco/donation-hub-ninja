@@ -19,11 +19,11 @@ const DonationsTableContent = ({ donations }: DonationsTableContentProps) => {
   // Function to render donation type badge
   const renderDonationTypeBadge = (donation: Donation) => {
     if (!donation.recurringPeriod) {
-      return <Badge variant="outline" className="bg-gray-100">One-time</Badge>;
+      return <Badge variant="outline" className="bg-gray-100 whitespace-nowrap">One-time</Badge>;
     }
 
     // Recurring donation badge
-    return <Badge className="bg-donor-blue text-white">Recurring</Badge>;
+    return <Badge className="bg-donor-blue text-white whitespace-nowrap">Recurring</Badge>;
   };
 
   // Function to render duration badge for recurring donations
@@ -34,13 +34,13 @@ const DonationsTableContent = ({ donations }: DonationsTableContentProps) => {
 
     // Infinite recurring donation
     if (donation.recurringDuration === 9999) {
-      return <Badge variant="outline" className="bg-donor-green text-white ml-2">Infinite</Badge>;
+      return <Badge variant="outline" className="bg-donor-green text-white ml-2 whitespace-nowrap">Infinite</Badge>;
     }
 
     // Regular recurring donation with duration
     if (donation.recurringDuration && donation.recurringDuration > 0) {
       return (
-        <Badge variant="outline" className="bg-gray-100 ml-2">
+        <Badge variant="outline" className="bg-gray-100 ml-2 whitespace-nowrap">
           For {donation.recurringDuration} months
         </Badge>
       );
@@ -72,7 +72,7 @@ const DonationsTableContent = ({ donations }: DonationsTableContentProps) => {
                 <TableCell className="px-6 py-4">{donation.name || "Anonymous"}</TableCell>
                 <TableCell className="px-6 py-4 text-blue-500">{donation.email || "---"}</TableCell>
                 <TableCell className="px-6 py-4">
-                  <div className="flex items-center">
+                  <div className="flex items-center flex-nowrap">
                     {renderDonationTypeBadge(donation)}
                     {renderDurationBadge(donation)}
                   </div>
