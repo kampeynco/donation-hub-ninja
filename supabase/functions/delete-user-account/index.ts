@@ -43,6 +43,75 @@ serve(async (req) => {
     // 1. Delete associated data first
     // This ensures all user-related data is cleaned up before the user is deleted
 
+    // Get related donor data
+    const { data: donorData } = await supabase
+      .from("donors")
+      .select("id")
+      .eq("user_id", userId);
+    
+    // If there are donor records, delete all related data
+    if (donorData && donorData.length > 0) {
+      for (const donor of donorData) {
+        // Delete related custom fields
+        const { data: donationData } = await supabase
+          .from("donations")
+          .select("id")
+          .eq("donor_id", donor.id);
+        
+        if (donationData && donationData.length > 0) {
+          for (const donation of donationData) {
+            // Delete custom fields for this donation
+            await supabase
+              .from("custom_fields")
+              .delete()
+              .eq("donation_id", donation.id);
+              
+            // Delete merchandise for this donation
+            await supabase
+              .from("merchandise")
+              .delete()
+              .eq("donation_id", donation.id);
+          }
+          
+          // Delete donations linked to this donor
+          await supabase
+            .from("donations")
+            .delete()
+            .eq("donor_id", donor.id);
+        }
+        
+        // Delete emails for this donor
+        await supabase
+          .from("emails")
+          .delete()
+          .eq("donor_id", donor.id);
+          
+        // Delete phones for this donor
+        await supabase
+          .from("phones")
+          .delete()
+          .eq("donor_id", donor.id);
+          
+        // Delete locations for this donor
+        await supabase
+          .from("locations")
+          .delete()
+          .eq("donor_id", donor.id);
+          
+        // Delete employer data for this donor
+        await supabase
+          .from("employer_data")
+          .delete()
+          .eq("donor_id", donor.id);
+      }
+      
+      // Delete donors records
+      await supabase
+        .from("donors")
+        .delete()
+        .eq("user_id", userId);
+    }
+    
     // Delete webhook data
     const { error: webhookError } = await supabase
       .from("webhooks")
@@ -64,6 +133,12 @@ serve(async (req) => {
       console.log(`Error deleting notification settings: ${notificationSettingsError.message}`);
       // Continue with deletion even if this fails
     }
+    
+    // Delete notifications
+    await supabase
+      .from("notifications")
+      .delete()
+      .eq("user_id", userId);
     
     // Delete profile
     const { error: profileError } = await supabase
