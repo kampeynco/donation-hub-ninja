@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Session, User } from "@supabase/supabase-js";
@@ -133,7 +132,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Log the reason for deletion (in a real app, you might want to store this)
       console.log(`User ${user.id} is deleting their account. Reason: ${reason}`);
       
-      // Delete the user account from Supabase Auth
+      // Use the client method to delete the user's own account
       const { error } = await supabase.auth.admin.deleteUser(user.id);
       
       if (error) {
