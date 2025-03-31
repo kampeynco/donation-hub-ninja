@@ -71,9 +71,8 @@ function getSenderEmailAddress(actionType: string): string {
     case 'recurring_donation':
       return "donor@alerts.donorcamp.pro";
     case 'weekly_report':
+    case 'marketing_update': // Changed marketing_update to use the account email domain
       return "account@alerts.donorcamp.pro";
-    case 'marketing_update':
-      return "system@alerts.donorcamp.pro";
     default:
       return "no-reply@alerts.donorcamp.pro";
   }
