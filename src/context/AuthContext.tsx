@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Session, User } from "@supabase/supabase-js";
@@ -132,11 +133,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Log the reason for deletion (in a real app, you might want to store this)
       console.log(`User ${user.id} is deleting their account. Reason: ${reason}`);
       
-      // Use the client method to delete the user's own account
-      const { error } = await supabase.auth.admin.deleteUser(user.id);
+      // Use the Edge Function to securely delete the account
+      const response = await supabase.functions.invoke('delete-user-account', {
+        body: { 
+          userId: user.id,
+          reason: reason
+        }
+      });
       
-      if (error) {
-        throw error;
+      if (response.error) {
+        throw new Error(response.error);
       }
       
       // Sign out from the client side
