@@ -6,14 +6,19 @@ import { createDonationNotification } from "./notification.ts";
 import { updateWebhookTimestamp } from "./webhook.ts";
 
 export {
+  // Donation exports
   extractDonationData,
   createDonation,
   processCustomFields,
   processMerchandise,
+  
+  // Donor exports
   extractDonorData,
   findOrCreateDonor,
   addDonorLocation,
   addEmployerData,
+  
+  // Notification and webhook exports
   createDonationNotification,
   updateWebhookTimestamp
 };
