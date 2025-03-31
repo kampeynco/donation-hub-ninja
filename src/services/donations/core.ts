@@ -29,7 +29,7 @@ export async function fetchRecentDonations(limit = 30): Promise<Donation[]> {
       throw userDonorsError;
     }
     
-    // Extract donor IDs
+    // Extract donor IDs as an array
     const donorIds = userDonors?.map(ud => ud.donor_id) || [];
     
     if (donorIds.length === 0) {
@@ -37,7 +37,7 @@ export async function fetchRecentDonations(limit = 30): Promise<Donation[]> {
       return [];
     }
     
-    // Query donations using the extracted donor IDs
+    // Query donations using the extracted donor IDs array
     const { data, error } = await supabase
       .from('donations')
       .select(`

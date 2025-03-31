@@ -59,7 +59,7 @@ export async function fetchDonorEmails(donations: any[]): Promise<Map<string, st
       return donoEmails;
     }
     
-    // Extract user's donor IDs
+    // Extract user's donor IDs as an array
     const userDonorIds = userDonors?.map(ud => ud.donor_id) || [];
     
     // Only proceed with donor IDs that belong to this user

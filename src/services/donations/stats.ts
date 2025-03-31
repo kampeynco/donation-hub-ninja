@@ -27,14 +27,14 @@ async function fetchLast30DaysStats() {
       return { total: 0, count: 0 };
     }
     
-    // Extract donor IDs
+    // Extract donor IDs as an array
     const donorIds = userDonors?.map(ud => ud.donor_id) || [];
     
     if (donorIds.length === 0) {
       return { total: 0, count: 0 };
     }
     
-    // Use extracted donor IDs to get donations
+    // Use extracted donor IDs array to get donations
     const { data, error } = await supabase
       .from('donations')
       .select('amount')
@@ -76,14 +76,14 @@ async function fetchAllTimeStats() {
       return { total: 0, count: 0 };
     }
     
-    // Extract donor IDs
+    // Extract donor IDs as an array
     const donorIds = userDonors?.map(ud => ud.donor_id) || [];
     
     if (donorIds.length === 0) {
       return { total: 0, count: 0 };
     }
     
-    // Use extracted donor IDs to get all donations
+    // Use extracted donor IDs array to get all donations
     const { data, error } = await supabase
       .from('donations')
       .select('amount')
@@ -124,14 +124,14 @@ async function fetchMonthlyDonorsCount() {
       return 0;
     }
     
-    // Extract donor IDs
+    // Extract donor IDs as an array
     const donorIds = userDonors?.map(ud => ud.donor_id) || [];
     
     if (donorIds.length === 0) {
       return 0;
     }
     
-    // Use extracted donor IDs to get monthly donors
+    // Use extracted donor IDs array to get monthly donors
     const { count, error } = await supabase
       .from('donations')
       .select('donor_id', { count: 'exact', head: true })
