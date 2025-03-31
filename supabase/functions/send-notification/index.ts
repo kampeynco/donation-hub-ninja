@@ -26,9 +26,19 @@ serve(async (req) => {
   try {
     // Parse request body
     const payload: NotificationRequest = await req.json();
-    const { userId, donationId, amount, donorId, donorName, donorEmail, donationType, requestId } = payload;
+    const { 
+      userId, 
+      donationId, 
+      amount, 
+      donorId, 
+      donorName, 
+      donorEmail, 
+      donationType, 
+      actionType = donationType === 'recurring' ? 'recurring_donation' : 'donation', // Default if not provided
+      requestId 
+    } = payload;
     
-    console.log(`[${requestId}] Processing notification for ${donationType} donation ${donationId}`);
+    console.log(`[${requestId}] Processing notification for ${donationType} donation ${donationId} with action type ${actionType}`);
     
     // Get user notification preferences
     const notificationSettings = await getUserNotificationSettings(userId);
@@ -90,6 +100,7 @@ serve(async (req) => {
           amount,
           donorName || 'Anonymous',
           donationType,
+          actionType, // Pass the action type to determine sender email
           requestId
         );
       } else {

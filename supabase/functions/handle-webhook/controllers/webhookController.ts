@@ -1,4 +1,3 @@
-
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.29.0";
 import { ActBlueRequest } from "../types.ts";
 import { errorResponses } from "../error-handler.ts";
@@ -245,6 +244,10 @@ export async function processActBlueWebhook(
 
   // Create notification for the donation if donor exists
   if (donorResult?.donorId) {
+    // Determine if this is a recurring donation
+    const isRecurring = donation.recurringDuration && donation.recurringPeriod !== 'once';
+    const actionType = isRecurring ? 'recurring_donation' : 'donation';
+    
     await createDonationNotification(
       supabase, 
       donation, 

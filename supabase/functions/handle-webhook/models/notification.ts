@@ -27,7 +27,9 @@ export async function createDonationNotification(
     
     // Check if this is a recurring donation
     const isRecurring = contribution.recurringDuration && contribution.recurringPeriod !== 'once';
-    const action = 'donor'; // Use 'donor' action type for all donation notifications
+    
+    // Determine the appropriate action type based on the donation type
+    const action = isRecurring ? 'recurring_donation' : 'donation';
     
     // Use the validated amount from the donation data
     const amount = donationData.amount;

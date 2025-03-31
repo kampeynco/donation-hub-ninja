@@ -13,6 +13,7 @@ export async function sendEmailNotification(
   amount: number,
   donorName: string,
   donationType: string,
+  actionType: 'donation' | 'recurring_donation' | 'weekly_report' | 'marketing_update',
   requestId: string
 ): Promise<boolean> {
   if (!resendApiKey) {
@@ -26,6 +27,9 @@ export async function sendEmailNotification(
   }
 
   try {
+    // Determine the sender email address based on notification action type
+    const senderEmail = getSenderEmailAddress(actionType);
+    
     const emailHtml = `
       <div style="font-family: 'Inter', system-ui, sans-serif; color: #1e293b; max-width: 600px; margin: 0 auto;">
         <h1 style="color: #007AFF;">Donation Received</h1>
@@ -43,18 +47,35 @@ export async function sendEmailNotification(
     `;
     
     const emailData = {
-      from: "Donor Camp <no-reply@alerts.donorcamp.pro>",
+      from: `Donor Camp <${senderEmail}>`,
       to: recipientEmail,
       subject: subject,
       html: emailHtml
     };
 
     const emailResponse = await resend.emails.send(emailData);
-    console.log(`[${requestId}] Email sent successfully:`, emailResponse);
+    console.log(`[${requestId}] Email sent successfully from ${senderEmail}:`, emailResponse);
     return true;
   } catch (error) {
     console.error(`[${requestId}] Error sending email:`, error);
     return false;
+  }
+}
+
+/**
+ * Determine the sender email address based on notification action type
+ */
+function getSenderEmailAddress(actionType: string): string {
+  switch(actionType) {
+    case 'donation':
+    case 'recurring_donation':
+      return "donor@alerts.donorcamp.pro";
+    case 'weekly_report':
+      return "account@alerts.donorcamp.pro";
+    case 'marketing_update':
+      return "system@alerts.donorcamp.pro";
+    default:
+      return "no-reply@alerts.donorcamp.pro";
   }
 }
 
