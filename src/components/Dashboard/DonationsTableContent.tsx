@@ -1,4 +1,3 @@
-
 import { Donation } from "@/types/donation";
 import {
   Table,
@@ -28,6 +27,7 @@ const DonationsTableContent = ({ donations }: DonationsTableContentProps) => {
 
   // Function to render duration badge for recurring donations
   const renderDurationBadge = (donation: Donation) => {
+    // Only show duration badge for recurring donations
     if (!donation.recurringPeriod || donation.recurringPeriod === 'once') {
       return null; // No duration badge for one-time donations
     }
@@ -54,7 +54,8 @@ const DonationsTableContent = ({ donations }: DonationsTableContentProps) => {
       }
     }
 
-    return null;
+    // Fallback badge for other recurring cases where duration is not specified
+    return <Badge variant="outline" className="bg-gray-100 ml-2 whitespace-nowrap">Recurring</Badge>;
   };
 
   return (
