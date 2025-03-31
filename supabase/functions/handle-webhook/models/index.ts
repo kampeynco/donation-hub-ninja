@@ -3,8 +3,8 @@
 export { extractDonationData, createDonation, processCustomFields, processMerchandise } from "./donation/index.ts";
 export { 
   extractDonorData,
-  processDonorLocation,
-  processDonorEmployer,
+  addDonorLocation as processDonorLocation,
+  addEmployerData as processDonorEmployer,
   findOrCreateDonor
 } from "./donor/index.ts";
 export { updateWebhookTimestamp } from "./webhook.ts";

@@ -3,8 +3,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.29.0";
 import { 
   extractDonorData, 
   findOrCreateDonor, 
-  addDonorLocation, 
-  addEmployerData 
+  processDonorLocation, 
+  processDonorEmployer 
 } from "../models/index.ts";
 
 /**
@@ -44,7 +44,7 @@ export async function processDonor(
   let employerDataId = null;
 
   if (donorResult.data?.donorId) {
-    const locationResult = await addDonorLocation(
+    const locationResult = await processDonorLocation(
       supabase, 
       donor, 
       donorResult.data.donorId, 
@@ -56,7 +56,7 @@ export async function processDonor(
       locationId = locationResult.data.locationId;
     }
 
-    const employerResult = await addEmployerData(
+    const employerResult = await processDonorEmployer(
       supabase, 
       donor, 
       donorResult.data.donorId, 
