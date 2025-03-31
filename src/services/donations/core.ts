@@ -19,8 +19,25 @@ export async function fetchRecentDonations(limit = 30): Promise<Donation[]> {
       return [];
     }
 
-    // Query using the user_donors junction table to enforce RLS
-    // This ensures we only get donations for donors associated with the current user
+    // First get donor IDs associated with the current user
+    const { data: userDonors, error: userDonorsError } = await supabase
+      .from('user_donors')
+      .select('donor_id')
+      .eq('user_id', userId);
+    
+    if (userDonorsError) {
+      throw userDonorsError;
+    }
+    
+    // Extract donor IDs
+    const donorIds = userDonors?.map(ud => ud.donor_id) || [];
+    
+    if (donorIds.length === 0) {
+      console.log('No donors associated with this user');
+      return [];
+    }
+    
+    // Query donations using the extracted donor IDs
     const { data, error } = await supabase
       .from('donations')
       .select(`
@@ -34,12 +51,7 @@ export async function fetchRecentDonations(limit = 30): Promise<Donation[]> {
           last_name
         )
       `)
-      .in('donor_id', function(builder) {
-        builder
-          .select('donor_id')
-          .from('user_donors')
-          .eq('user_id', userId);
-      })
+      .in('donor_id', donorIds)
       .order('created_at', { ascending: false })
       .limit(limit);
     

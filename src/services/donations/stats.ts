@@ -16,16 +16,29 @@ async function fetchLast30DaysStats() {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     
-    // Use user_donors junction table to ensure we only get donations for the current user
+    // First get donor IDs associated with the current user
+    const { data: userDonors, error: userDonorsError } = await supabase
+      .from('user_donors')
+      .select('donor_id')
+      .eq('user_id', userId);
+    
+    if (userDonorsError) {
+      console.error('Error fetching user donors:', userDonorsError);
+      return { total: 0, count: 0 };
+    }
+    
+    // Extract donor IDs
+    const donorIds = userDonors?.map(ud => ud.donor_id) || [];
+    
+    if (donorIds.length === 0) {
+      return { total: 0, count: 0 };
+    }
+    
+    // Use extracted donor IDs to get donations
     const { data, error } = await supabase
       .from('donations')
       .select('amount')
-      .in('donor_id', function(builder) {
-        builder
-          .select('donor_id')
-          .from('user_donors')
-          .eq('user_id', userId);
-      })
+      .in('donor_id', donorIds)
       .gte('created_at', thirtyDaysAgo.toISOString());
     
     if (error) throw error;
@@ -52,16 +65,29 @@ async function fetchAllTimeStats() {
       return { total: 0, count: 0 };
     }
 
-    // Use user_donors junction table to ensure we only get donations for the current user
+    // First get donor IDs associated with the current user
+    const { data: userDonors, error: userDonorsError } = await supabase
+      .from('user_donors')
+      .select('donor_id')
+      .eq('user_id', userId);
+    
+    if (userDonorsError) {
+      console.error('Error fetching user donors:', userDonorsError);
+      return { total: 0, count: 0 };
+    }
+    
+    // Extract donor IDs
+    const donorIds = userDonors?.map(ud => ud.donor_id) || [];
+    
+    if (donorIds.length === 0) {
+      return { total: 0, count: 0 };
+    }
+    
+    // Use extracted donor IDs to get all donations
     const { data, error } = await supabase
       .from('donations')
       .select('amount')
-      .in('donor_id', function(builder) {
-        builder
-          .select('donor_id')
-          .from('user_donors')
-          .eq('user_id', userId);
-      });
+      .in('donor_id', donorIds);
     
     if (error) throw error;
     
@@ -87,16 +113,29 @@ async function fetchMonthlyDonorsCount() {
       return 0;
     }
 
-    // Use user_donors junction table to ensure we only get donors for the current user
+    // First get donor IDs associated with the current user
+    const { data: userDonors, error: userDonorsError } = await supabase
+      .from('user_donors')
+      .select('donor_id')
+      .eq('user_id', userId);
+    
+    if (userDonorsError) {
+      console.error('Error fetching user donors:', userDonorsError);
+      return 0;
+    }
+    
+    // Extract donor IDs
+    const donorIds = userDonors?.map(ud => ud.donor_id) || [];
+    
+    if (donorIds.length === 0) {
+      return 0;
+    }
+    
+    // Use extracted donor IDs to get monthly donors
     const { count, error } = await supabase
       .from('donations')
       .select('donor_id', { count: 'exact', head: true })
-      .in('donor_id', function(builder) {
-        builder
-          .select('donor_id')
-          .from('user_donors')
-          .eq('user_id', userId);
-      })
+      .in('donor_id', donorIds)
       .not('recurring_period', 'eq', 'once');
     
     if (error) throw error;

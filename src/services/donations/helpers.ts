@@ -48,17 +48,32 @@ export async function fetchDonorEmails(donations: any[]): Promise<Map<string, st
       return donoEmails;
     }
 
+    // First get donor IDs associated with the current user
+    const { data: userDonors, error: userDonorsError } = await supabase
+      .from('user_donors')
+      .select('donor_id')
+      .eq('user_id', userId);
+    
+    if (userDonorsError) {
+      console.error('Error fetching user donors:', userDonorsError);
+      return donoEmails;
+    }
+    
+    // Extract user's donor IDs
+    const userDonorIds = userDonors?.map(ud => ud.donor_id) || [];
+    
+    // Only proceed with donor IDs that belong to this user
+    const validDonorIds = donorIds.filter(id => userDonorIds.includes(id));
+
+    if (validDonorIds.length === 0) {
+      return donoEmails;
+    }
+
     // Fetch all emails with a single query, ensuring they belong to the current user's donors
     const { data: emailData, error } = await supabase
       .from('emails')
       .select('email, donor_id')
-      .in('donor_id', donorIds)
-      .in('donor_id', function(builder) {
-        builder
-          .select('donor_id')
-          .from('user_donors')
-          .eq('user_id', userId);
-      });
+      .in('donor_id', validDonorIds);
       
     if (error) {
       console.error('Error fetching donor emails:', error);
