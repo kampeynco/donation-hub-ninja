@@ -137,7 +137,7 @@ export async function processDonation(
     );
   }
 
-  return { success: true, donationResult: donationResult.data };
+  return { success: true, donationResult: donationResult.data, donationData: donationDataResult.data };
 }
 
 /**
@@ -229,7 +229,7 @@ export async function processActBlueWebhook(
   }
 
   // Process donation
-  const { success: donationSuccess, donationResult, error: donationError } = 
+  const { success: donationSuccess, donationResult, donationData, error: donationError } = 
     await processDonation(
       supabase, 
       donation, 
@@ -249,7 +249,8 @@ export async function processActBlueWebhook(
       supabase, 
       donation, 
       donor, 
-      donorResult.donorId, 
+      donorResult.donorId,
+      donationData, // Pass the processed donation data
       requestId
     );
   }

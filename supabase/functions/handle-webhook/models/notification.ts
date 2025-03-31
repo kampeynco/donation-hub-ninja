@@ -1,7 +1,7 @@
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.29.0";
 import { ActBlueDonor, ActBlueContribution } from "../types.ts";
-import { ProcessResult } from "./types.ts";
+import { ProcessResult, DonationData } from "./types.ts";
 
 /**
  * Creates a notification for a new donation
@@ -11,6 +11,7 @@ export async function createDonationNotification(
   contribution: ActBlueContribution,
   donor: ActBlueDonor | undefined,
   donorId: string | null,
+  donationData: DonationData,
   requestId: string
 ): Promise<ProcessResult<{id: string}>> {
   try {
@@ -28,8 +29,8 @@ export async function createDonationNotification(
     const isRecurring = contribution.recurringDuration && contribution.recurringPeriod !== 'once';
     const action = 'donor'; // Use 'donor' action type for all donation notifications
     
-    // Parse amount correctly to avoid NaN
-    const amount = parseFloat(contribution.amount || '0');
+    // Use the validated amount from the donation data
+    const amount = donationData.amount;
     const formattedAmount = amount.toFixed(2);
     
     // Build message based on donation type
