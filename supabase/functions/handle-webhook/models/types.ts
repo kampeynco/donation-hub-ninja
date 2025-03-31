@@ -28,6 +28,8 @@ export interface DonationData {
   gift_declined?: boolean;
   gift_identifier?: number | null;
   shipping_info?: any;
+  text_message_option?: string;
+  with_express_lane?: boolean;
 }
 
 export interface DonorData {

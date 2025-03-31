@@ -29,8 +29,8 @@ export interface ActBlueContribution {
   refcode2?: string | null;
   creditCardExpiration?: string;
   recurringPeriod?: string;
-  recurringDuration?: number;
-  isRecurring: boolean;
+  recurringDuration?: number | string;
+  isRecurring: boolean | string;
   isPaypal: boolean;
   isMobile: boolean;
   isExpress: boolean;
@@ -40,17 +40,46 @@ export interface ActBlueContribution {
   status: string;
   paidAt?: string;
   amount?: string;
+  smartBoostAmount?: string;
+  giftDeclined?: boolean;
+  giftIdentifier?: number | null;
+  shippingName?: string;
+  shippingAddr1?: string;
+  shippingCity?: string;
+  shippingState?: string;
+  shippingZip?: string;
+  shippingCountry?: string;
+  customFields?: Array<{
+    label: string;
+    answer: string;
+  }>;
+  merchandise?: Array<{
+    name: string;
+    itemId: number;
+    details?: any;
+  }>;
+  bumpYourRecurring?: {
+    bumpRecurringLink?: string;
+    recurringUpsellSeen?: boolean;
+    recurringUpsellAccepted?: boolean;
+  };
+  uniqueIdentifier?: string;
+  abTestName?: string;
+  abTestVariation?: string;
+  thanksUrl?: string;
+  retryUrl?: string;
+  weeklyRecurringSunset?: string | null;
 }
 
 export interface ActBlueLineItem {
   sequence: number;
   entityId: number;
-  fecId: string;
+  fecId: string | null;
   committeeName: string;
   amount: string;
   recurringAmount: string | null;
   paidAt: string;
-  paymentId: number;
+  paymentId: number | string;
   lineitemId: number;
 }
 
@@ -61,7 +90,7 @@ export interface ActBlueWebhookPayload {
   form?: {
     name: string;
     kind: string;
-    ownerEmail: string;
+    ownerEmail: string | null;
     managingEntityName: string | null;
     managingEntityCommitteeName: string | null;
   };

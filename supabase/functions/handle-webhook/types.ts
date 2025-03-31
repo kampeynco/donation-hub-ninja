@@ -30,7 +30,7 @@ export interface ActBlueContribution {
   creditCardExpiration?: string;
   recurringPeriod?: string;
   recurringDuration?: number | string;
-  isRecurring: boolean;
+  isRecurring: boolean | string;
   isPaypal: boolean;
   isMobile: boolean;
   isExpress: boolean;
@@ -58,28 +58,39 @@ export interface ActBlueContribution {
     itemId: number;
     details?: any;
   }>;
+  bumpYourRecurring?: {
+    bumpRecurringLink?: string;
+    recurringUpsellSeen?: boolean;
+    recurringUpsellAccepted?: boolean;
+  };
+  uniqueIdentifier?: string;
+  abTestName?: string;
+  abTestVariation?: string;
+  thanksUrl?: string;
+  retryUrl?: string;
+  weeklyRecurringSunset?: string | null;
 }
 
 export interface ActBlueLineItem {
   sequence: number;
   entityId: number;
-  fecId: string;
+  fecId: string | null;
   committeeName: string;
   amount: string;
   recurringAmount: string | null;
   paidAt: string;
-  paymentId: number;
+  paymentId: number | string;
   lineitemId: number;
 }
 
 export interface ActBlueRequest {
   donor?: ActBlueDonor;
   contribution: ActBlueContribution;
-  lineItems?: ActBlueLineItem[];
+  lineitems?: ActBlueLineItem[];
   form?: {
     name: string;
     kind: string;
-    ownerEmail: string;
+    ownerEmail: string | null;
     managingEntityName: string | null;
     managingEntityCommitteeName: string | null;
   };
