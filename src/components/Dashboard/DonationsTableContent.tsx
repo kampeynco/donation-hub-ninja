@@ -1,3 +1,4 @@
+
 import { Donation } from "@/types/donation";
 import {
   Table,
@@ -41,13 +42,13 @@ const DonationsTableContent = ({ donations }: DonationsTableContentProps) => {
       if (donation.recurringPeriod === 'Monthly') {
         return (
           <Badge variant="outline" className="bg-gray-100 ml-2 whitespace-nowrap">
-            Monthly = {donation.recurringDuration} Months
+            {donation.recurringDuration} Months
           </Badge>
         );
       } else if (donation.recurringPeriod === 'Weekly') {
         return (
           <Badge variant="outline" className="bg-gray-100 ml-2 whitespace-nowrap">
-            Weekly = {donation.recurringDuration} Weeks
+            {donation.recurringDuration} Weeks
           </Badge>
         );
       }
