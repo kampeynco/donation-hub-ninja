@@ -11,13 +11,18 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import NotificationsList from './NotificationsList';
+import { 
+  fetchRecentNotifications, 
+  markNotificationAsRead, 
+  markAllNotificationsAsRead 
+} from '@/services/notifications';
 
 export interface Notification {
   id: string;
   message: string;
   is_read: boolean;
   date: string;
-  action: 'donation' | 'recurring_donation' | string;
+  action: 'donation' | 'recurring_donation' | 'marketing_update' | 'weekly_report' | string;
   donor_id: string | null;
 }
 
@@ -33,17 +38,11 @@ const NotificationBell = () => {
   useEffect(() => {
     if (!user) return;
 
-    const fetchNotifications = async () => {
+    const loadNotifications = async () => {
       try {
         setLoading(true);
-        const { data, error } = await supabase
-          .from('notifications')
-          .select('*')
-          .order('date', { ascending: false })
-          .limit(10);
-
-        if (error) throw error;
-        setNotifications(data || []);
+        const data = await fetchRecentNotifications(10);
+        setNotifications(data);
       } catch (error) {
         console.error('Error fetching notifications:', error);
         toast({
@@ -56,7 +55,7 @@ const NotificationBell = () => {
       }
     };
 
-    fetchNotifications();
+    loadNotifications();
 
     // Set up real-time subscription
     const channel = supabase
@@ -79,50 +78,21 @@ const NotificationBell = () => {
     };
   }, [user, toast]);
 
-  const markAsRead = async (id: string) => {
-    try {
-      const { error } = await supabase
-        .from('notifications')
-        .update({ is_read: true })
-        .eq('id', id);
-
-      if (error) throw error;
-
+  const handleMarkAsRead = async (id: string) => {
+    const success = await markNotificationAsRead(id);
+    if (success) {
       setNotifications(prev => 
         prev.map(n => n.id === id ? { ...n, is_read: true } : n)
       );
-    } catch (error) {
-      console.error('Error marking notification as read:', error);
     }
   };
 
-  const markAllAsRead = async () => {
-    try {
-      const unreadIds = notifications.filter(n => !n.is_read).map(n => n.id);
-      if (unreadIds.length === 0) return;
-
-      const { error } = await supabase
-        .from('notifications')
-        .update({ is_read: true })
-        .in('id', unreadIds);
-
-      if (error) throw error;
-
+  const handleMarkAllAsRead = async () => {
+    const success = await markAllNotificationsAsRead();
+    if (success) {
       setNotifications(prev => 
         prev.map(n => ({ ...n, is_read: true }))
       );
-
-      toast({
-        title: 'Success',
-        description: 'All notifications marked as read',
-      });
-    } catch (error) {
-      console.error('Error marking all notifications as read:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to mark notifications as read',
-        variant: 'destructive'
-      });
     }
   };
 
@@ -142,8 +112,8 @@ const NotificationBell = () => {
         <NotificationsList
           notifications={notifications}
           loading={loading}
-          markAsRead={markAsRead}
-          markAllAsRead={markAllAsRead}
+          markAsRead={handleMarkAsRead}
+          markAllAsRead={handleMarkAllAsRead}
           onClose={() => setOpen(false)}
         />
       </PopoverContent>

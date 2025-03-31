@@ -1,62 +1,63 @@
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.29.0";
-import { logDbOperation } from "./utils.ts";
-
-interface DonationNotificationData {
-  donationId: string;
-  amount: number;
-  donorId: string;
-  donorName: string | null;
-  donorEmail: string | undefined;
-  donationType: 'recurring' | 'one_time';
-}
+import { ActBlueDonor, ActBlueContribution } from "../types.ts";
+import { ProcessResult } from "./types.ts";
 
 /**
- * Dispatches notification to the send-notification edge function
+ * Creates a notification for a new donation
  */
-export async function sendDonationNotification(
+export async function createDonationNotification(
   supabase: ReturnType<typeof createClient>,
-  data: DonationNotificationData,
+  contribution: ActBlueContribution,
+  donor: ActBlueDonor | undefined,
+  donorId: string | null,
   requestId: string
-): Promise<void> {
+): Promise<ProcessResult<{id: string}>> {
   try {
-    logDbOperation("Sending donation notification", data.donationId, requestId);
+    if (!donorId) {
+      console.log(`[${requestId}] No donor ID provided for notification, skipping`);
+      return { success: true, data: { id: '' }};
+    }
     
-    // Get the donation owner (committee) from the database
-    const { data: webhookData, error: webhookError } = await supabase
-      .from('webhooks')
-      .select('user_id')
-      .limit(1)
+    // Build the donor name or use "Anonymous"
+    const donorName = donor?.firstName && donor?.lastName 
+      ? `${donor.firstName} ${donor.lastName}`
+      : donor?.firstName || donor?.lastName || "Anonymous";
+    
+    // Check if this is a recurring donation
+    const isRecurring = contribution.recurringDuration && contribution.recurringPeriod !== 'once';
+    const action = isRecurring ? 'recurring_donation' : 'donation';
+    
+    // Build message based on donation type
+    let message = '';
+    if (isRecurring) {
+      message = `${donorName} set up a ${contribution.recurringPeriod} donation of $${Number(contribution.amount).toFixed(2)}`;
+    } else {
+      message = `${donorName} donated $${Number(contribution.amount).toFixed(2)}`;
+    }
+    
+    // Create the notification
+    const { data, error } = await supabase
+      .from('notifications')
+      .insert({
+        message,
+        action,
+        donor_id: donorId,
+        date: new Date().toISOString(),
+        is_read: false
+      })
+      .select()
       .single();
-    
-    if (webhookError) {
-      console.error(`[${requestId}] Error getting webhook user_id:`, webhookError);
-      return;
-    }
-    
-    const userId = webhookData.user_id;
-    
-    // Call the send-notification edge function
-    const { error } = await supabase.functions.invoke('send-notification', {
-      body: {
-        userId,
-        donationId: data.donationId,
-        amount: data.amount,
-        donorId: data.donorId,
-        donorName: data.donorName,
-        donorEmail: data.donorEmail,
-        donationType: data.donationType,
-        requestId
-      }
-    });
-    
+      
     if (error) {
-      throw new Error(`Failed to invoke send-notification function: ${error.message}`);
+      console.error(`[${requestId}] Error creating notification:`, error);
+      return { success: true, data: { id: '' }}; // Non-critical error, still return success
     }
     
-    logDbOperation("Notification sent successfully", data.donationId, requestId);
+    console.log(`[${requestId}] Created ${action} notification for donor ${donorId}`);
+    return { success: true, data: { id: data.id }};
   } catch (error) {
-    console.error(`[${requestId}] Error sending notification:`, error);
-    // This is non-critical, so we don't throw the error
+    console.error(`[${requestId}] Error in createDonationNotification:`, error);
+    return { success: true, data: { id: '' }}; // Non-critical error, still return success
   }
 }
