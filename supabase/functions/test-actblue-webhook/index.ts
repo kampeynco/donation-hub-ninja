@@ -136,6 +136,10 @@ serve(async (req) => {
     // Create authorization header
     const authHeaderValue = `Basic ${btoa(`${webhook.api_username}:${webhook.api_password}`)}`;
     
+    // Log full auth header for debugging
+    const debugAuthHeader = `Basic ${btoa(`${webhook.api_username}:[redacted]`)}`;
+    console.log(`[${requestId}] Auth header format: ${debugAuthHeader}`);
+    
     // Send test request directly to the edge function
     const response = await fetch(destinationUrl, {
       method: 'POST',

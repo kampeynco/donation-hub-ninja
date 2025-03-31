@@ -49,6 +49,19 @@ export async function validateWebhookAuth(
     
     console.log(`[${requestId}] Attempting to authenticate with username: ${username}`);
     
+    // Debug logging - query for all webhooks to see what's available
+    const { data: allWebhooks, error: webhooksError } = await supabase
+      .from("webhooks")
+      .select("id, user_id, api_username, is_active")
+      .eq("is_active", true);
+      
+    if (webhooksError) {
+      console.error(`[${requestId}] Error fetching all webhooks:`, webhooksError);
+    } else {
+      console.log(`[${requestId}] Available active webhooks:`, 
+        JSON.stringify(allWebhooks.map(w => ({id: w.id, user_id: w.user_id, username: w.api_username}))));
+    }
+    
     let query = supabase.from("webhooks").select("*").eq("is_active", true);
     
     // If source name is provided, use it to find the specific webhook
@@ -56,6 +69,10 @@ export async function validateWebhookAuth(
       query = query.eq("user_id", sourceNameHeader);
       console.log(`[${requestId}] Finding webhook by user_id: ${sourceNameHeader}`);
     }
+    
+    // Try to find by username as a fallback
+    query = query.eq("api_username", username);
+    console.log(`[${requestId}] Also filtering by username: ${username}`);
     
     // Fetch webhook from database to verify credentials
     const { data: webhook, error: webhookError } = await query.maybeSingle();
@@ -74,12 +91,12 @@ export async function validateWebhookAuth(
     }
     
     if (!webhook) {
-      console.error(`[${requestId}] No active webhook configuration found for source: ${sourceNameHeader || 'any'}`);
+      console.error(`[${requestId}] No active webhook configuration found for source: ${sourceNameHeader || 'any'} and username: ${username}`);
       return { 
         success: false, 
         error: errorResponses.notFoundError(
           "Webhook configuration not found",
-          "No active webhook configuration exists for the provided credentials",
+          `No active webhook configuration exists for the provided credentials (username: ${username})`,
           requestId,
           timestamp
         )
@@ -89,6 +106,11 @@ export async function validateWebhookAuth(
     // Verify provided credentials against stored credentials
     if (username !== webhook.api_username || password !== webhook.api_password) {
       console.error(`[${requestId}] Authentication failed: Invalid credentials provided. Expected username: ${webhook.api_username}`);
+      if (username === webhook.api_username) {
+        console.error(`[${requestId}] Username matched but password was incorrect`);
+        // Log first 3 chars of provided and expected passwords for debugging
+        console.error(`[${requestId}] Password mismatch. Provided starts with: ${password.substring(0, 3)}..., Expected starts with: ${webhook.api_password.substring(0, 3)}...`);
+      }
       return { 
         success: false, 
         error: errorResponses.authenticationError(

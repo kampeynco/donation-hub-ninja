@@ -5,9 +5,11 @@ import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import CopyableInput from "@/components/Auth/CopyableInput";
 import CopyablePasswordInput from "@/components/Auth/CopyablePasswordInput";
-import { IconRefresh, IconPlaylistAdd } from "@tabler/icons-react";
+import { IconRefresh, IconPlaylistAdd, IconAlertCircle, IconCheck } from "@tabler/icons-react";
 import { WebhookCredentials, regenerateApiPassword, testActBlueWebhook } from "@/services/webhookService";
 import { toast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { cn } from "@/lib/utils";
 
 interface WebhookConfigProps {
   webhookCredentials: WebhookCredentials | null;
@@ -24,6 +26,7 @@ const WebhookConfig = ({
 }: WebhookConfigProps) => {
   const [isRegeneratingPassword, setIsRegeneratingPassword] = useState(false);
   const [isTesting, setIsTesting] = useState(false);
+  const [testResults, setTestResults] = useState<{success: boolean; message: string} | null>(null);
 
   const handleRegeneratePassword = async () => {
     if (!webhookCredentials) return;
@@ -40,6 +43,8 @@ const WebhookConfig = ({
           title: "API Password regenerated",
           description: "Your new API password has been generated. Make sure to update your ActBlue webhook settings."
         });
+        // Clear test results since we've changed the credentials
+        setTestResults(null);
       } else {
         throw new Error("Failed to regenerate API password");
       }
@@ -59,8 +64,25 @@ const WebhookConfig = ({
     if (!webhookCredentials) return;
     
     setIsTesting(true);
+    setTestResults(null);
     try {
-      const success = await testActBlueWebhook(webhookCredentials.id);
+      const response = await supabase.functions.invoke('test-actblue-webhook', {
+        body: { webhookId: webhookCredentials.id }
+      });
+      
+      console.log("Test webhook response:", response);
+      
+      if (response.error) {
+        throw new Error(response.error);
+      }
+      
+      const success = response.data?.success || false;
+      
+      setTestResults({
+        success,
+        message: response.data?.message || (success ? "Test successful" : "Test failed")
+      });
+      
       if (success) {
         toast({
           title: "Webhook test successful",
@@ -69,12 +91,16 @@ const WebhookConfig = ({
       } else {
         toast({
           title: "Webhook test failed",
-          description: "Please check your configuration and try again.",
+          description: response.data?.error?.message || "Please check your configuration and try again.",
           variant: "destructive"
         });
       }
     } catch (error) {
       console.error("Error testing webhook:", error);
+      setTestResults({
+        success: false,
+        message: error instanceof Error ? error.message : "An unknown error occurred"
+      });
       toast({
         title: "Error testing webhook",
         description: error instanceof Error ? error.message : "An unknown error occurred",
@@ -126,7 +152,7 @@ const WebhookConfig = ({
               </p>
             </div>
 
-            <div className="pt-4">
+            <div className="pt-4 space-y-4">
               <Button 
                 onClick={handleTestWebhook} 
                 disabled={isTesting}
@@ -136,9 +162,43 @@ const WebhookConfig = ({
                 <IconPlaylistAdd size={16} className="mr-2" />
                 {isTesting ? "Testing..." : "Test Webhook Configuration"}
               </Button>
-              <p className="text-xs text-gray-500 mt-2">
+              
+              {testResults && (
+                <div className={cn(
+                  "p-3 rounded-md text-sm flex items-start gap-2",
+                  testResults.success ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"
+                )}>
+                  {testResults.success ? 
+                    <IconCheck size={18} className="flex-shrink-0 mt-0.5 text-green-600" /> : 
+                    <IconAlertCircle size={18} className="flex-shrink-0 mt-0.5 text-red-600" />
+                  }
+                  <div>
+                    <strong>{testResults.success ? "Success" : "Error"}</strong>: {testResults.message}
+                    {!testResults.success && (
+                      <div className="mt-1 text-xs">
+                        Check that your username and password are correctly configured in ActBlue. 
+                        The username should be "{webhookCredentials.api_username}" and the password 
+                        should be exactly as shown above. 
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+              
+              <p className="text-xs text-gray-500">
                 Sends a test request to verify your webhook configuration is working correctly.
+                This can help identify authentication issues with ActBlue.
               </p>
+              
+              <div className="p-3 border rounded-md bg-blue-50 text-sm">
+                <strong>Troubleshooting tips:</strong>
+                <ul className="list-disc list-inside mt-1 space-y-1 text-xs">
+                  <li>Ensure your ActBlue webhook URL exactly matches the one shown above</li>
+                  <li>Check that username and password are correctly entered in ActBlue</li>
+                  <li>Verify the webhook is enabled in your ActBlue account</li>
+                  <li>Make sure there are no typos or extra spaces in your credentials</li>
+                </ul>
+              </div>
             </div>
           </div> : <div className="py-4 text-center text-gray-500">
             Loading webhook credentials...
