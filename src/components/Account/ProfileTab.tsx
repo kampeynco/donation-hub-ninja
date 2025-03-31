@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -33,7 +32,6 @@ const ProfileTab = () => {
   const [mobilePhone, setMobilePhone] = useState("");
   const [loading, setLoading] = useState(false);
   
-  // State for account deletion
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deleteReason, setDeleteReason] = useState<string>("");
   const [confirmDelete, setConfirmDelete] = useState("");
@@ -41,10 +39,8 @@ const ProfileTab = () => {
 
   useEffect(() => {
     if (user) {
-      // Set email from the authenticated user
       setEmail(user.email || "");
       
-      // Try to fetch profile data if it exists
       const fetchProfileData = async () => {
         try {
           const { data, error } = await supabase
@@ -59,7 +55,6 @@ const ProfileTab = () => {
           }
           
           if (data) {
-            // Set profile data from database
             setFirstName(data.contact_first_name || "");
             setLastName(data.contact_last_name || "");
             setOrganization(data.committee_name || "");
@@ -76,7 +71,6 @@ const ProfileTab = () => {
 
   const handleImageChange = (_file: File, dataUrl: string) => {
     setProfileImage(dataUrl);
-    // In a real app, you would upload the file to a server here
     console.log("Image changed, would upload in a real app");
   };
 
@@ -88,8 +82,6 @@ const ProfileTab = () => {
     setLoading(true);
     
     try {
-      // Update the profile in the database
-      // Strip formatting before saving to the database
       const formattedPhone = mobilePhone.replace(/\D/g, "");
       
       const { error } = await supabase
@@ -119,7 +111,6 @@ const ProfileTab = () => {
     }
   };
 
-  // Get user initials for avatar fallback
   const getUserInitials = () => {
     if (firstName && lastName) {
       return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
@@ -133,7 +124,6 @@ const ProfileTab = () => {
     return user.email.substring(0, 2).toUpperCase();
   };
 
-  // Handle account deletion
   const handleDeleteAccount = async () => {
     if (confirmDelete !== "DELETE") {
       toast({
@@ -147,7 +137,6 @@ const ProfileTab = () => {
     setIsDeleting(true);
     try {
       await deleteAccount(deleteReason);
-      // The redirect happens in the AuthContext, so we don't need to handle it here
     } catch (error: any) {
       console.error("Error deleting account:", error);
       toast({
@@ -280,7 +269,7 @@ const ProfileTab = () => {
                   
                   <div className="space-y-2 mt-4">
                     <Label htmlFor="confirm-delete" className="font-medium">
-                      Type DELETE to confirm deletion:
+                      Type <strong>DELETE</strong> to confirm deletion:
                     </Label>
                     <Input
                       id="confirm-delete"
