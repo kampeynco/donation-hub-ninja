@@ -2,7 +2,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.29.0";
 import { ActBlueRequest } from "../types.ts";
 import { errorResponses } from "../error-handler.ts";
-import { createDonationNotification, updateWebhookTimestamp } from "../models/index.ts";
+import { updateWebhookTimestamp } from "../models/index.ts";
 import { processDonor } from "./donorProcessor.ts";
 import { processDonation } from "./donationProcessor.ts";
 import { sendNotification, formatDonorResponse } from "./notificationService.ts";
@@ -61,20 +61,11 @@ export async function processActBlueWebhook(
     return { success: false, error: donationError };
   }
 
-  // Create notification for the donation if donor exists
+  // Send notification for the donation if donor exists and userId is provided
+  // We only want to send notifications if we have both a donor ID and a user ID
   if (donorResult?.donorId && userId) {
     // Determine if this is a recurring donation
     const isRecurring = donation.recurringDuration && donation.recurringPeriod !== 'once';
-    
-    // Create a donation notification entry in the notifications table
-    await createDonationNotification(
-      supabase, 
-      donation, 
-      donor, 
-      donorResult.donorId,
-      donationData, // Pass the processed donation data
-      requestId
-    );
     
     // Extract actual donation amount from the lineitem or contribution
     const donationAmount = lineItems && lineItems.length > 0 
@@ -86,7 +77,7 @@ export async function processActBlueWebhook(
       ? `${donor.firstname} ${donor.lastname}` 
       : donor?.firstname || donor?.lastname || "Anonymous";
       
-    // Send notification via edge function
+    // Send notification via edge function - this will handle both web and email notifications
     await sendNotification(
       supabase,
       userId,
