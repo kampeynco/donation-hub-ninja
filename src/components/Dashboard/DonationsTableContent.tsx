@@ -23,7 +23,7 @@ const DonationsTableContent = ({ donations }: DonationsTableContentProps) => {
     }
 
     // Recurring donation badge for Monthly or Weekly
-    return <Badge className="bg-donor-green whitespace-nowrap">Recurring</Badge>;
+    return <Badge variant="outline" className="bg-donor-green text-secondary-foreground whitespace-nowrap">Recurring</Badge>;
   };
 
   // Function to render duration badge for recurring donations
@@ -35,7 +35,7 @@ const DonationsTableContent = ({ donations }: DonationsTableContentProps) => {
 
     // Infinite recurring donation
     if (donation.recurringDuration === 9999) {
-      return <Badge variant="outline" className="bg-donor-blue text-white ml-2 whitespace-nowrap">Infinite</Badge>;
+      return <Badge variant="outline" className="bg-donor-blue text-secondary-foreground ml-2 whitespace-nowrap">Infinite</Badge>;
     }
 
     // Regular recurring donation with duration
