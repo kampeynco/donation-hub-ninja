@@ -13,18 +13,25 @@ export async function handleRequest(req: Request): Promise<Response> {
   const timestamp = new Date().toISOString();
   
   console.log(`[${requestId}] Request received: ${req.method}`);
-  console.log(`[${requestId}] Request headers:`, JSON.stringify(Object.fromEntries(req.headers.entries())));
-
-  // Handle CORS preflight requests
-  if (req.method === "OPTIONS") {
-    console.log(`[${requestId}] Responding to OPTIONS request with CORS headers`);
-    return new Response(null, {
-      headers: corsHeaders,
-      status: 204,
-    });
-  }
-
+  
   try {
+    // Log detailed request information for debugging
+    const headers = Object.fromEntries(req.headers.entries());
+    console.log(`[${requestId}] Request headers:`, JSON.stringify(headers));
+    
+    // Get the URL for debugging
+    const url = new URL(req.url);
+    console.log(`[${requestId}] Request URL: ${url.toString()}`);
+
+    // Handle CORS preflight requests
+    if (req.method === "OPTIONS") {
+      console.log(`[${requestId}] Responding to OPTIONS request with CORS headers`);
+      return new Response(null, {
+        headers: corsHeaders,
+        status: 204,
+      });
+    }
+
     // Create Supabase client using environment variables
     const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
@@ -76,22 +83,43 @@ export async function handleRequest(req: Request): Promise<Response> {
     
     // Authentication check (using basic auth headers when present)
     const authHeader = req.headers.get("authorization");
+    console.log(`[${requestId}] Authorization header present: ${!!authHeader}`);
+    
     const authResult = await validateWebhookAuth(authHeader, supabase, requestId, timestamp, req.headers);
     
     if (!authResult.success && authResult.error) {
+      console.error(`[${requestId}] Authentication failed: ${authResult.error.message}`);
       return createErrorHttpResponse(authResult.error, corsHeaders, authResult.error.code);
     }
     
     let payload: ActBlueWebhookPayload;
     try {
       // Parse the request body (ActBlue payload)
-      payload = await req.json();
+      const bodyText = await req.text();
+      console.log(`[${requestId}] Request body: ${bodyText.substring(0, 500)}${bodyText.length > 500 ? '...' : ''}`);
+      
+      try {
+        payload = JSON.parse(bodyText);
+      } catch (parseError) {
+        console.error(`[${requestId}] Error parsing JSON payload:`, parseError);
+        return createErrorHttpResponse(
+          errorResponses.invalidPayload(
+            "Invalid JSON payload",
+            parseError.message,
+            requestId,
+            timestamp
+          ),
+          corsHeaders,
+          400
+        );
+      }
+      
       console.log(`[${requestId}] Received ActBlue webhook payload:`, JSON.stringify(payload));
     } catch (error) {
-      console.error(`[${requestId}] Error parsing payload:`, error);
+      console.error(`[${requestId}] Error reading payload:`, error);
       return createErrorHttpResponse(
         errorResponses.invalidPayload(
-          "Invalid JSON payload",
+          "Error reading request body",
           error.message,
           requestId,
           timestamp

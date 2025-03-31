@@ -19,14 +19,27 @@ export async function validateWebhookAuth(
   
   // If no auth header is provided, log but allow to proceed for testing
   if (!authHeader || !authHeader.startsWith("Basic ")) {
-    console.log(`[${requestId}] No authentication header provided or invalid format`);
+    console.log(`[${requestId}] No authentication header provided or invalid format: ${authHeader}`);
     
-    // For production apps, we would reject unauthenticated requests
-    // but for testing purposes, we'll allow them through
-    return { 
-      success: true, 
-      error: null 
-    };
+    // Only allow this in development/testing environments
+    if (Deno.env.get("ENVIRONMENT") === "development") {
+      console.log(`[${requestId}] DEVELOPMENT MODE: Allowing request without authentication`);
+      return { 
+        success: true, 
+        error: null 
+      };
+    } else {
+      console.error(`[${requestId}] Authentication required: No valid Basic Auth header provided`);
+      return { 
+        success: false, 
+        error: errorResponses.authenticationError(
+          "Authentication required",
+          "Missing or invalid Basic Auth header format",
+          requestId,
+          timestamp
+        )
+      };
+    }
   }
 
   try {
@@ -66,7 +79,7 @@ export async function validateWebhookAuth(
         success: false, 
         error: errorResponses.notFoundError(
           "Webhook configuration not found",
-          undefined,
+          "No active webhook configuration exists for the provided credentials",
           requestId,
           timestamp
         )
@@ -75,12 +88,12 @@ export async function validateWebhookAuth(
     
     // Verify provided credentials against stored credentials
     if (username !== webhook.api_username || password !== webhook.api_password) {
-      console.error(`[${requestId}] Authentication failed: Invalid credentials provided`);
+      console.error(`[${requestId}] Authentication failed: Invalid credentials provided. Expected username: ${webhook.api_username}`);
       return { 
         success: false, 
         error: errorResponses.authenticationError(
           "Invalid authentication credentials",
-          undefined,
+          "The provided username or password is incorrect",
           requestId,
           timestamp
         )

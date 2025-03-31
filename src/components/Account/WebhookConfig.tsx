@@ -5,8 +5,8 @@ import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import CopyableInput from "@/components/Auth/CopyableInput";
 import CopyablePasswordInput from "@/components/Auth/CopyablePasswordInput";
-import { IconRefresh } from "@tabler/icons-react";
-import { WebhookCredentials, regenerateApiPassword } from "@/services/webhookService";
+import { IconRefresh, IconPlaylistAdd } from "@tabler/icons-react";
+import { WebhookCredentials, regenerateApiPassword, testActBlueWebhook } from "@/services/webhookService";
 import { toast } from "@/components/ui/use-toast";
 
 interface WebhookConfigProps {
@@ -23,6 +23,7 @@ const WebhookConfig = ({
   setActBlueWebhookUrl
 }: WebhookConfigProps) => {
   const [isRegeneratingPassword, setIsRegeneratingPassword] = useState(false);
+  const [isTesting, setIsTesting] = useState(false);
 
   const handleRegeneratePassword = async () => {
     if (!webhookCredentials) return;
@@ -51,6 +52,36 @@ const WebhookConfig = ({
       });
     } finally {
       setIsRegeneratingPassword(false);
+    }
+  };
+
+  const handleTestWebhook = async () => {
+    if (!webhookCredentials) return;
+    
+    setIsTesting(true);
+    try {
+      const success = await testActBlueWebhook(webhookCredentials.id);
+      if (success) {
+        toast({
+          title: "Webhook test successful",
+          description: "Your webhook configuration is working properly."
+        });
+      } else {
+        toast({
+          title: "Webhook test failed",
+          description: "Please check your configuration and try again.",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error("Error testing webhook:", error);
+      toast({
+        title: "Error testing webhook",
+        description: error instanceof Error ? error.message : "An unknown error occurred",
+        variant: "destructive"
+      });
+    } finally {
+      setIsTesting(false);
     }
   };
 
@@ -92,6 +123,21 @@ const WebhookConfig = ({
               <CopyablePasswordInput id="apiPassword" value={webhookCredentials.api_password} />
               <p className="text-xs text-gray-500">
                 For security reasons, we recommend regenerating your API password periodically.
+              </p>
+            </div>
+
+            <div className="pt-4">
+              <Button 
+                onClick={handleTestWebhook} 
+                disabled={isTesting}
+                variant="outline" 
+                className="w-full"
+              >
+                <IconPlaylistAdd size={16} className="mr-2" />
+                {isTesting ? "Testing..." : "Test Webhook Configuration"}
+              </Button>
+              <p className="text-xs text-gray-500 mt-2">
+                Sends a test request to verify your webhook configuration is working correctly.
               </p>
             </div>
           </div> : <div className="py-4 text-center text-gray-500">
