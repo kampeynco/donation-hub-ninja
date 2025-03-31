@@ -1,0 +1,5 @@
+
+project_id = "igjnhwvtasegwyiwcdkr"
+
+[functions.delete-hookdeck-source]
+verify_jwt = false

@@ -9,3 +9,6 @@ verify_jwt = false
 
 [functions.send-notification]
 verify_jwt = false
+
+[functions.delete-hookdeck-source]
+verify_jwt = false

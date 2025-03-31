@@ -120,3 +120,80 @@ export async function configureHookdeckSourceAuth(config: HookdeckSourceAuthConf
     return { text: responseText };
   }
 }
+
+/**
+ * Deletes a Hookdeck source by ID
+ * Uses the DELETE method as specified in the Hookdeck API
+ */
+export async function deleteHookdeckSource(sourceId: string): Promise<any> {
+  const apiKey = Deno.env.get("HOOKDECK_API_KEY");
+  if (!apiKey) {
+    throw new Error("HOOKDECK_API_KEY is not configured");
+  }
+
+  console.log(`Deleting Hookdeck source with ID: ${sourceId}`);
+
+  const response = await fetch(`https://api.hookdeck.com/2025-01-01/sources/${sourceId}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${apiKey}`
+    }
+  });
+
+  const responseText = await response.text();
+  console.log(`Hookdeck source deletion response (${response.status}):`, responseText);
+
+  if (!response.ok) {
+    console.error("Hookdeck source deletion failed:", responseText);
+    throw new Error(`Failed to delete Hookdeck source: ${responseText}`);
+  }
+
+  try {
+    return responseText ? JSON.parse(responseText) : { success: true };
+  } catch (e) {
+    console.error("Failed to parse Hookdeck response:", e);
+    return { text: responseText, success: response.ok };
+  }
+}
+
+/**
+ * Updates the URL for a Hookdeck source
+ */
+export async function updateHookdeckSourceUrl(sourceId: string, url: string): Promise<any> {
+  const apiKey = Deno.env.get("HOOKDECK_API_KEY");
+  if (!apiKey) {
+    throw new Error("HOOKDECK_API_KEY is not configured");
+  }
+
+  const sourceUpdatePayload = {
+    "id": sourceId,
+    "url": url
+  };
+
+  console.log("Updating Hookdeck source URL with payload:", JSON.stringify(sourceUpdatePayload));
+
+  const response = await fetch("https://api.hookdeck.com/2025-01-01/sources", {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${apiKey}`
+    },
+    body: JSON.stringify(sourceUpdatePayload)
+  });
+
+  const responseText = await response.text();
+  console.log(`Hookdeck source URL update response (${response.status}):`, responseText);
+
+  if (!response.ok) {
+    console.error("Hookdeck source URL update failed:", responseText);
+    throw new Error(`Failed to update Hookdeck source URL: ${responseText}`);
+  }
+
+  try {
+    return JSON.parse(responseText);
+  } catch (e) {
+    console.error("Failed to parse Hookdeck response:", e);
+    return { text: responseText };
+  }
+}

@@ -161,3 +161,34 @@ export const createHookdeckWebhook = async (userId: string, email: string): Prom
     return null;
   }
 };
+
+export const deleteHookdeckSource = async (sourceId: string, userId?: string): Promise<boolean> => {
+  try {
+    // Call our edge function to delete the Hookdeck source
+    const response = await supabase.functions.invoke('delete-hookdeck-source', {
+      body: { 
+        sourceId,
+        userId 
+      }
+    });
+    
+    if (response.error) {
+      throw new Error(response.error);
+    }
+    
+    toast({
+      title: "Webhook source deleted",
+      description: "The Hookdeck webhook source was successfully deleted",
+    });
+    
+    return true;
+  } catch (error) {
+    console.error("Error deleting Hookdeck source:", error);
+    toast({
+      title: "Error deleting webhook source",
+      description: error instanceof Error ? error.message : "Unknown error occurred",
+      variant: "destructive",
+    });
+    return false;
+  }
+};
