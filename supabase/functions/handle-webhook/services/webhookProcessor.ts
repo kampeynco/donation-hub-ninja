@@ -3,10 +3,11 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.29.0";
 import { ActBlueRequest } from "../types.ts";
 import { errorResponses } from "../error-handler.ts";
 import { updateWebhookTimestamp } from "../models/index.ts";
-import { processDonor } from "./donorProcessor.ts";
-import { processDonation } from "./donationProcessor.ts";
-import { sendNotification, formatDonorResponse } from "./notificationService.ts";
-import { createSuccessResponse } from "./responseFormatter.ts";
+import { processDonor } from "./donors/processDonor.ts";
+import { processDonation } from "./donations/processDonation.ts";
+import { sendNotification } from "./notifications/notificationService.ts";
+import { formatDonorResponse } from "./formatters/responseFormatter.ts";
+import { createSuccessResponse } from "./formatters/responseFormatter.ts";
 
 /**
  * Process ActBlue webhook
