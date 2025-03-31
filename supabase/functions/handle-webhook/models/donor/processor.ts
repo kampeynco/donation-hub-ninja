@@ -69,12 +69,9 @@ export async function findOrCreateDonor(
       // Create new donor
       console.log(`[${requestId}] No existing donor found for email ${donor.email}, creating new donor`);
       
-      // Add user_id to donor data if provided
-      const donorDataWithUserId = userId ? { ...donorData, user_id: userId } : donorData;
-      
       const { data: newDonor, error: donorError } = await supabase
         .from("donors")
-        .insert(donorDataWithUserId)
+        .insert(donorData)
         .select()
         .single();
 
@@ -115,6 +112,42 @@ export async function findOrCreateDonor(
       
       emailId = newEmail.id;
       logDbOperation("Created email record", emailId, requestId);
+    }
+    
+    // Add entry to user_donors junction table if userId is provided
+    // This is the case when the webhook is called with a user ID from Hookdeck
+    if (userId && donorId) {
+      // Check if association already exists
+      const { data: existingAssociation, error: checkAssociationError } = await supabase
+        .from("user_donors")
+        .select("id")
+        .eq("user_id", userId)
+        .eq("donor_id", donorId)
+        .maybeSingle();
+        
+      if (checkAssociationError) {
+        console.error(`[${requestId}] Error checking user-donor association:`, checkAssociationError);
+        // Non-critical error, continue processing
+      }
+      
+      // Only create a new association if one doesn't exist
+      if (!existingAssociation) {
+        const { error: associationError } = await supabase
+          .from("user_donors")
+          .insert({
+            user_id: userId,
+            donor_id: donorId
+          });
+          
+        if (associationError) {
+          console.error(`[${requestId}] Error creating user-donor association:`, associationError);
+          // Non-critical error, continue processing
+        } else {
+          logDbOperation("Created user-donor association", donorId, requestId, `for user: ${userId}`);
+        }
+      } else {
+        console.log(`[${requestId}] User-donor association already exists for user ${userId} and donor ${donorId}`);
+      }
     }
 
     return { success: true, data: { donorId, emailId } };

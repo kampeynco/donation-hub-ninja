@@ -162,7 +162,6 @@ export type Database = {
             | Database["public"]["Enums"]["text_message_option"]
             | null
           updated_at: string
-          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -177,7 +176,6 @@ export type Database = {
             | Database["public"]["Enums"]["text_message_option"]
             | null
           updated_at?: string
-          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -192,7 +190,6 @@ export type Database = {
             | Database["public"]["Enums"]["text_message_option"]
             | null
           updated_at?: string
-          user_id?: string | null
         }
         Relationships: []
       }
@@ -519,6 +516,35 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      user_donors: {
+        Row: {
+          created_at: string
+          donor_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          donor_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          donor_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_donors_donor_id_fkey"
+            columns: ["donor_id"]
+            isOneToOne: false
+            referencedRelation: "donors"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       webhooks: {
         Row: {

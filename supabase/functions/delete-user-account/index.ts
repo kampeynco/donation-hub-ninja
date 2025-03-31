@@ -43,71 +43,97 @@ serve(async (req) => {
     // 1. Delete associated data first
     // This ensures all user-related data is cleaned up before the user is deleted
 
-    // Get related donor data
-    const { data: donorData } = await supabase
-      .from("donors")
-      .select("id")
+    // Get related donor IDs from the user_donors junction table
+    const { data: userDonorsData } = await supabase
+      .from("user_donors")
+      .select("donor_id")
       .eq("user_id", userId);
     
-    // If there are donor records, delete all related data
-    if (donorData && donorData.length > 0) {
-      for (const donor of donorData) {
-        // Delete related custom fields
-        const { data: donationData } = await supabase
-          .from("donations")
-          .select("id")
-          .eq("donor_id", donor.id);
+    const donorIds = userDonorsData ? userDonorsData.map(ud => ud.donor_id) : [];
+    
+    // If there are donor associations, handle related data
+    if (donorIds.length > 0) {
+      for (const donorId of donorIds) {
+        // First check if this donor is associated with only this user or multiple users
+        const { count: userCount, error: countError } = await supabase
+          .from("user_donors")
+          .select("*", { count: "exact", head: true })
+          .eq("donor_id", donorId);
         
-        if (donationData && donationData.length > 0) {
-          for (const donation of donationData) {
-            // Delete custom fields for this donation
-            await supabase
-              .from("custom_fields")
-              .delete()
-              .eq("donation_id", donation.id);
-              
-            // Delete merchandise for this donation
-            await supabase
-              .from("merchandise")
-              .delete()
-              .eq("donation_id", donation.id);
-          }
-          
-          // Delete donations linked to this donor
-          await supabase
-            .from("donations")
-            .delete()
-            .eq("donor_id", donor.id);
+        if (countError) {
+          console.error(`Error counting users for donor ${donorId}: ${countError.message}`);
+          continue;
         }
         
-        // Delete emails for this donor
-        await supabase
-          .from("emails")
-          .delete()
-          .eq("donor_id", donor.id);
+        // If this is the only user associated with the donor, delete the donor and related data
+        if (userCount === 1) {
+          console.log(`Donor ${donorId} is only associated with this user, deleting donor and related data`);
           
-        // Delete phones for this donor
-        await supabase
-          .from("phones")
-          .delete()
-          .eq("donor_id", donor.id);
+          // Get donations for this donor
+          const { data: donationsData } = await supabase
+            .from("donations")
+            .select("id")
+            .eq("donor_id", donorId);
           
-        // Delete locations for this donor
-        await supabase
-          .from("locations")
-          .delete()
-          .eq("donor_id", donor.id);
+          if (donationsData && donationsData.length > 0) {
+            for (const donation of donationsData) {
+              // Delete custom fields for this donation
+              await supabase
+                .from("custom_fields")
+                .delete()
+                .eq("donation_id", donation.id);
+              
+              // Delete merchandise for this donation
+              await supabase
+                .from("merchandise")
+                .delete()
+                .eq("donation_id", donation.id);
+            }
+            
+            // Delete all donations for this donor
+            await supabase
+              .from("donations")
+              .delete()
+              .eq("donor_id", donorId);
+          }
           
-        // Delete employer data for this donor
-        await supabase
-          .from("employer_data")
-          .delete()
-          .eq("donor_id", donor.id);
+          // Delete emails for this donor
+          await supabase
+            .from("emails")
+            .delete()
+            .eq("donor_id", donorId);
+          
+          // Delete phones for this donor
+          await supabase
+            .from("phones")
+            .delete()
+            .eq("donor_id", donorId);
+          
+          // Delete locations for this donor
+          await supabase
+            .from("locations")
+            .delete()
+            .eq("donor_id", donorId);
+          
+          // Delete employer data for this donor
+          await supabase
+            .from("employer_data")
+            .delete()
+            .eq("donor_id", donorId);
+          
+          // Finally delete the donor
+          await supabase
+            .from("donors")
+            .delete()
+            .eq("id", donorId);
+        } else {
+          console.log(`Donor ${donorId} is associated with multiple users, keeping donor data and just removing association`);
+        }
       }
       
-      // Delete donors records
+      // Delete user's associations in the user_donors table
       await supabase
-        .from("donors")
+        .from("user_donors")
         .delete()
         .eq("user_id", userId);
     }
