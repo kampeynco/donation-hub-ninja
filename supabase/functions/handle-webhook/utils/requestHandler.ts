@@ -49,22 +49,37 @@ export async function handleRequest(req: Request): Promise<Response> {
     const userId = req.headers.get("source-name");
     console.log(`[${requestId}] Extracted source name header: ${userId}`);
 
+    // Method check - only accept POST
+    if (req.method !== "POST") {
+      // For non-POST requests, provide a more helpful error message
+      console.error(`[${requestId}] Method not allowed: ${req.method}`);
+      
+      // For GET requests, provide documentation response instead of error
+      if (req.method === "GET") {
+        return new Response(JSON.stringify({
+          status: "error",
+          message: "ActBlue webhook endpoint - POST requests only",
+          documentation: "This endpoint processes ActBlue webhook payloads. It requires POST requests with a JSON payload containing contribution data.",
+          note: "If you're seeing this in a browser, you're making a GET request. ActBlue should be configured to make POST requests to this URL."
+        }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 405
+        });
+      }
+      
+      return createErrorHttpResponse(
+        errorResponses.methodNotAllowed(req.method, requestId, timestamp),
+        { ...corsHeaders, "Allow": "POST, OPTIONS" },
+        405
+      );
+    }
+    
     // Authentication check (using basic auth headers when present)
     const authHeader = req.headers.get("authorization");
     const authResult = await validateWebhookAuth(authHeader, supabase, requestId, timestamp, req.headers);
     
     if (!authResult.success && authResult.error) {
       return createErrorHttpResponse(authResult.error, corsHeaders, authResult.error.code);
-    }
-    
-    // Method check - only accept POST
-    if (req.method !== "POST") {
-      console.error(`[${requestId}] Method not allowed: ${req.method}`);
-      return createErrorHttpResponse(
-        errorResponses.methodNotAllowed(req.method, requestId, timestamp),
-        { ...corsHeaders, "Allow": "POST, OPTIONS" },
-        405
-      );
     }
     
     let payload: ActBlueWebhookPayload;

@@ -67,6 +67,15 @@ serve(async (req) => {
       contribution: {
         contributionForm: "Test Form",
         orderNumber: "TEST-" + Math.floor(Math.random() * 1000000),
+        status: "approved",
+        isRecurring: false,
+        isPaypal: false,
+        isMobile: false,
+        isExpress: false,
+        withExpressLane: false,
+        expressSignup: false,
+        createdAt: new Date().toISOString(),
+        paidAt: new Date().toISOString(),
         donor: {
           firstName: "Test",
           lastName: "Donor",
@@ -79,6 +88,9 @@ serve(async (req) => {
       }
     };
 
+    console.log(`Testing webhook for URL: ${webhook.actblue_webhook_url}`);
+    console.log(`Using credentials: ${webhook.api_username}:${webhook.api_password.substring(0, 3)}***`);
+
     // Send a test request to the ActBlue webhook URL
     const response = await fetch(webhook.actblue_webhook_url, {
       method: "POST",
@@ -89,13 +101,18 @@ serve(async (req) => {
       body: JSON.stringify(testPayload),
     });
 
+    // Capture the response body
+    const responseBody = await response.text();
+    console.log(`ActBlue webhook response status: ${response.status}`);
+    console.log(`ActBlue webhook response body: ${responseBody}`);
+
     // Check if the request was successful (status code 200-299)
     if (!response.ok) {
-      const responseText = await response.text();
-      console.error("Error from ActBlue webhook:", responseText);
       return new Response(JSON.stringify({ 
         error: `ActBlue webhook returned an error: ${response.status} ${response.statusText}`,
-        details: responseText
+        details: responseBody,
+        url: webhook.actblue_webhook_url,
+        auth: `${webhook.api_username}:***` // Don't log full password
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 500,
@@ -115,7 +132,8 @@ serve(async (req) => {
     // Return success response
     return new Response(JSON.stringify({
       success: true,
-      message: "ActBlue webhook test completed successfully"
+      message: "ActBlue webhook test completed successfully",
+      response: responseBody
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
