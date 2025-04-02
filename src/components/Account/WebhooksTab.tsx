@@ -34,18 +34,18 @@ const WebhooksTab = () => {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Webhook Configuration */}
+        {/* ActBlue Integration Instructions - Moved to the top */}
+        <WebhookInstructions />
+
+        <Separator className="my-6" />
+
+        {/* Webhook Configuration - Moved below */}
         <WebhookConfig 
           webhookCredentials={webhookCredentials}
           setWebhookCredentials={setWebhookCredentials}
           actBlueWebhookUrl={actBlueWebhookUrl}
           setActBlueWebhookUrl={setActBlueWebhookUrl}
         />
-
-        <Separator className="my-6" />
-
-        {/* ActBlue Integration Instructions */}
-        <WebhookInstructions />
       </CardContent>
     </Card>
   );
