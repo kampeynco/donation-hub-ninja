@@ -72,6 +72,17 @@ const NotificationBell = () => {
           setNotifications(prev => [payload.new as Notification, ...prev].slice(0, 10));
         }
       )
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'notifications'
+        },
+        (payload) => {
+          setNotifications(prev => prev.filter(n => n.id !== payload.old.id));
+        }
+      )
       .subscribe();
 
     return () => {
