@@ -59,9 +59,7 @@ const IntegrationCard: React.FC<IntegrationCardProps> = ({
           </div>
         </div>
         
-        <div className="flex pl-16">
-          <p className="text-sm text-gray-500">{description}</p>
-        </div>
+        <p className="text-sm text-gray-500 mt-2">{description}</p>
       </CardContent>
     </Card>
   );
