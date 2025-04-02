@@ -6,7 +6,6 @@ import {
   IconUsers, 
   IconCreditCard, 
   IconReportMoney, 
-  IconArrowRight, 
   IconSun, 
   IconMoon, 
   IconStarFilled,
