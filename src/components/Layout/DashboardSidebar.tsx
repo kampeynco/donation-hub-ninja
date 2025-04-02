@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Separator } from "@/components/ui/separator";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import SidebarItem from "./Sidebar/SidebarItem";
@@ -10,6 +10,20 @@ import sidebarItems from "./Sidebar/sidebarItems";
 
 const DashboardSidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const [items, setItems] = useState(sidebarItems);
+
+  // Re-evaluate sidebar items when component mounts or route changes
+  useEffect(() => {
+    // Force re-evaluation of the items to check localStorage
+    const updatedItems = sidebarItems.map(item => ({
+      ...item,
+      hidden: item.name === "Personas" ? 
+        localStorage.getItem("hidePersonasSidebar") === "true" : 
+        item.hidden
+    }));
+    
+    setItems(updatedItems);
+  }, []);
 
   const toggleSidebar = () => setCollapsed(!collapsed);
 
@@ -28,7 +42,7 @@ const DashboardSidebar = () => {
         {/* Navigation */}
         <div className="px-3 py-2 flex-1">
           <nav className="space-y-1">
-            {sidebarItems.map((item) => (
+            {items.filter(item => !item.hidden).map((item) => (
               <SidebarItem 
                 key={item.path}
                 name={item.name}

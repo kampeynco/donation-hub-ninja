@@ -14,7 +14,13 @@ export interface SidebarItemType {
     text: string;
     variant: string;
   };
+  hidden?: boolean;
 }
+
+// Function to check if Personas should be hidden
+const shouldHidePersonas = (): boolean => {
+  return localStorage.getItem("hidePersonasSidebar") === "true";
+};
 
 const sidebarItems: SidebarItemType[] = [
   {
@@ -34,7 +40,8 @@ const sidebarItems: SidebarItemType[] = [
     badge: {
       text: "Coming",
       variant: "coming"
-    }
+    },
+    hidden: shouldHidePersonas()
   },
   {
     name: "Settings",
