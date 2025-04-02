@@ -17,11 +17,11 @@ const SidebarItem = ({ name, path, icon: Icon, collapsed }: SidebarItemProps) =>
         <NavLink
           to={path}
           className={({ isActive }) =>
-            `flex flex-row items-center px-3 py-2 rounded-md transition-colors ${
+            `flex items-center px-3 py-2 rounded-md transition-colors ${
               isActive
                 ? "bg-donor-blue text-white"
                 : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-            } ${collapsed ? "justify-center" : ""}`
+            } ${collapsed ? "justify-center w-full" : "w-full justify-start"}`
           }
         >
           <Icon className="h-5 w-5" />
