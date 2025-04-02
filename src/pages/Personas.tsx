@@ -45,9 +45,9 @@ const Personas = () => {
 
         <Separator className="my-10" />
 
-        {/* Feature columns */}
+        {/* Feature columns - removed card styling */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
+          <div className="p-6">
             <div className="w-12 h-12 flex items-center justify-center rounded-full bg-blue-100 mb-4">
               <IconArrowRight className="h-6 w-6 text-blue-600" />
             </div>
@@ -57,7 +57,7 @@ const Personas = () => {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
+          <div className="p-6">
             <div className="w-12 h-12 flex items-center justify-center rounded-full bg-green-100 mb-4">
               <IconArrowRight className="h-6 w-6 text-green-600" />
             </div>
@@ -67,7 +67,7 @@ const Personas = () => {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
+          <div className="p-6">
             <div className="w-12 h-12 flex items-center justify-center rounded-full bg-purple-100 mb-4">
               <IconArrowRight className="h-6 w-6 text-purple-600" />
             </div>

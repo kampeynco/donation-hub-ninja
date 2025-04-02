@@ -106,7 +106,7 @@ const NotInterestedModal = ({ open, onOpenChange }: NotInterestedModalProps) => 
               <Button variant="outline" type="button" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>
-              <Button type="submit">Submit feedback</Button>
+              <Button type="submit">Submit</Button>
             </DialogFooter>
           </form>
         </Form>
