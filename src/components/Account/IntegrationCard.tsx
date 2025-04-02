@@ -42,7 +42,7 @@ const IntegrationCard: React.FC<IntegrationCardProps> = ({
               <h3 className="text-lg font-medium">{title}</h3>
             </div>
           </div>
-          <div className="flex flex-col items-end gap-1">
+          <div className="flex flex-col items-center">
             <Button 
               onClick={onConnectClick} 
               variant={connected ? "outline" : "default"} 
@@ -52,15 +52,15 @@ const IntegrationCard: React.FC<IntegrationCardProps> = ({
             </Button>
             <button 
               onClick={onInstructionsClick}
-              className="text-xs text-primary hover:underline"
+              className="text-xs text-primary hover:underline mt-1"
             >
               Instructions
             </button>
           </div>
         </div>
         
-        <div className="pl-16">
-          <p className="text-sm text-gray-500 mb-1">{description}</p>
+        <div className="flex pl-16">
+          <p className="text-sm text-gray-500">{description}</p>
         </div>
       </CardContent>
     </Card>
