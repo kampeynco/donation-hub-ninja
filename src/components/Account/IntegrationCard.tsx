@@ -54,8 +54,8 @@ const IntegrationCard: React.FC<IntegrationCardProps> = ({
       <CardFooter className="p-0 border-t">
         <Button 
           onClick={onConnectClick} 
-          variant={connected ? "outline" : "default"} 
-          className="w-full rounded-none h-12 bg-donor-blue hover:bg-donor-blue/90 text-white"
+          variant={connected ? "default" : "default"} 
+          className="w-full rounded-none h-12 bg-donor-blue hover:bg-donor-blue/90 text-white border-0"
         >
           {connected ? "Configure" : "Connect"}
         </Button>
