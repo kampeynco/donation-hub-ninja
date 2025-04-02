@@ -7,7 +7,7 @@ import {
   CardTitle, 
   CardDescription 
 } from "@/components/ui/card";
-import { IconBrandActblue } from "@tabler/icons-react";
+import { IconCreditCard } from "@tabler/icons-react";
 import {
   Dialog,
   DialogContent,
@@ -52,7 +52,7 @@ const IntegrationsTab = () => {
         <IntegrationCard
           title="ActBlue"
           description="Connect your ActBlue account to automatically sync donations"
-          icon={<IconBrandActblue size={24} className="text-primary" />}
+          icon={<IconCreditCard size={24} className="text-primary" />}
           onConnectClick={() => setConfigModalOpen(true)}
           onInstructionsClick={() => setInstructionsModalOpen(true)}
           connected={isConnected}

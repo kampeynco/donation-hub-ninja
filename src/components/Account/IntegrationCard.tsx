@@ -2,7 +2,7 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { IconBrandActblue } from "@tabler/icons-react";
+import { IconCreditCard } from "@tabler/icons-react";
 
 interface IntegrationCardProps {
   title: string;
