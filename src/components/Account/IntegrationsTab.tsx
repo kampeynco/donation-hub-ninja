@@ -19,12 +19,14 @@ import { WebhookCredentials, fetchWebhookCredentials } from "@/services/webhookS
 import IntegrationCard from "./IntegrationCard";
 import WebhookConfig from "./WebhookConfig";
 import WebhookInstructions from "./WebhookInstructions";
+import { getActBlueLogo, checkActBlueLogoExists } from "@/services/actBlueService";
 
 const IntegrationsTab = () => {
   const [webhookCredentials, setWebhookCredentials] = useState<WebhookCredentials | null>(null);
   const [actBlueWebhookUrl, setActBlueWebhookUrl] = useState<string>("");
   const [configModalOpen, setConfigModalOpen] = useState(false);
   const [instructionsModalOpen, setInstructionsModalOpen] = useState(false);
+  const [actBlueLogoUrl, setActBlueLogoUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const loadWebhookCredentials = async () => {
@@ -36,6 +38,16 @@ const IntegrationsTab = () => {
     };
     
     loadWebhookCredentials();
+
+    // Check if ActBlue logo exists in storage
+    const checkLogo = async () => {
+      const exists = await checkActBlueLogoExists();
+      if (exists) {
+        setActBlueLogoUrl(getActBlueLogo());
+      }
+    };
+    
+    checkLogo();
   }, []);
 
   const isConnected = Boolean(webhookCredentials?.actblue_webhook_url);
@@ -53,6 +65,7 @@ const IntegrationsTab = () => {
           title="ActBlue"
           description="Connect your ActBlue account to automatically sync donations"
           icon={<IconCreditCard size={24} className="text-primary" />}
+          logoUrl={actBlueLogoUrl || undefined}
           onConnectClick={() => setConfigModalOpen(true)}
           onInstructionsClick={() => setInstructionsModalOpen(true)}
           connected={isConnected}

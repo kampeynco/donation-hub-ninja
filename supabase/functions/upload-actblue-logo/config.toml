@@ -1,0 +1,3 @@
+
+# This function requires the user to be authenticated
+verify_jwt = true

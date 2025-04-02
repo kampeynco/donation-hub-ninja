@@ -8,6 +8,7 @@ interface IntegrationCardProps {
   title: string;
   description: string;
   icon: React.ReactNode;
+  logoUrl?: string;
   onConnectClick: () => void;
   onInstructionsClick: () => void;
   connected?: boolean;
@@ -17,6 +18,7 @@ const IntegrationCard: React.FC<IntegrationCardProps> = ({
   title,
   description,
   icon,
+  logoUrl,
   onConnectClick,
   onInstructionsClick,
   connected = false,
@@ -27,7 +29,15 @@ const IntegrationCard: React.FC<IntegrationCardProps> = ({
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-              {icon}
+              {logoUrl ? (
+                <img 
+                  src={logoUrl} 
+                  alt={title}
+                  className="h-6 w-auto object-contain"
+                />
+              ) : (
+                icon
+              )}
             </div>
             <div>
               <h3 className="text-lg font-medium">{title}</h3>
