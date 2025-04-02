@@ -1,9 +1,9 @@
 
 import { 
-  IconDashboard, 
-  IconUsers, 
-  IconCreditCard, 
-  IconReportMoney 
+  IconCampfire,
+  IconArrowsRightLeft,
+  IconCurrentLocation,
+  IconAdjustments
 } from "@tabler/icons-react";
 
 export interface SidebarItemType {
@@ -14,24 +14,24 @@ export interface SidebarItemType {
 
 const sidebarItems: SidebarItemType[] = [
   {
-    name: "Dashboard",
+    name: "Camp",
     path: "/dashboard",
-    icon: IconDashboard,
+    icon: IconCampfire,
   },
   {
-    name: "Donors",
+    name: "Logs",
     path: "/donors",
-    icon: IconUsers,
+    icon: IconArrowsRightLeft,
   },
   {
-    name: "Donations",
+    name: "Personas",
     path: "/donations",
-    icon: IconCreditCard,
+    icon: IconCurrentLocation,
   },
   {
-    name: "Reports",
+    name: "Settings",
     path: "/reports",
-    icon: IconReportMoney,
+    icon: IconAdjustments,
   },
 ];
 

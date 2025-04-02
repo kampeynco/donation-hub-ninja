@@ -1,6 +1,6 @@
 
 import React from "react";
-import { IconChevronLeft, IconMoon, IconSun } from "@tabler/icons-react";
+import { IconChevronLeft, IconMoonStars, IconSun } from "@tabler/icons-react";
 import { useTheme } from "@/context/ThemeContext";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -22,7 +22,7 @@ const SidebarActions = ({ collapsed, toggleSidebar }: SidebarActionsProps) => {
             <Button 
               variant="ghost" 
               size="sm" 
-              className={`${collapsed ? "justify-center w-full" : "w-full flex items-center"}`}
+              className={`${collapsed ? "justify-center w-full" : "w-full flex items-center justify-start"}`}
               onClick={toggleSidebar}
             >
               <IconChevronLeft className={`h-5 w-5 transition-transform ${collapsed ? "rotate-180" : ""}`} />
@@ -44,11 +44,11 @@ const SidebarActions = ({ collapsed, toggleSidebar }: SidebarActionsProps) => {
             <Button
               variant="ghost"
               size="sm"
-              className={`${collapsed ? "justify-center w-full" : "w-full flex items-center"}`}
+              className={`${collapsed ? "justify-center w-full" : "w-full flex items-center justify-start"}`}
               onClick={toggleTheme}
             >
               {theme === "light" ? (
-                <IconMoon className="h-5 w-5" />
+                <IconMoonStars className="h-5 w-5" />
               ) : (
                 <IconSun className="h-5 w-5" />
               )}
