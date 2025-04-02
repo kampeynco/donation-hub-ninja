@@ -9,7 +9,8 @@ import {
   IconSun, 
   IconMoon, 
   IconStarFilled,
-  IconChevronLeft
+  IconChevronLeft,
+  IconPower
 } from "@tabler/icons-react";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
@@ -77,19 +78,6 @@ const DashboardSidebar = () => {
         {!collapsed && <span className="ml-3 font-bold text-lg">Donor Camp</span>}
       </div>
 
-      {/* Collapse button */}
-      <div className="px-4 mb-4">
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className="w-full justify-between items-center"
-          onClick={toggleSidebar}
-        >
-          {!collapsed && <span>Collapse</span>}
-          <IconChevronLeft className={`h-5 w-5 transition-transform ${collapsed ? "rotate-180" : ""}`} />
-        </Button>
-      </div>
-
       <Separator className="mb-4" />
       
       {/* Navigation */}
@@ -101,7 +89,7 @@ const DashboardSidebar = () => {
                 <NavLink
                   to={item.path}
                   className={({ isActive }) =>
-                    `flex items-center px-3 py-2 rounded-md transition-colors ${
+                    `flex flex-row items-center px-3 py-2 rounded-md transition-colors ${
                       isActive
                         ? "bg-donor-blue text-white"
                         : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
@@ -109,7 +97,7 @@ const DashboardSidebar = () => {
                   }
                 >
                   {item.icon}
-                  {!collapsed && <span className="ml-3">{item.name}</span>}
+                  {!collapsed && <span className="ml-3 whitespace-nowrap">{item.name}</span>}
                 </NavLink>
               </TooltipTrigger>
               {collapsed && (
@@ -122,73 +110,104 @@ const DashboardSidebar = () => {
         </nav>
       </div>
 
-      <Separator className="my-2" />
-
-      {/* Theme Toggle */}
-      <div className="px-3 py-2">
-        <Tooltip delayDuration={0}>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className={`${collapsed ? "justify-center w-full" : "w-full justify-between"}`}
-              onClick={toggleTheme}
-            >
-              {theme === "light" ? (
-                <IconMoon className="h-5 w-5" />
-              ) : (
-                <IconSun className="h-5 w-5" />
-              )}
-              {!collapsed && <span>{theme === "light" ? "Dark Mode" : "Light Mode"}</span>}
-            </Button>
-          </TooltipTrigger>
-          {collapsed && (
-            <TooltipContent side="right">
-              {theme === "light" ? "Dark Mode" : "Light Mode"}
-            </TooltipContent>
-          )}
-        </Tooltip>
-      </div>
-
-      {/* User Profile */}
-      <div className="p-4 border-t dark:border-gray-800">
-        <Tooltip delayDuration={0}>
-          <TooltipTrigger asChild>
-            <div className={`flex ${collapsed ? "justify-center" : "items-center"}`}>
-              <Avatar className="h-9 w-9 border-2 border-gray-200">
-                <AvatarFallback className="bg-donor-blue text-white">
-                  {getInitials()}
-                </AvatarFallback>
-              </Avatar>
-              {!collapsed && (
-                <div className="ml-3">
-                  <p className="text-sm font-medium">{getUserDisplayName()}</p>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="h-auto p-0 text-xs text-gray-500 hover:text-red-500"
-                    onClick={signOut}
-                  >
-                    Sign out
-                  </Button>
-                </div>
-              )}
-            </div>
-          </TooltipTrigger>
-          {collapsed && (
-            <TooltipContent side="right" className="flex flex-col gap-2 p-2">
-              <p className="text-sm font-medium">{getUserDisplayName()}</p>
+      {/* Bottom section with collapse, theme toggle and profile */}
+      <div className="mt-auto">
+        {/* Collapse button */}
+        <div className="px-3 py-2">
+          <Tooltip delayDuration={0}>
+            <TooltipTrigger asChild>
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="text-xs text-gray-500 hover:text-red-500"
-                onClick={signOut}
+                className={`${collapsed ? "justify-center w-full" : "w-full justify-between items-center"}`}
+                onClick={toggleSidebar}
               >
-                Sign out
+                {!collapsed && <span>Collapse</span>}
+                <IconChevronLeft className={`h-5 w-5 transition-transform ${collapsed ? "rotate-180" : ""}`} />
               </Button>
-            </TooltipContent>
-          )}
-        </Tooltip>
+            </TooltipTrigger>
+            {collapsed && (
+              <TooltipContent side="right">
+                {collapsed ? "Expand" : "Collapse"}
+              </TooltipContent>
+            )}
+          </Tooltip>
+        </div>
+
+        {/* Theme Toggle */}
+        <div className="px-3 py-2">
+          <Tooltip delayDuration={0}>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className={`${collapsed ? "justify-center w-full" : "w-full justify-between"}`}
+                onClick={toggleTheme}
+              >
+                {theme === "light" ? (
+                  <IconMoon className="h-5 w-5" />
+                ) : (
+                  <IconSun className="h-5 w-5" />
+                )}
+                {!collapsed && <span>{theme === "light" ? "Dark Mode" : "Light Mode"}</span>}
+              </Button>
+            </TooltipTrigger>
+            {collapsed && (
+              <TooltipContent side="right">
+                {theme === "light" ? "Dark Mode" : "Light Mode"}
+              </TooltipContent>
+            )}
+          </Tooltip>
+        </div>
+
+        <Separator className="my-2" />
+
+        {/* User Profile */}
+        <div className="p-4 border-t dark:border-gray-800">
+          <Tooltip delayDuration={0}>
+            <TooltipTrigger asChild>
+              <div className={`flex ${collapsed ? "justify-center" : "items-center justify-between"}`}>
+                <div className="flex items-center">
+                  <Avatar className="h-9 w-9 border-2 border-gray-200">
+                    <AvatarFallback className="bg-donor-blue text-white">
+                      {getInitials()}
+                    </AvatarFallback>
+                  </Avatar>
+                  {!collapsed && (
+                    <div className="ml-3">
+                      <p className="text-sm font-medium truncate max-w-[120px]">{getUserDisplayName()}</p>
+                    </div>
+                  )}
+                </div>
+                {!collapsed && (
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className="h-auto p-1 text-gray-500 hover:text-red-500"
+                    onClick={signOut}
+                    aria-label="Sign out"
+                  >
+                    <IconPower className="h-5 w-5" />
+                  </Button>
+                )}
+              </div>
+            </TooltipTrigger>
+            {collapsed && (
+              <TooltipContent side="right" className="flex flex-col gap-2 p-2">
+                <p className="text-sm font-medium">{getUserDisplayName()}</p>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-xs text-gray-500 hover:text-red-500 flex items-center gap-2"
+                  onClick={signOut}
+                >
+                  <IconPower className="h-4 w-4" />
+                  Sign out
+                </Button>
+              </TooltipContent>
+            )}
+          </Tooltip>
+        </div>
       </div>
     </div>
   );
