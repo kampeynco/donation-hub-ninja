@@ -13,6 +13,7 @@ import SignIn from "./pages/Auth/SignIn";
 import SignUp from "./pages/Auth/SignUp";
 import Dashboard from "./pages/Dashboard";
 import Account from "./pages/Account";
+import Personas from "./pages/Personas";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -71,10 +72,7 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <Layout>
-                      <div className="p-8 text-center">
-                        <h1 className="text-2xl font-semibold mb-4">Personas Page</h1>
-                        <p>This page is under construction.</p>
-                      </div>
+                      <Personas />
                     </Layout>
                   </ProtectedRoute>
                 } 

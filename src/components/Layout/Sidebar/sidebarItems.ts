@@ -10,6 +10,10 @@ export interface SidebarItemType {
   name: string;
   path: string;
   icon: React.ComponentType<any>;
+  badge?: {
+    text: string;
+    variant: string;
+  };
 }
 
 const sidebarItems: SidebarItemType[] = [
@@ -27,6 +31,10 @@ const sidebarItems: SidebarItemType[] = [
     name: "Personas",
     path: "/personas",
     icon: IconCurrentLocation,
+    badge: {
+      text: "Coming",
+      variant: "coming"
+    }
   },
   {
     name: "Settings",
