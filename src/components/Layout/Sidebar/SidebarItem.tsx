@@ -40,7 +40,12 @@ const SidebarItem = ({ name, path, icon: Icon, collapsed, badge }: SidebarItemPr
                 
                 {!collapsed && badge && (
                   <div className="absolute top-1 right-2">
-                    <BadgeCustom variant={badge.variant as any}>{badge.text}</BadgeCustom>
+                    <BadgeCustom 
+                      variant={badge.variant as any}
+                      className={isActive ? "bg-white/20 text-white border-white/30 dark:bg-white/20 dark:text-white dark:border-white/30" : ""}
+                    >
+                      {badge.text}
+                    </BadgeCustom>
                   </div>
                 )}
               </div>

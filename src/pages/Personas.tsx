@@ -12,7 +12,7 @@ const Personas = () => {
   const [modalOpen, setModalOpen] = useState(false);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-120px)]">
+    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-120px)] mt-6">
       <div className="max-w-6xl w-full space-y-10">
         {/* Main section */}
         <div className="flex flex-col md:flex-row items-center gap-8">
