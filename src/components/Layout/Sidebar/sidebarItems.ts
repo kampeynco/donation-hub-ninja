@@ -1,6 +1,6 @@
 
 import { 
-  IconCampfire,
+  IconTent,
   IconArrowsRightLeft,
   IconCurrentLocation,
   IconAdjustments
@@ -26,7 +26,7 @@ const sidebarItems: SidebarItemType[] = [
   {
     name: "Camp",
     path: "/dashboard",
-    icon: IconCampfire,
+    icon: IconTent,
   },
   {
     name: "Logs",

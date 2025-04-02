@@ -1,6 +1,8 @@
 
 import { Link } from "react-router-dom";
-import { IconStarFilled } from "@tabler/icons-react";
+
+// Logo mark image from assets bucket
+const LIGHT_LOGO_MARK = "https://igjnhwvtasegwyiwcdkr.supabase.co/storage/v1/object/public/assets//updated_dc_logomark_light.png";
 
 interface AuthSidebarProps {
   title: string;
@@ -20,7 +22,7 @@ const AuthSidebar: React.FC<AuthSidebarProps> = ({
       <div className="max-w-md">
         <Link to="/" className="flex items-center gap-2 mb-10">
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white">
-            <IconStarFilled size={16} color="#007AFF" />
+            <img src={LIGHT_LOGO_MARK} alt="Donor Camp Logo" className="w-4 h-4" />
           </div>
           <span className="text-xl font-semibold tracking-tight">Donor Camp</span>
         </Link>

@@ -3,7 +3,10 @@ import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
-import { IconArrowRight, IconCreditCard, IconUsers, IconReportMoney, IconStarFilled } from "@tabler/icons-react";
+import { IconArrowRight, IconCreditCard, IconUsers, IconReportMoney, IconTent } from "@tabler/icons-react";
+
+// Logo mark image from assets bucket
+const LIGHT_LOGO_MARK = "https://igjnhwvtasegwyiwcdkr.supabase.co/storage/v1/object/public/assets//updated_dc_logomark_light.png";
 
 const Home = () => {
   const {
@@ -31,7 +34,7 @@ const Home = () => {
         <div className="container mx-auto px-4 py-6 flex justify-between items-center">
           <Link to="/" className="flex items-center gap-2">
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white">
-              <IconStarFilled size={16} color="#007AFF" />
+              <img src={LIGHT_LOGO_MARK} alt="Donor Camp Logo" className="w-4 h-4" />
             </div>
             <span className="text-xl font-semibold tracking-tight">Donor Camp</span>
           </Link>
@@ -125,7 +128,7 @@ const Home = () => {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <Link to="/" className="flex items-center gap-2 mb-6 md:mb-0">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white">
-                <IconStarFilled size={16} color="#007AFF" />
+                <img src={LIGHT_LOGO_MARK} alt="Donor Camp Logo" className="w-4 h-4" />
               </div>
               <span className="text-xl font-semibold tracking-tight">Donor Camp</span>
             </Link>
