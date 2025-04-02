@@ -39,13 +39,15 @@ const IntegrationCard: React.FC<IntegrationCardProps> = ({
               )}
             </div>
             <div>
-              <h3 className="text-lg font-medium">{title}</h3>
-              <button 
-                onClick={onInstructionsClick}
-                className="text-xs text-primary hover:underline mt-1"
-              >
-                Instructions
-              </button>
+              <div className="flex items-center space-x-2">
+                <h3 className="text-lg font-medium">{title}</h3>
+                <button 
+                  onClick={onInstructionsClick}
+                  className="text-xs text-primary hover:underline"
+                >
+                  Instructions
+                </button>
+              </div>
             </div>
           </div>
         </div>
