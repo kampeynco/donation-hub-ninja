@@ -56,6 +56,10 @@ const DashboardSidebar = () => {
   const toggleSidebar = () => setCollapsed(!collapsed);
 
   const getInitials = () => {
+    const committeeName = user?.user_metadata?.committee_name;
+    if (committeeName) {
+      return committeeName.substring(0, 2).toUpperCase();
+    }
     const email = user?.email || "";
     return email.substring(0, 2).toUpperCase();
   };
@@ -122,8 +126,8 @@ const DashboardSidebar = () => {
                 className={`${collapsed ? "justify-center w-full" : "w-full justify-between items-center"}`}
                 onClick={toggleSidebar}
               >
-                {!collapsed && <span>Collapse</span>}
                 <IconChevronLeft className={`h-5 w-5 transition-transform ${collapsed ? "rotate-180" : ""}`} />
+                {!collapsed && <span>Collapse</span>}
               </Button>
             </TooltipTrigger>
             {collapsed && (
@@ -159,8 +163,6 @@ const DashboardSidebar = () => {
             )}
           </Tooltip>
         </div>
-
-        <Separator className="my-2" />
 
         {/* User Profile */}
         <div className="p-4 border-t dark:border-gray-800">
