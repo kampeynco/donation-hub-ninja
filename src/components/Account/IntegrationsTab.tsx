@@ -26,7 +26,7 @@ const IntegrationsTab = () => {
   const [actBlueWebhookUrl, setActBlueWebhookUrl] = useState<string>("");
   const [configModalOpen, setConfigModalOpen] = useState(false);
   const [instructionsModalOpen, setInstructionsModalOpen] = useState(false);
-  const [actBlueLogoUrl, setActBlueLogoUrl] = useState<string | null>(null);
+  const [actBlueLogoUrl, setActBlueLogoUrl] = useState<string>("https://igjnhwvtasegwyiwcdkr.supabase.co/storage/v1/object/public/assets//updated_actblue_icon.png");
 
   useEffect(() => {
     const loadWebhookCredentials = async () => {
@@ -38,16 +38,6 @@ const IntegrationsTab = () => {
     };
     
     loadWebhookCredentials();
-
-    // Check if ActBlue logo exists in storage
-    const checkLogo = async () => {
-      const exists = await checkActBlueLogoExists();
-      if (exists) {
-        setActBlueLogoUrl(getActBlueLogo());
-      }
-    };
-    
-    checkLogo();
   }, []);
 
   const isConnected = Boolean(webhookCredentials?.actblue_webhook_url);
@@ -65,7 +55,7 @@ const IntegrationsTab = () => {
           title="ActBlue"
           description="Connect your ActBlue account to automatically sync donations"
           icon={<IconCreditCard size={24} className="text-primary" />}
-          logoUrl={actBlueLogoUrl || undefined}
+          logoUrl={actBlueLogoUrl}
           onConnectClick={() => setConfigModalOpen(true)}
           onInstructionsClick={() => setInstructionsModalOpen(true)}
           connected={isConnected}

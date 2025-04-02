@@ -1,13 +1,12 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { getPublicUrl } from "./storageService";
 
 /**
  * Get the URL of the ActBlue logo from storage
  * If the image doesn't exist, a default icon will be used
  */
 export const getActBlueLogo = (): string => {
-  return getPublicUrl("assets", "actblue-logo.png");
+  return "https://igjnhwvtasegwyiwcdkr.supabase.co/storage/v1/object/public/assets//updated_actblue_icon.png";
 };
 
 /**
@@ -19,7 +18,7 @@ export const checkActBlueLogoExists = async (): Promise<boolean> => {
     const { data, error } = await supabase.storage
       .from("assets")
       .list("", {
-        search: "actblue-logo.png"
+        search: "updated_actblue_icon.png"
       });
 
     if (error) {
@@ -27,7 +26,7 @@ export const checkActBlueLogoExists = async (): Promise<boolean> => {
       return false;
     }
 
-    return data.some(file => file.name === "actblue-logo.png");
+    return data.some(file => file.name === "updated_actblue_icon.png");
   } catch (error) {
     console.error("Error checking for ActBlue logo:", error);
     return false;
