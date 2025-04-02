@@ -23,7 +23,7 @@ const IntegrationCard: React.FC<IntegrationCardProps> = ({
   connected = false,
 }) => {
   return (
-    <Card className="overflow-hidden h-full flex flex-col">
+    <Card className="overflow-hidden h-full flex flex-col dark:bg-gray-800 dark:border-gray-700">
       <CardContent className="p-6 flex-grow">
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center space-x-4">
@@ -48,10 +48,10 @@ const IntegrationCard: React.FC<IntegrationCardProps> = ({
           </button>
         </div>
         
-        <p className="text-sm text-gray-500 mt-2">{description}</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">{description}</p>
       </CardContent>
       
-      <CardFooter className="p-0 border-t">
+      <CardFooter className="p-0 border-t dark:border-gray-700">
         <Button 
           onClick={onConnectClick} 
           variant={connected ? "default" : "default"} 
