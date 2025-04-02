@@ -45,7 +45,7 @@ const Personas = () => {
 
         <Separator className="my-10" />
 
-        {/* Feature columns - removed card styling */}
+        {/* Feature columns - added vertical separators between columns */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="p-6">
             <div className="w-12 h-12 flex items-center justify-center rounded-full bg-blue-100 mb-4">
@@ -56,8 +56,11 @@ const Personas = () => {
               Easily link data from the warehouse to any event before it's sent downstream.
             </p>
           </div>
-
-          <div className="p-6">
+          
+          {/* Vertical separator for desktop */}
+          <div className="hidden md:block w-px bg-gray-200 dark:bg-gray-700 absolute left-1/3 h-48 my-6 transform translate-x-4" />
+          
+          <div className="p-6 relative">
             <div className="w-12 h-12 flex items-center justify-center rounded-full bg-green-100 mb-4">
               <IconArrowRight className="h-6 w-6 text-green-600" />
             </div>
@@ -66,7 +69,10 @@ const Personas = () => {
               Visually explore user profiles in one place to understand donor behavior and traits.
             </p>
           </div>
-
+          
+          {/* Vertical separator for desktop */}
+          <div className="hidden md:block w-px bg-gray-200 dark:bg-gray-700 absolute left-2/3 h-48 my-6 transform translate-x-4" />
+          
           <div className="p-6">
             <div className="w-12 h-12 flex items-center justify-center rounded-full bg-purple-100 mb-4">
               <IconArrowRight className="h-6 w-6 text-purple-600" />
@@ -75,6 +81,14 @@ const Personas = () => {
             <p className="text-gray-600 dark:text-gray-300">
               Defines relationships between any entity data set in the warehouse and the Segment Profiles you send with Profiles Sync.
             </p>
+          </div>
+          
+          {/* Mobile horizontal separators */}
+          <div className="md:hidden w-full">
+            <Separator className="my-4" />
+          </div>
+          <div className="md:hidden w-full">
+            <Separator className="my-4" />
           </div>
         </div>
       </div>

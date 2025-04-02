@@ -16,7 +16,7 @@ const badgeCustomVariants = cva(
         destructive:
           "border-transparent bg-destructive text-destructive-foreground",
         outline: "text-foreground border",
-        coming: "bg-donor-blue/15 text-donor-blue border border-donor-blue/20 dark:bg-donor-blue/20 dark:text-donor-blue/90 dark:border-donor-blue/30",
+        coming: "bg-red-500/15 text-red-500 border border-red-500/20 dark:bg-red-500/20 dark:text-red-500/90 dark:border-red-500/30",
       },
     },
     defaultVariants: {
