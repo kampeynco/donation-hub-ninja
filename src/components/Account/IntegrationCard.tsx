@@ -27,7 +27,7 @@ const IntegrationCard: React.FC<IntegrationCardProps> = ({
       <CardContent className="p-6">
         <div className="flex items-start justify-between mb-2">
           <div className="flex items-center space-x-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full">
               {logoUrl ? (
                 <img 
                   src={logoUrl} 
@@ -42,23 +42,25 @@ const IntegrationCard: React.FC<IntegrationCardProps> = ({
               <h3 className="text-lg font-medium">{title}</h3>
             </div>
           </div>
-          <Button 
-            onClick={onConnectClick} 
-            variant={connected ? "outline" : "default"} 
-            size="sm"
-          >
-            {connected ? "Configure" : "Connect"}
-          </Button>
+          <div className="flex flex-col items-end gap-1">
+            <Button 
+              onClick={onConnectClick} 
+              variant={connected ? "outline" : "default"} 
+              size="sm"
+            >
+              {connected ? "Configure" : "Connect"}
+            </Button>
+            <button 
+              onClick={onInstructionsClick}
+              className="text-xs text-primary hover:underline"
+            >
+              Instructions
+            </button>
+          </div>
         </div>
         
         <div className="pl-16">
           <p className="text-sm text-gray-500 mb-1">{description}</p>
-          <button 
-            onClick={onInstructionsClick}
-            className="text-sm text-primary hover:underline"
-          >
-            Instructions
-          </button>
         </div>
       </CardContent>
     </Card>
