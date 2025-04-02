@@ -20,17 +20,17 @@ const sidebarItems: SidebarItemType[] = [
   },
   {
     name: "Logs",
-    path: "/donors",
+    path: "/logs",
     icon: IconArrowsRightLeft,
   },
   {
     name: "Personas",
-    path: "/donations",
+    path: "/personas",
     icon: IconCurrentLocation,
   },
   {
     name: "Settings",
-    path: "/reports",
+    path: "/account",
     icon: IconAdjustments,
   },
 ];

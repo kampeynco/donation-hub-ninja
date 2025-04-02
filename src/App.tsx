@@ -52,14 +52,14 @@ const App = () => (
                 } 
               />
               
-              {/* Placeholder routes for new navigation items */}
+              {/* Updated routes for navigation items */}
               <Route 
-                path="/donors" 
+                path="/logs" 
                 element={
                   <ProtectedRoute>
                     <Layout>
                       <div className="p-8 text-center">
-                        <h1 className="text-2xl font-semibold mb-4">Donors Page</h1>
+                        <h1 className="text-2xl font-semibold mb-4">Logs Page</h1>
                         <p>This page is under construction.</p>
                       </div>
                     </Layout>
@@ -67,31 +67,23 @@ const App = () => (
                 } 
               />
               <Route 
-                path="/donations" 
+                path="/personas" 
                 element={
                   <ProtectedRoute>
                     <Layout>
                       <div className="p-8 text-center">
-                        <h1 className="text-2xl font-semibold mb-4">Donations Page</h1>
+                        <h1 className="text-2xl font-semibold mb-4">Personas Page</h1>
                         <p>This page is under construction.</p>
                       </div>
                     </Layout>
                   </ProtectedRoute>
                 } 
               />
-              <Route 
-                path="/reports" 
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <div className="p-8 text-center">
-                        <h1 className="text-2xl font-semibold mb-4">Reports Page</h1>
-                        <p>This page is under construction.</p>
-                      </div>
-                    </Layout>
-                  </ProtectedRoute>
-                } 
-              />
+              
+              {/* Redirects for old routes */}
+              <Route path="/donors" element={<Navigate to="/logs" replace />} />
+              <Route path="/donations" element={<Navigate to="/personas" replace />} />
+              <Route path="/reports" element={<Navigate to="/account" replace />} />
               
               {/* 404 route */}
               <Route path="*" element={<NotFound />} />
