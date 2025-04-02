@@ -2,6 +2,7 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
 
 interface SidebarItemProps {
   name: string;
@@ -12,28 +13,34 @@ interface SidebarItemProps {
 
 const SidebarItem = ({ name, path, icon: Icon, collapsed }: SidebarItemProps) => {
   return (
-    <Tooltip delayDuration={0}>
-      <TooltipTrigger asChild>
-        <NavLink
-          to={path}
-          className={({ isActive }) =>
-            `flex items-center px-3 py-2 rounded-md transition-colors ${
-              isActive
-                ? "bg-donor-blue text-white"
-                : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-            } ${collapsed ? "justify-center w-full" : "w-full justify-start"}`
-          }
-        >
-          <Icon className="h-5 w-5" />
-          {!collapsed && <span className="ml-3 whitespace-nowrap">{name}</span>}
-        </NavLink>
-      </TooltipTrigger>
-      {collapsed && (
-        <TooltipContent side="right">
-          {name}
-        </TooltipContent>
-      )}
-    </Tooltip>
+    <div className="px-3 py-2">
+      <Tooltip delayDuration={0}>
+        <TooltipTrigger asChild>
+          <NavLink
+            to={path}
+            className="w-full block"
+          >
+            {({ isActive }) => (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className={`${collapsed ? "justify-center w-full" : "w-full flex items-center justify-start"} ${
+                  isActive ? "bg-donor-blue text-white hover:bg-donor-blue hover:text-white" : ""
+                }`}
+              >
+                <Icon className="h-5 w-5" />
+                {!collapsed && <span className="ml-2 whitespace-nowrap">{name}</span>}
+              </Button>
+            )}
+          </NavLink>
+        </TooltipTrigger>
+        {collapsed && (
+          <TooltipContent side="right">
+            {name}
+          </TooltipContent>
+        )}
+      </Tooltip>
+    </div>
   );
 };
 
