@@ -35,6 +35,7 @@ const DashboardSidebar = () => {
                 path={item.path}
                 icon={item.icon}
                 collapsed={collapsed}
+                badge={item.badge}
               />
             ))}
           </nav>
