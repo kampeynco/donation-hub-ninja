@@ -1,6 +1,5 @@
 
 import { useState } from "react";
-import { Separator } from "@/components/ui/separator";
 import { IconChevronDown, IconChevronUp } from "@tabler/icons-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
@@ -11,7 +10,7 @@ const WebhookInstructions = () => {
     <div className="space-y-4">
       <Collapsible open={isOpen} onOpenChange={setIsOpen} className="w-full">
         <div className="flex items-center justify-between">
-          <h3 className="font-medium">ActBlue Integration Instructions</h3>
+          <h3 className="font-medium">Setup Details</h3>
           <CollapsibleTrigger asChild>
             <button className="p-1 hover:bg-gray-100 rounded-md">
               {isOpen ? <IconChevronUp size={18} /> : <IconChevronDown size={18} />}
