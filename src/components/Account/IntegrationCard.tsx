@@ -38,18 +38,14 @@ const IntegrationCard: React.FC<IntegrationCardProps> = ({
                 icon
               )}
             </div>
-            <div>
-              <div className="flex items-center space-x-2">
-                <h3 className="text-lg font-medium">{title}</h3>
-                <button 
-                  onClick={onInstructionsClick}
-                  className="text-xs text-primary hover:underline"
-                >
-                  Instructions
-                </button>
-              </div>
-            </div>
+            <h3 className="text-lg font-medium">{title}</h3>
           </div>
+          <button 
+            onClick={onInstructionsClick}
+            className="text-xs text-primary hover:underline"
+          >
+            Instructions
+          </button>
         </div>
         
         <p className="text-sm text-gray-500 mt-2">{description}</p>
@@ -59,7 +55,7 @@ const IntegrationCard: React.FC<IntegrationCardProps> = ({
         <Button 
           onClick={onConnectClick} 
           variant={connected ? "outline" : "default"} 
-          className="w-full rounded-none h-12"
+          className="w-full rounded-none h-12 bg-donor-blue hover:bg-donor-blue/90 text-white"
         >
           {connected ? "Configure" : "Connect"}
         </Button>
