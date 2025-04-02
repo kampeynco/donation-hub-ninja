@@ -23,16 +23,16 @@ const IntegrationCard: React.FC<IntegrationCardProps> = ({
   connected = false,
 }) => {
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden h-full">
       <CardContent className="p-6">
-        <div className="flex items-start justify-between mb-2">
+        <div className="flex items-start justify-between mb-4">
           <div className="flex items-center space-x-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full">
+            <div className="flex h-12 w-12 items-center justify-center">
               {logoUrl ? (
                 <img 
                   src={logoUrl} 
                   alt={title}
-                  className="h-8 w-auto object-contain"
+                  className="h-10 w-auto object-contain"
                 />
               ) : (
                 icon
@@ -52,7 +52,7 @@ const IntegrationCard: React.FC<IntegrationCardProps> = ({
             </Button>
             <button 
               onClick={onInstructionsClick}
-              className="text-xs text-primary hover:underline mt-1"
+              className="text-xs text-primary hover:underline mt-1 text-center"
             >
               Instructions
             </button>

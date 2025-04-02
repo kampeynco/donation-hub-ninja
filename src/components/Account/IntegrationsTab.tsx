@@ -19,7 +19,7 @@ import { WebhookCredentials, fetchWebhookCredentials } from "@/services/webhookS
 import IntegrationCard from "./IntegrationCard";
 import WebhookConfig from "./WebhookConfig";
 import WebhookInstructions from "./WebhookInstructions";
-import { getActBlueLogo, checkActBlueLogoExists } from "@/services/actBlueService";
+import { getActBlueLogo } from "@/services/actBlueService";
 
 const IntegrationsTab = () => {
   const [webhookCredentials, setWebhookCredentials] = useState<WebhookCredentials | null>(null);
@@ -51,15 +51,19 @@ const IntegrationsTab = () => {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <IntegrationCard
-          title="ActBlue"
-          description="Connect your ActBlue account to automatically sync donations"
-          icon={<IconCreditCard size={24} className="text-primary" />}
-          logoUrl={actBlueLogoUrl}
-          onConnectClick={() => setConfigModalOpen(true)}
-          onInstructionsClick={() => setInstructionsModalOpen(true)}
-          connected={isConnected}
-        />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <IntegrationCard
+            title="ActBlue"
+            description="Connect your ActBlue account to automatically sync donations"
+            icon={<IconCreditCard size={24} className="text-primary" />}
+            logoUrl={actBlueLogoUrl}
+            onConnectClick={() => setConfigModalOpen(true)}
+            onInstructionsClick={() => setInstructionsModalOpen(true)}
+            connected={isConnected}
+          />
+          
+          {/* Additional integration cards can be added here */}
+        </div>
 
         {/* Configuration Modal */}
         <Dialog open={configModalOpen} onOpenChange={setConfigModalOpen}>
