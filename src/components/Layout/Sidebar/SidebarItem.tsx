@@ -6,11 +6,11 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 interface SidebarItemProps {
   name: string;
   path: string;
-  icon: React.ReactNode;
+  icon: React.ComponentType<any>;
   collapsed: boolean;
 }
 
-const SidebarItem = ({ name, path, icon, collapsed }: SidebarItemProps) => {
+const SidebarItem = ({ name, path, icon: Icon, collapsed }: SidebarItemProps) => {
   return (
     <Tooltip delayDuration={0}>
       <TooltipTrigger asChild>
@@ -24,7 +24,7 @@ const SidebarItem = ({ name, path, icon, collapsed }: SidebarItemProps) => {
             } ${collapsed ? "justify-center" : ""}`
           }
         >
-          {icon}
+          <Icon className="h-5 w-5" />
           {!collapsed && <span className="ml-3 whitespace-nowrap">{name}</span>}
         </NavLink>
       </TooltipTrigger>
