@@ -1,7 +1,7 @@
 
 import { 
   IconTent,
-  IconArrowsRightLeft,
+  IconActivity,
   IconCurrentLocation,
   IconAdjustments,
   IconSparkles
@@ -34,7 +34,7 @@ const sidebarItems: SidebarItemType[] = [
   {
     name: "Logs",
     path: "/logs",
-    icon: IconArrowsRightLeft,
+    icon: IconActivity,
     showNotificationBadge: true
   },
   {
