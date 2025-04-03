@@ -65,11 +65,11 @@ const SidebarItem = ({
                 )}
 
                 {showNotificationBadge && unreadCount > 0 && (
-                  <div className={`absolute ${collapsed ? 'top-0 right-0' : 'top-0 right-8'}`}>
+                  <div className={`absolute ${collapsed ? 'top-1/2 -translate-y-1/2 right-0' : 'top-1/2 -translate-y-1/2 right-8'}`}>
                     <Badge 
                       variant="destructive"
                       className={`flex items-center justify-center ${
-                        isActive ? "bg-white text-donor-blue" : ""
+                        isActive ? "bg-white text-donor-blue hover:bg-white hover:text-donor-blue" : "hover:bg-destructive"
                       }`}
                     >
                       {unreadCount}
