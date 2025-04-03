@@ -42,8 +42,8 @@ const HeroSection = () => {
               change that.
             </h1>
             <p className="text-[1.25rem] font-[300] mb-6 md:mb-8 max-w-2xl mx-auto px-4 leading-[1.5]">
-              Connect your fundraising stack. We analyze donor<br />
-              data for insights to engage them when ready to donate.
+              Connect your fundraising stack, and we'll analyze donor data<br />
+              for insights to engage them when ready to donate.
             </p>
             
             {/* Testimonial cards for mobile - placed between text and buttons */}
