@@ -1,6 +1,6 @@
 
-import React, { useEffect } from "react";
-import { Navigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -14,31 +14,59 @@ const UniverseProtectedRoute: React.FC<UniverseProtectedRouteProps> = ({
   children 
 }) => {
   const { user } = useAuth();
+  const location = useLocation();
   const { isVisible, isLoading, refreshVisibility } = useUniverseVisibility();
+  const [shouldRedirect, setShouldRedirect] = useState(false);
+  const [initialCheckComplete, setInitialCheckComplete] = useState(false);
   
-  // Ensure we have the latest feature status when the route is loaded
+  // Only refresh visibility on initial mount or when user changes
   useEffect(() => {
-    if (user?.id) {
-      console.log(`[UniverseProtectedRoute] User ${user.id.substring(0, 8)} accessing Universe feature`);
-      refreshVisibility();
+    let isMounted = true;
+    
+    const checkFeatureAccess = async () => {
+      if (!user?.id) return;
+      
+      console.log(`[UniverseProtectedRoute] User ${user.id.substring(0, 8)} accessing Universe feature at ${location.pathname}`);
+      await refreshVisibility();
+      
+      if (isMounted) {
+        setInitialCheckComplete(true);
+      }
+    };
+    
+    checkFeatureAccess();
+    
+    return () => { isMounted = false; };
+  }, [user?.id, refreshVisibility, location.pathname]);
+  
+  // Only decide on redirection once loading is complete and we've done our initial check
+  useEffect(() => {
+    if (!isLoading && initialCheckComplete && !isVisible) {
+      console.log(`[UniverseProtectedRoute] Feature not enabled, will redirect to account`);
+      setShouldRedirect(true);
     }
-  }, [user?.id, refreshVisibility]);
+  }, [isLoading, isVisible, initialCheckComplete]);
   
   // Debug log for troubleshooting
   useEffect(() => {
     console.log("[UniverseProtectedRoute] Status:", { 
       isVisible, 
       isLoading,
-      userId: user?.id ? user.id.substring(0, 8) : 'none'
+      initialCheckComplete,
+      shouldRedirect,
+      userId: user?.id ? user.id.substring(0, 8) : 'none',
+      path: location.pathname
     });
-  }, [isVisible, isLoading, user?.id]);
+  }, [isVisible, isLoading, user?.id, initialCheckComplete, shouldRedirect, location.pathname]);
 
+  // Handle authentication
   if (!user) {
     console.log(`[UniverseProtectedRoute] No user, redirecting to signin`);
-    return <Navigate to="/auth/signin" replace />;
+    return <Navigate to="/auth/signin" state={{ from: location }} replace />;
   }
 
-  if (isLoading) {
+  // Show loading state
+  if (isLoading || !initialCheckComplete) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-120px)] p-4">
         <div className="w-full max-w-6xl">
@@ -55,9 +83,8 @@ const UniverseProtectedRoute: React.FC<UniverseProtectedRouteProps> = ({
     );
   }
 
-  // Only redirect if we're sure the feature is not available (not loading and not visible)
-  if (!isLoading && !isVisible) {
-    console.log(`[UniverseProtectedRoute] Feature not enabled, redirecting to account`);
+  // Only redirect after we're completely sure the feature is not available
+  if (shouldRedirect) {
     toast.error(`You don't have access to the Universe feature. Enable it in your account settings.`);
     return <Navigate to="/account?tab=features" replace />;
   }

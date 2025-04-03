@@ -18,6 +18,8 @@ const Layout = ({ children }: LayoutProps) => {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [displayedChildren, setDisplayedChildren] = useState(children);
   const initialRenderRef = useRef(true);
+  const lastRefreshTimeRef = useRef(0);
+  const currentPathRef = useRef(location.pathname);
 
   // Manage smooth transitions between routes
   useEffect(() => {
@@ -30,6 +32,7 @@ const Layout = ({ children }: LayoutProps) => {
       return;
     }
     
+    // Only transition if we're actually changing content
     if (children !== displayedChildren) {
       setIsTransitioning(true);
       
@@ -55,14 +58,29 @@ const Layout = ({ children }: LayoutProps) => {
     return () => { isMounted = false; };
   }, [children, displayedChildren]);
 
-  // Aggressively refresh feature status on each route change
+  // Refresh feature status on significant route changes (avoiding duplicate refreshes)
   useEffect(() => {
     const refreshFeatures = async () => {
-      if (user?.id) {
-        console.log(`[Layout] Route changed to ${location.pathname}, refreshing features for user ${user.id.substring(0, 8)}`);
-        const result = await refreshFeatureCache(user.id);
-        console.log(`[Layout] Feature refresh result:`, result);
+      // Only refresh if user exists and path has actually changed
+      if (!user?.id || currentPathRef.current === location.pathname) {
+        return;
       }
+      
+      const now = Date.now();
+      // Limit refreshes to once every 1000ms to prevent race conditions
+      if (now - lastRefreshTimeRef.current < 1000) {
+        console.log(`[Layout] Skipping feature refresh for ${location.pathname} (too soon)`);
+        return;
+      }
+      
+      console.log(`[Layout] Route changed from ${currentPathRef.current} to ${location.pathname}, refreshing features for user ${user.id.substring(0, 8)}`);
+      
+      // Update refs before the async operation
+      currentPathRef.current = location.pathname;
+      lastRefreshTimeRef.current = now;
+      
+      const result = await refreshFeatureCache(user.id);
+      console.log(`[Layout] Feature refresh result:`, result);
     };
     
     refreshFeatures();

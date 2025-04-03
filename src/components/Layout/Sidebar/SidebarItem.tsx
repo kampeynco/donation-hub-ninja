@@ -1,6 +1,6 @@
 
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { BadgeCustom } from "@/components/ui/badge-custom";
@@ -28,6 +28,8 @@ const SidebarItem = ({
   badge, 
   showNotificationBadge 
 }: SidebarItemProps) => {
+  const location = useLocation();
+  
   // Safely get notifications context
   let unreadCount = 0;
   try {
@@ -40,21 +42,25 @@ const SidebarItem = ({
     console.error("Notifications context not available:", error);
   }
 
+  // Determine if this item is active (exact path match or starts with path for nested routes)
+  const isActive = location.pathname === path || 
+    (path !== '/' && location.pathname.startsWith(path + '/'));
+
   return (
     <Tooltip delayDuration={0}>
       <TooltipTrigger asChild>
         <NavLink
           to={path}
           className="block"
-          end
+          end={path === '/' || path === '/dashboard'} // Only use end for home and dashboard
         >
-          {({ isActive }) => (
+          {({ isActive: navLinkActive }) => (
             <div className="relative">
               <Button 
                 variant="ghost" 
                 size="sm" 
                 className={`${collapsed ? "justify-center w-full" : "w-full flex items-center justify-start"} ${
-                  isActive ? "bg-donor-blue text-white hover:bg-donor-blue hover:text-white" : ""
+                  navLinkActive ? "bg-donor-blue text-white hover:bg-donor-blue hover:text-white" : ""
                 }`}
               >
                 <Icon className="h-5 w-5" />
@@ -65,7 +71,7 @@ const SidebarItem = ({
                 <div className="absolute top-1/2 -translate-y-1/2 right-2">
                   <BadgeCustom 
                     variant={badge.variant as any}
-                    className={`flex items-center gap-1 ${isActive ? "bg-white/20 text-white border-white/30 dark:bg-white/20 dark:text-white dark:border-white/30" : ""}`}
+                    className={`flex items-center gap-1 ${navLinkActive ? "bg-white/20 text-white border-white/30 dark:bg-white/20 dark:text-white dark:border-white/30" : ""}`}
                   >
                     {badge.icon && <badge.icon className="h-3 w-3" />}
                     {badge.text}
@@ -82,7 +88,7 @@ const SidebarItem = ({
                       <Badge 
                         variant="destructive"
                         className={`flex items-center justify-center ${
-                          isActive ? "bg-white text-donor-blue hover:bg-white hover:text-donor-blue" : "hover:bg-destructive"
+                          navLinkActive ? "bg-white text-donor-blue hover:bg-white hover:text-donor-blue" : "hover:bg-destructive"
                         }`}
                       >
                         {unreadCount}

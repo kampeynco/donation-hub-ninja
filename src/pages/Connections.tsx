@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import IntegrationsTab from "@/components/Account/IntegrationsTab";
 
 const Connections = () => {
@@ -13,7 +13,17 @@ const Connections = () => {
         </p>
       </div>
 
-      <IntegrationsTab />
+      <Card>
+        <CardHeader>
+          <CardTitle>Integrations</CardTitle>
+          <CardDescription>
+            Connect with external services to enhance your donor management
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <IntegrationsTab />
+        </CardContent>
+      </Card>
     </div>
   );
 };
