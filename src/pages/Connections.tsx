@@ -1,11 +1,8 @@
-
 import React from "react";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import IntegrationsTab from "@/components/Account/IntegrationsTab";
-
 const Connections = () => {
-  return (
-    <div className="space-y-6">
+  return <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Connections</h1>
         <p className="text-muted-foreground mt-2">
@@ -15,7 +12,7 @@ const Connections = () => {
 
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle>Manage Connections</CardTitle>
+          
           <CardDescription>
             Connect your Donor Camp account with third-party services
           </CardDescription>
@@ -24,8 +21,6 @@ const Connections = () => {
           <IntegrationsTab />
         </div>
       </Card>
-    </div>
-  );
+    </div>;
 };
-
 export default Connections;
