@@ -4,7 +4,7 @@ import StatCard from "@/components/Dashboard/StatCard";
 import DonationsTable from "@/components/Dashboard/DonationsTable";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { fetchRecentDonations, fetchDonationStats } from "@/services/donations";
-import { IconActivity, IconUsers, IconCurrencyDollar } from "@tabler/icons-react";
+import { IconActivity, IconMoodDollar, IconHeartDollar } from "@tabler/icons-react";
 
 const Dashboard = () => {
   const {
@@ -47,14 +47,14 @@ const Dashboard = () => {
             value={`${stats.totalDonors.count}`} 
             subtitle={`UNIQUE DONORS`} 
             className="bg-donor-blue shadow-sm hover:shadow-md transition-shadow text-white"
-            icon={<IconUsers className="h-6 w-6" />}
+            icon={<IconMoodDollar className="h-6 w-6" />}
           />
           <StatCard 
             title="Total Funds Raised" 
             value={`$${stats.allTime.total.toLocaleString()}`} 
             subtitle={`ACROSS ALL DONATIONS`} 
             className="bg-gray-700 shadow-sm hover:shadow-md transition-shadow text-white"
-            icon={<IconCurrencyDollar className="h-6 w-6" />}
+            icon={<IconHeartDollar className="h-6 w-6" />}
           />
         </div>
       </div>
