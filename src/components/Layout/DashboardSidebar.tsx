@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Separator } from "@/components/ui/separator";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import SidebarItem from "./Sidebar/SidebarItem";
@@ -16,31 +16,52 @@ const DashboardSidebar = () => {
   const [items, setItems] = useState(sidebarItems);
   const location = useLocation();
   const { user } = useAuth();
+  const fetchInProgressRef = useRef(false);
+  const lastRefreshTimeRef = useRef(0);
 
   // Log the current location
   useEffect(() => {
     console.log("DashboardSidebar: Current location path:", location.pathname);
   }, [location.pathname]);
 
-  // Fetch feature flags from database
+  // Fetch feature flags from database with throttling and debouncing
   const fetchFeatures = useCallback(async () => {
-    if (!user) return;
+    if (!user) {
+      console.log("DashboardSidebar: No user, skipping features fetch");
+      return;
+    }
 
+    // Prevent concurrent fetches
+    if (fetchInProgressRef.current) {
+      console.log("DashboardSidebar: Feature fetch already in progress, skipping");
+      return;
+    }
+    
+    const now = Date.now();
+    if (now - lastRefreshTimeRef.current < 2000) {
+      console.log("DashboardSidebar: Too soon to fetch features again, skipping");
+      return;
+    }
+    
     try {
+      console.log(`DashboardSidebar: Fetching features for user ${user.id.substring(0, 8)}`);
+      fetchInProgressRef.current = true;
+      lastRefreshTimeRef.current = now;
+      
       // Get features from the database
       const { data, error } = await supabase
         .from('features')
         .select('*')
         .eq('user_id', user.id)
-        .maybeSingle(); // Use maybeSingle instead of limit(1)
+        .maybeSingle();
       
       if (error) {
-        console.error('Error fetching features:', error);
+        console.error('DashboardSidebar: Error fetching features:', error);
         return;
       }
       
       if (!data) {
-        console.log('No features found for sidebar. Using default visibility.');
+        console.log('DashboardSidebar: No features found. Using default visibility.');
         return;
       }
       
@@ -63,16 +84,25 @@ const DashboardSidebar = () => {
         return item;
       });
       
+      console.log("DashboardSidebar: Features updated successfully", { 
+        personas: data.personas, 
+        universe: data.universe 
+      });
+      
       setItems(updatedItems);
     } catch (err) {
-      console.error('Unexpected error fetching features:', err);
+      console.error('DashboardSidebar: Unexpected error fetching features:', err);
+    } finally {
+      fetchInProgressRef.current = false;
     }
   }, [user]);
 
-  // Set up realtime subscription for features
+  // Set up realtime subscription for features - only once when component mounts
   useEffect(() => {
     if (!user?.id) return;
 
+    console.log(`DashboardSidebar: Setting up realtime subscription for user ${user.id.substring(0, 8)}`);
+    
     let isMounted = true;
 
     const channel = supabase
@@ -85,25 +115,35 @@ const DashboardSidebar = () => {
           table: 'features',
           filter: `user_id=eq.${user.id}`
         },
-        () => {
+        (payload) => {
           if (!isMounted) return;
+          console.log('DashboardSidebar: Feature change detected via realtime:', payload);
           fetchFeatures();
         }
       )
       .subscribe();
 
+    // Initial fetch
+    fetchFeatures();
+
     return () => {
+      console.log('DashboardSidebar: Cleaning up realtime subscription');
       isMounted = false;
       supabase.removeChannel(channel);
     };
   }, [user?.id, fetchFeatures]);
 
-  // Re-evaluate sidebar items when component mounts, route changes, or user changes
+  // Fetch features when component mounts
   useEffect(() => {
-    fetchFeatures();
-  }, [location.pathname, user, fetchFeatures]);
+    if (user?.id) {
+      fetchFeatures();
+    }
+  }, [user?.id, fetchFeatures]);
 
-  const toggleSidebar = useCallback(() => setCollapsed(prev => !prev), []);
+  const toggleSidebar = useCallback(() => {
+    setCollapsed(prev => !prev);
+    console.log(`DashboardSidebar: Sidebar ${collapsed ? 'expanded' : 'collapsed'}`);
+  }, [collapsed]);
 
   return (
     <TooltipProvider>

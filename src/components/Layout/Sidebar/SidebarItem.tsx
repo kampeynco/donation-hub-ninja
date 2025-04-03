@@ -47,16 +47,21 @@ const SidebarItem = ({
   const isActive = location.pathname === path || 
     (path !== '/' && location.pathname.startsWith(path + '/'));
 
-  // Handle manual click for refresh logic
+  // Handle manual click for refresh logic with improved debugging
   const handleClick = useCallback((e: React.MouseEvent) => {
-    // If already on the same path, we want to force a re-render of the route
+    console.log(`SidebarItem clicked: ${name} (${path}), current path: ${location.pathname}, isActive: ${isActive}`);
+    
+    // Always force navigation to ensure the route refreshes properly
     if (isActive) {
       e.preventDefault();
-      console.log("Reloading current route:", path);
-      // Simply re-navigate to the same route to trigger a refresh
+      console.log(`Forcing refresh of current route: ${path}`);
+      // Force a full reload through navigate with replace to avoid history stacking
       navigate(path, { replace: true });
+    } else {
+      // For non-active paths, still log but let the NavLink handle it normally
+      console.log(`Regular navigation to: ${path}`);
     }
-  }, [isActive, navigate, path]);
+  }, [isActive, navigate, path, name, location.pathname]);
 
   return (
     <Tooltip delayDuration={0}>

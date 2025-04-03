@@ -20,10 +20,13 @@ const Layout = ({ children }: LayoutProps) => {
   const initialRenderRef = useRef(true);
   const lastRefreshTimeRef = useRef(0);
   const currentPathRef = useRef(location.pathname);
+  const refreshInProgressRef = useRef(false);
 
   // Manage smooth transitions between routes
   useEffect(() => {
     let isMounted = true;
+    
+    console.log(`[Layout] Route changed to: ${location.pathname}`);
     
     // Skip transition on initial render
     if (initialRenderRef.current) {
@@ -60,29 +63,53 @@ const Layout = ({ children }: LayoutProps) => {
 
   // Refresh feature status on significant route changes (avoiding duplicate refreshes)
   useEffect(() => {
+    // Check if this is a real path change
+    if (currentPathRef.current === location.pathname) {
+      console.log(`[Layout] Path unchanged: ${location.pathname}, skipping feature refresh`);
+      return;
+    }
+    
+    // Log the path change
+    console.log(`[Layout] Path changed from ${currentPathRef.current} to ${location.pathname}`);
+    currentPathRef.current = location.pathname;
+    
+    // Throttled feature refresh function
     const refreshFeatures = async () => {
-      // Only refresh if user exists and path has actually changed
-      if (!user?.id || currentPathRef.current === location.pathname) {
+      if (!user?.id) {
+        console.log(`[Layout] No user, skipping feature refresh`);
+        return;
+      }
+      
+      // Prevent concurrent refreshes
+      if (refreshInProgressRef.current) {
+        console.log(`[Layout] Refresh already in progress, skipping`);
         return;
       }
       
       const now = Date.now();
       // Limit refreshes to once every 1000ms to prevent race conditions
       if (now - lastRefreshTimeRef.current < 1000) {
-        console.log(`[Layout] Skipping feature refresh for ${location.pathname} (too soon)`);
+        console.log(`[Layout] Too soon for another refresh (${now - lastRefreshTimeRef.current}ms), skipping`);
         return;
       }
       
-      console.log(`[Layout] Route changed from ${currentPathRef.current} to ${location.pathname}, refreshing features for user ${user.id.substring(0, 8)}`);
+      console.log(`[Layout] Refreshing features for user ${user.id.substring(0, 8)}`);
       
       // Update refs before the async operation
-      currentPathRef.current = location.pathname;
       lastRefreshTimeRef.current = now;
+      refreshInProgressRef.current = true;
       
-      const result = await refreshFeatureCache(user.id);
-      console.log(`[Layout] Feature refresh result:`, result);
+      try {
+        const result = await refreshFeatureCache(user.id);
+        console.log(`[Layout] Feature refresh completed:`, result ? 'success' : 'no data');
+      } catch (error) {
+        console.error(`[Layout] Feature refresh failed:`, error);
+      } finally {
+        refreshInProgressRef.current = false;
+      }
     };
     
+    // Execute the refresh
     refreshFeatures();
   }, [user?.id, location.pathname]);
 

@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
@@ -20,26 +20,69 @@ const FeatureProtectedRoute: React.FC<FeatureProtectedRouteProps> = ({
   const { isVisible, isLoading, refreshVisibility } = useFeatureVisibility(featureId);
   const [shouldRedirect, setShouldRedirect] = useState(false);
   const [initialCheckComplete, setInitialCheckComplete] = useState(false);
+  const previousPathRef = useRef(location.pathname);
+  const checkTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
-  // Only refresh visibility on initial mount or when user changes
+  // Log component state for debugging
+  useEffect(() => {
+    console.log(`[FeatureProtectedRoute(${featureId})] Mounted/updated at ${location.pathname}, state:`, {
+      user: user?.id ? user.id.substring(0, 8) : 'none',
+      isVisible,
+      isLoading,
+      initialCheckComplete,
+      shouldRedirect
+    });
+    
+    // Track path changes
+    if (previousPathRef.current !== location.pathname) {
+      console.log(`[FeatureProtectedRoute(${featureId})] Path changed from ${previousPathRef.current} to ${location.pathname}`);
+      previousPathRef.current = location.pathname;
+    }
+    
+    return () => {
+      // Clean up any pending timeouts on unmount
+      if (checkTimeoutRef.current) {
+        clearTimeout(checkTimeoutRef.current);
+      }
+    };
+  }, [featureId, user, isVisible, isLoading, initialCheckComplete, shouldRedirect, location.pathname]);
+  
+  // Only check feature access once on initial mount or when user changes
   useEffect(() => {
     let isMounted = true;
     
     const checkFeatureAccess = async () => {
       if (!user?.id) return;
       
-      console.log(`[FeatureProtectedRoute] User ${user.id.substring(0, 8)} accessing feature: ${featureId} at ${location.pathname}`);
-      await refreshVisibility();
+      console.log(`[FeatureProtectedRoute] Checking access for feature ${featureId}, user ${user.id.substring(0, 8)}`);
+      
+      try {
+        await refreshVisibility();
+      } catch (error) {
+        console.error(`[FeatureProtectedRoute] Error checking feature visibility:`, error);
+      }
       
       if (isMounted) {
+        console.log(`[FeatureProtectedRoute] Initial check complete for ${featureId}`);
         setInitialCheckComplete(true);
       }
     };
     
-    checkFeatureAccess();
+    // Clear any existing timeout
+    if (checkTimeoutRef.current) {
+      clearTimeout(checkTimeoutRef.current);
+    }
     
-    return () => { isMounted = false; };
-  }, [user?.id, featureId, refreshVisibility, location.pathname]);
+    // Add a small delay to avoid race conditions with other components
+    checkTimeoutRef.current = setTimeout(checkFeatureAccess, 100);
+    
+    return () => { 
+      isMounted = false;
+      if (checkTimeoutRef.current) {
+        clearTimeout(checkTimeoutRef.current);
+      }
+    };
+  }, [user?.id, featureId, refreshVisibility]);
   
   // Only decide on redirection once loading is complete and we've done our initial check
   useEffect(() => {
@@ -48,18 +91,6 @@ const FeatureProtectedRoute: React.FC<FeatureProtectedRouteProps> = ({
       setShouldRedirect(true);
     }
   }, [isLoading, isVisible, featureId, initialCheckComplete]);
-  
-  // Debug log for troubleshooting
-  useEffect(() => {
-    console.log(`[FeatureProtectedRoute(${featureId})] Status:`, { 
-      isVisible, 
-      isLoading,
-      initialCheckComplete,
-      shouldRedirect,
-      userId: user?.id ? user.id.substring(0, 8) : 'none',
-      path: location.pathname
-    });
-  }, [featureId, isVisible, isLoading, user?.id, initialCheckComplete, shouldRedirect, location.pathname]);
 
   // Handle authentication
   if (!user) {

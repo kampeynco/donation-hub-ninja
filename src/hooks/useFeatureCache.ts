@@ -11,11 +11,14 @@ interface FeatureCache {
 let globalFeatureCache: FeatureCache = {};
 let lastFetchTimestamp = 0;
 let isFetchingCache = false;
-const CACHE_TTL = 30 * 1000; // 30 seconds in milliseconds (reduced from 5 minutes)
+const CACHE_TTL = 30 * 1000; // 30 seconds in milliseconds
 
 // Standalone function to refresh the cache with debouncing
 export async function refreshFeatureCache(userId: string | undefined): Promise<FeatureCache | null> {
-  if (!userId) return null;
+  if (!userId) {
+    console.log(`[refreshFeatureCache] No user ID provided, skipping refresh`);
+    return null;
+  }
   
   // Don't allow concurrent refreshes
   if (isFetchingCache) {
@@ -25,20 +28,18 @@ export async function refreshFeatureCache(userId: string | undefined): Promise<F
   
   const currentTime = Date.now();
   const cacheAge = currentTime - lastFetchTimestamp;
-  console.log(`[refreshFeatureCache] Checking cache for user ${userId.substring(0, 8)}...`);
-  console.log(`[refreshFeatureCache] Cache age: ${cacheAge / 1000}s, TTL: ${CACHE_TTL / 1000}s`);
   
   // If cache is still fresh, return it
   if (cacheAge < CACHE_TTL && Object.keys(globalFeatureCache).length > 0) {
-    console.log(`[refreshFeatureCache] Using existing cache:`, globalFeatureCache);
+    console.log(`[refreshFeatureCache] Using existing cache (age: ${cacheAge / 1000}s):`, globalFeatureCache);
     return globalFeatureCache;
   }
   
   try {
+    console.log(`[refreshFeatureCache] Fetching fresh feature data for user ${userId.substring(0, 8)}`);
     isFetchingCache = true;
     
     // Fetch fresh data from the database
-    console.log(`[refreshFeatureCache] Fetching features for user ${userId.substring(0, 8)}`);
     const { data, error } = await supabase
       .from('features')
       .select('*')
@@ -67,17 +68,16 @@ export async function refreshFeatureCache(userId: string | undefined): Promise<F
       // Update global cache and timestamp
       globalFeatureCache = newCache;
       lastFetchTimestamp = currentTime;
-      isFetchingCache = false;
       return newCache;
     } else {
       console.warn('[refreshFeatureCache] No feature data found for user', userId.substring(0, 8));
-      isFetchingCache = false;
       return null;
     }
   } catch (error) {
     console.error('[refreshFeatureCache] Unexpected error fetching features:', error);
-    isFetchingCache = false;
     return null;
+  } finally {
+    isFetchingCache = false;
   }
 }
 
@@ -118,6 +118,8 @@ export function useFeatureCache() {
     // Force an update when the hook is first mounted
     updateFeatureCache();
 
+    console.log(`[useFeatureCache] Setting up realtime subscription for user ${user.id.substring(0, 8)}`);
+    
     const channel = supabase
       .channel('feature-cache-changes')
       .on(
@@ -130,7 +132,7 @@ export function useFeatureCache() {
         },
         (payload) => {
           // Invalidate cache when changes occur
-          console.log('[useFeatureCache] Feature change detected:', payload);
+          console.log('[useFeatureCache] Feature change detected via realtime:', payload);
           lastFetchTimestamp = 0; // Force refresh
           updateFeatureCache(true);
         }
@@ -138,6 +140,7 @@ export function useFeatureCache() {
       .subscribe();
 
     return () => {
+      console.log('[useFeatureCache] Cleaning up realtime subscription');
       supabase.removeChannel(channel);
     };
   }, [user?.id, updateFeatureCache]);
