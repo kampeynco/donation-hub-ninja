@@ -22,100 +22,104 @@ import Logs from "./pages/Logs";
 import Connections from "./pages/Connections";
 import NotFound from "./pages/NotFound";
 
+// Create a client
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
-      <TooltipProvider>
-        <ThemeProvider>
-          <AuthProvider>
-            <Routes>
-              {/* Public routes */}
-              <Route path="/" element={<Home />} />
-              <Route path="/auth/signin" element={<SignIn />} />
-              <Route path="/login" element={<Navigate to="/auth/signin" replace />} />
-              <Route path="/auth/signup" element={<SignUp />} />
-              
-              {/* Protected routes */}
-              <Route 
-                path="/dashboard" 
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <Dashboard />
-                    </Layout>
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/account" 
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <Account />
-                    </Layout>
-                  </ProtectedRoute>
-                } 
-              />
-              
-              {/* Updated routes for navigation items */}
-              <Route 
-                path="/logs" 
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <Logs />
-                    </Layout>
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/personas" 
-                element={
-                  <FeatureProtectedRoute featureId="personas">
-                    <Layout>
-                      <Personas />
-                    </Layout>
-                  </FeatureProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/universe" 
-                element={
-                  <UniverseProtectedRoute>
-                    <Layout>
-                      <Universe />
-                    </Layout>
-                  </UniverseProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/connections" 
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <Connections />
-                    </Layout>
-                  </ProtectedRoute>
-                } 
-              />
-              
-              {/* Redirects for old routes */}
-              <Route path="/donors" element={<Navigate to="/logs" replace />} />
-              <Route path="/donations" element={<Navigate to="/personas" replace />} />
-              <Route path="/reports" element={<Navigate to="/account" replace />} />
-              
-              {/* 404 route */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            <Toaster />
-            <Sonner />
-          </AuthProvider>
-        </ThemeProvider>
-      </TooltipProvider>
-    </BrowserRouter>
-  </QueryClientProvider>
-);
+// Define the App component with brackets instead of parentheses
+const App = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <TooltipProvider>
+          <ThemeProvider>
+            <AuthProvider>
+              <Routes>
+                {/* Public routes */}
+                <Route path="/" element={<Home />} />
+                <Route path="/auth/signin" element={<SignIn />} />
+                <Route path="/login" element={<Navigate to="/auth/signin" replace />} />
+                <Route path="/auth/signup" element={<SignUp />} />
+                
+                {/* Protected routes */}
+                <Route 
+                  path="/dashboard" 
+                  element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <Dashboard />
+                      </Layout>
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/account" 
+                  element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <Account />
+                      </Layout>
+                    </ProtectedRoute>
+                  } 
+                />
+                
+                {/* Updated routes for navigation items */}
+                <Route 
+                  path="/logs" 
+                  element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <Logs />
+                      </Layout>
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/personas" 
+                  element={
+                    <FeatureProtectedRoute featureId="personas">
+                      <Layout>
+                        <Personas />
+                      </Layout>
+                    </FeatureProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/universe" 
+                  element={
+                    <UniverseProtectedRoute>
+                      <Layout>
+                        <Universe />
+                      </Layout>
+                    </UniverseProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/connections" 
+                  element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <Connections />
+                      </Layout>
+                    </ProtectedRoute>
+                  } 
+                />
+                
+                {/* Redirects for old routes */}
+                <Route path="/donors" element={<Navigate to="/logs" replace />} />
+                <Route path="/donations" element={<Navigate to="/personas" replace />} />
+                <Route path="/reports" element={<Navigate to="/account" replace />} />
+                
+                {/* 404 route */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+              <Toaster />
+              <Sonner />
+            </AuthProvider>
+          </ThemeProvider>
+        </TooltipProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
