@@ -4,6 +4,7 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface UniverseProtectedRouteProps {
   children: React.ReactNode;
@@ -52,12 +53,25 @@ const UniverseProtectedRoute: React.FC<UniverseProtectedRouteProps> = ({
     }
   }, [user]);
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
   if (!user) {
     return <Navigate to="/auth/signin" replace />;
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-120px)] p-4">
+        <div className="w-full max-w-6xl">
+          <Skeleton className="h-12 w-1/3 mb-6" />
+          <Skeleton className="h-8 w-2/3 mb-4" />
+          <Skeleton className="h-8 w-1/2 mb-10" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <Skeleton className="h-48 rounded-lg" />
+            <Skeleton className="h-48 rounded-lg" />
+            <Skeleton className="h-48 rounded-lg" />
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (!hasAccess) {
