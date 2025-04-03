@@ -30,11 +30,8 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-donor-gray">
-      <div className="bg-primary relative">
-        <HomeHeader />
-        <HeroSection />
-      </div>
-
+      <HomeHeader />
+      <HeroSection />
       <FeaturesSection />
       <CTASection />
       <HomeFooter />
