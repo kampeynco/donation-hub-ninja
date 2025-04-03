@@ -10,21 +10,21 @@ const HeroSection = () => {
 
   return (
     <div className="bg-primary text-primary-foreground">
-      <div className="container mx-auto px-4 py-10 md:py-16 lg:py-24 max-w-7xl">
+      <div className="container mx-auto px-4 py-10 md:py-16 lg:py-32 xl:py-48 max-w-7xl">
         <div className="relative">
           {/* Testimonial cards for desktop */}
           {!isMobile && (
             <>
               {/* First testimonial card - floating to the left of hero */}
-              <div className="hidden md:block absolute left-0 top-24 z-10 transform hover:-translate-y-1 transition-transform">
+              <div className="hidden md:block absolute left-0 top-36 z-10 transform hover:-translate-y-1 transition-transform">
                 <TestimonialCard 
                   icon={<IconUsers className="text-primary" size={16} />}
                   text="Monthly donations increased 12% with donor automation"
                 />
               </div>
               
-              {/* Second testimonial card - floating to the right of hero */}
-              <div className="hidden md:block absolute right-0 top-24 z-10 transform hover:-translate-y-1 transition-transform">
+              {/* Second testimonial card - floating to the right of hero, positioned higher than left card */}
+              <div className="hidden md:block absolute right-0 top-16 z-10 transform hover:-translate-y-1 transition-transform">
                 <TestimonialCard 
                   icon={<IconCreditCard className="text-primary" size={16} />}
                   text="Renewed 87% of lapsed donors this quarter"
@@ -65,9 +65,11 @@ const HeroSection = () => {
                   Get Started Free
                 </Button>
               </Link>
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 font-semibold px-6 md:px-8 w-full sm:w-auto">
-                Book a Demo
-              </Button>
+              <Link to="#" className="w-full sm:w-auto">
+                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 font-semibold px-6 md:px-8 w-full">
+                  Book a Demo
+                </Button>
+              </Link>
             </div>
           </div>
           
@@ -75,7 +77,7 @@ const HeroSection = () => {
           {!isMobile && (
             <>
               {/* Third testimonial card - floating left under the buttons */}
-              <div className="hidden md:block absolute left-4 bottom-0 transform translate-y-1/2 z-10 hover:-translate-y-6 transition-transform">
+              <div className="hidden md:block absolute left-4 bottom-[-100px] transform z-10 hover:-translate-y-1 transition-transform">
                 <TestimonialCard 
                   icon={<IconReportMoney className="text-primary" size={16} />}
                   text="See your donor dashboard in minutes"
@@ -83,7 +85,7 @@ const HeroSection = () => {
               </div>
               
               {/* Fourth testimonial card - floating right under the buttons */}
-              <div className="hidden md:block absolute right-4 bottom-0 transform translate-y-1/2 z-10 hover:-translate-y-6 transition-transform">
+              <div className="hidden md:block absolute right-4 bottom-[-50px] transform z-10 hover:-translate-y-1 transition-transform">
                 <TestimonialCard 
                   icon={<IconCreditCard className="text-primary" size={16} />}
                   text="Automate donor follow-ups with precision"
