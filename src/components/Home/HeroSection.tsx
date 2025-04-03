@@ -10,7 +10,7 @@ const HeroSection = () => {
 
   return (
     <div className="bg-primary text-primary-foreground">
-      <div className="container mx-auto px-4 py-10 md:py-16 lg:py-32 xl:py-48 max-w-7xl">
+      <div className="container mx-auto px-4 py-10 md:py-16 lg:py-36 xl:py-56 2xl:py-64 max-w-7xl">
         <div className="relative">
           {/* Testimonial cards for desktop */}
           {!isMobile && (
@@ -77,7 +77,7 @@ const HeroSection = () => {
           {!isMobile && (
             <>
               {/* Third testimonial card - floating left under the buttons */}
-              <div className="hidden md:block absolute left-4 bottom-[-100px] transform z-10 hover:-translate-y-1 transition-transform">
+              <div className="hidden md:block absolute left-4 bottom-[-120px] transform z-10 hover:-translate-y-1 transition-transform">
                 <TestimonialCard 
                   icon={<IconReportMoney className="text-primary" size={16} />}
                   text="See your donor dashboard in minutes"
@@ -85,7 +85,7 @@ const HeroSection = () => {
               </div>
               
               {/* Fourth testimonial card - floating right under the buttons */}
-              <div className="hidden md:block absolute right-4 bottom-[-50px] transform z-10 hover:-translate-y-1 transition-transform">
+              <div className="hidden md:block absolute right-4 bottom-[-70px] transform z-10 hover:-translate-y-1 transition-transform">
                 <TestimonialCard 
                   icon={<IconCreditCard className="text-primary" size={16} />}
                   text="Automate donor follow-ups with precision"
