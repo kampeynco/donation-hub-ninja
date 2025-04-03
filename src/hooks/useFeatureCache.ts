@@ -12,19 +12,18 @@ let lastFetchTimestamp = 0;
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes in milliseconds
 let isFetchingPromise: Promise<void> | null = null;
 
+// Helper function to check if cache is fresh - defined outside the hook
+const isCacheFresh = () => {
+  return Object.keys(globalFeatureCache).length > 0 && 
+         Date.now() - lastFetchTimestamp < CACHE_TTL;
+};
+
 export function useFeatureCache() {
   const { user } = useAuth();
-  const [isLoading, setIsLoading] = useState<boolean>(() => {
-    // Initial loading state depends on cache freshness
-    return !isCacheFresh();
-  });
+  
+  // Initialize with cache freshness check using the function defined above
+  const [isLoading, setIsLoading] = useState(!isCacheFresh());
   const [featureCache, setFeatureCache] = useState<FeatureCache>(globalFeatureCache);
-
-  // Check if cache is fresh
-  const isCacheFresh = useCallback(() => {
-    return Object.keys(globalFeatureCache).length > 0 && 
-           Date.now() - lastFetchTimestamp < CACHE_TTL;
-  }, []);
 
   // Process feature data from database response
   const processFeatureData = useCallback((data: any): FeatureCache => {
@@ -100,7 +99,7 @@ export function useFeatureCache() {
     } catch (error) {
       console.error("Error during feature fetch:", error);
     }
-  }, [user, processFeatureData, isCacheFresh]);
+  }, [user, processFeatureData]);
 
   // Set up realtime subscription to keep cache updated
   useEffect(() => {
@@ -139,7 +138,7 @@ export function useFeatureCache() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user?.id, updateFeatureCache, isCacheFresh]);
+  }, [user?.id, updateFeatureCache]);
 
   return {
     featureCache,
