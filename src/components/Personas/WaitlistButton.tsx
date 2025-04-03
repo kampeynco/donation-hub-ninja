@@ -4,21 +4,21 @@ import { Button } from '@/components/ui/button';
 import { 
   checkWaitlistStatus, 
   joinWaitlist, 
-  WaitlistStatus 
+  WaitlistStatus,
+  WaitlistEntry
 } from '@/services/waitlistService';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from '@/hooks/use-toast';
 import { IconCheck, IconX } from '@tabler/icons-react';
 
-// Define the waitlist status type
-type WaitlistStatusResponse = {
+type WaitlistStatusState = {
   status: WaitlistStatus;
   rejection_reason: string | null;
 } | null;
 
 const WaitlistButton = () => {
   const { user } = useAuth();
-  const [waitlistStatus, setWaitlistStatus] = useState<WaitlistStatusResponse>(null);
+  const [waitlistStatus, setWaitlistStatus] = useState<WaitlistStatusState>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -60,7 +60,8 @@ const WaitlistButton = () => {
     setLoading(true);
     try {
       await joinWaitlist('Personas', user.id);
-      setWaitlistStatus({ status: 'joined' as WaitlistStatus, rejection_reason: null });
+      const status = await checkWaitlistStatus('Personas', user.id);
+      setWaitlistStatus(status);
       toast({
         title: 'Joined waitlist',
         description: 'You\'ve been added to the Personas waitlist.',
