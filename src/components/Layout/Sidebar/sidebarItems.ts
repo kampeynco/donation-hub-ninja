@@ -3,7 +3,8 @@ import {
   IconTent,
   IconArrowsRightLeft,
   IconCurrentLocation,
-  IconAdjustments
+  IconAdjustments,
+  IconSparkles
 } from "@tabler/icons-react";
 
 export interface SidebarItemType {
@@ -13,6 +14,7 @@ export interface SidebarItemType {
   badge?: {
     text: string;
     variant: string;
+    icon?: React.ComponentType<any>;
   };
   showNotificationBadge?: boolean;
   hidden?: boolean;
@@ -40,8 +42,9 @@ const sidebarItems: SidebarItemType[] = [
     path: "/personas",
     icon: IconCurrentLocation,
     badge: {
-      text: "Coming",
-      variant: "coming"
+      text: "Beta",
+      variant: "beta",
+      icon: IconSparkles
     },
     hidden: shouldHidePersonas()
   },

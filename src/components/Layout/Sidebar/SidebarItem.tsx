@@ -15,6 +15,7 @@ interface SidebarItemProps {
   badge?: {
     text: string;
     variant: string;
+    icon?: React.ComponentType<any>;
   };
   showNotificationBadge?: boolean;
 }
@@ -55,8 +56,9 @@ const SidebarItem = ({
                   <div className="absolute top-1 right-2">
                     <BadgeCustom 
                       variant={badge.variant as any}
-                      className={isActive ? "bg-white/20 text-white border-white/30 dark:bg-white/20 dark:text-white dark:border-white/30" : ""}
+                      className={`flex items-center gap-1 ${isActive ? "bg-white/20 text-white border-white/30 dark:bg-white/20 dark:text-white dark:border-white/30" : ""}`}
                     >
+                      {badge.icon && <badge.icon className="h-3 w-3" />}
                       {badge.text}
                     </BadgeCustom>
                   </div>
@@ -83,7 +85,10 @@ const SidebarItem = ({
             <div className="flex items-center gap-2">
               {name}
               {badge && (
-                <BadgeCustom variant={badge.variant as any} className="ml-1">{badge.text}</BadgeCustom>
+                <BadgeCustom variant={badge.variant as any} className="flex items-center gap-1 ml-1">
+                  {badge.icon && <badge.icon className="h-3 w-3" />}
+                  {badge.text}
+                </BadgeCustom>
               )}
               {showNotificationBadge && unreadCount > 0 && (
                 <Badge variant="destructive">{unreadCount}</Badge>
