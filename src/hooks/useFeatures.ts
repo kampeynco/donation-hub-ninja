@@ -27,7 +27,7 @@ export const useFeatures = () => {
         .from('features')
         .select('*')
         .eq('user_id', user.id)
-        .limit(1); // Add limit to avoid multiple results
+        .maybeSingle(); // Use maybeSingle instead of limit(1)
       
       if (error) {
         console.error('Error fetching features:', error);
@@ -35,35 +35,10 @@ export const useFeatures = () => {
         return;
       }
       
-      let featureData = data;
-      
-      if (!featureData || featureData.length === 0) {
-        // No features found, create a new row
-        const { error: insertError } = await supabase
-          .from('features')
-          .insert({ user_id: user.id })
-          .select();
-        
-        if (insertError) {
-          console.error('Error creating features:', insertError);
-          setFeatures(INITIAL_FEATURES);
-          return;
-        }
-        
-        // Re-fetch after insert
-        const { data: newData, error: refetchError } = await supabase
-          .from('features')
-          .select('*')
-          .eq('user_id', user.id)
-          .limit(1);
-          
-        if (refetchError || !newData || newData.length === 0) {
-          console.error('Error fetching features after creation:', refetchError);
-          setFeatures(INITIAL_FEATURES);
-          return;
-        }
-        
-        featureData = newData;
+      if (!data) {
+        console.log('No features found for user. Relying on database trigger to create them.');
+        setFeatures(INITIAL_FEATURES);
+        return;
       }
       
       // Convert the database feature flags to FeatureItem[]
@@ -72,7 +47,7 @@ export const useFeatures = () => {
           id: "personas",
           name: "Personas",
           description: "Access donor personas and analytics",
-          enabled: featureData[0].personas,
+          enabled: data.personas,
           beta: true,
           hidden: false // Always show in the features tab
         }

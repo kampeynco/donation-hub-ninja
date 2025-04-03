@@ -27,14 +27,15 @@ const DashboardSidebar = () => {
         .from('features')
         .select('*')
         .eq('user_id', user.id)
-        .limit(1);
+        .maybeSingle(); // Use maybeSingle instead of limit(1)
       
       if (error) {
         console.error('Error fetching features:', error);
         return;
       }
       
-      if (!data || data.length === 0) {
+      if (!data) {
+        console.log('No features found for sidebar. Using default visibility.');
         return;
       }
       
@@ -44,7 +45,7 @@ const DashboardSidebar = () => {
         if (item.name === "Personas") {
           return {
             ...item,
-            hidden: !data[0].personas
+            hidden: !data.personas
           };
         }
         return item;

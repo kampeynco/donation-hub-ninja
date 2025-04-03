@@ -31,13 +31,13 @@ const FeatureProtectedRoute: React.FC<FeatureProtectedRouteProps> = ({
           .from('features')
           .select('*')
           .eq('user_id', user.id)
-          .limit(1);
+          .maybeSingle();
         
-        if (error || !data || data.length === 0) {
+        if (error || !data) {
           console.error('Error checking feature access:', error);
           setHasAccess(false);
         } else {
-          setHasAccess(!!data[0][featureId]);
+          setHasAccess(!!data[featureId]);
         }
       } catch (error) {
         console.error('Unexpected error checking feature access:', error);

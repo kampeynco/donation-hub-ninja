@@ -21,13 +21,13 @@ export function useFeatureVisibility(featureId: string) {
           .from('features')
           .select('*')
           .eq('user_id', user.id)
-          .limit(1);
+          .maybeSingle();
 
-        if (error || !data || data.length === 0) {
+        if (error || !data) {
           console.error("Error checking feature visibility:", error);
           setIsVisible(false);
         } else {
-          setIsVisible(!!data[0][featureId]);
+          setIsVisible(!!data[featureId]);
         }
       } catch (error) {
         console.error("Unexpected error:", error);

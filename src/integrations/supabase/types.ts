@@ -650,6 +650,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      consolidate_duplicate_features: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       get_average_recurring_duration: {
         Args: {
           donor_uuid: string
