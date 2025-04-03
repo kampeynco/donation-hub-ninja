@@ -13,12 +13,14 @@ const ProfileTab = () => {
   const [email, setEmail] = useState("");
   const [organization, setOrganization] = useState("");
   const [mobilePhone, setMobilePhone] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (user) {
       setEmail(user.email || "");
       
       const fetchProfileData = async () => {
+        setLoading(true);
         try {
           const { data, error } = await supabase
             .from('profiles')
@@ -39,6 +41,8 @@ const ProfileTab = () => {
           }
         } catch (error) {
           console.error('Error in profile fetch:', error);
+        } finally {
+          setLoading(false);
         }
       };
       
@@ -55,21 +59,29 @@ const ProfileTab = () => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ProfileForm
-          user={user}
-          firstName={firstName}
-          lastName={lastName}
-          email={email}
-          organization={organization}
-          mobilePhone={mobilePhone}
-          setFirstName={setFirstName}
-          setLastName={setLastName}
-          setOrganization={setOrganization}
-          setMobilePhone={setMobilePhone}
-        />
-        <div className="mt-6 pt-6 border-t flex">
-          <DeleteAccountDialog onDelete={deleteAccount} />
-        </div>
+        {loading ? (
+          <div className="py-4 text-center text-gray-500">
+            Loading profile data...
+          </div>
+        ) : (
+          <>
+            <ProfileForm
+              user={user}
+              firstName={firstName}
+              lastName={lastName}
+              email={email}
+              organization={organization}
+              mobilePhone={mobilePhone}
+              setFirstName={setFirstName}
+              setLastName={setLastName}
+              setOrganization={setOrganization}
+              setMobilePhone={setMobilePhone}
+            />
+            <div className="mt-6 pt-6 border-t flex">
+              <DeleteAccountDialog onDelete={deleteAccount} />
+            </div>
+          </>
+        )}
       </CardContent>
     </Card>
   );

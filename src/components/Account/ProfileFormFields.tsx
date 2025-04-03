@@ -60,7 +60,7 @@ const ProfileFormFields = ({ form, email }: ProfileFormFieldsProps) => {
           id="email" 
           type="email" 
           value={email}
-          onChange={() => {}}
+          readOnly
           disabled 
           className="bg-gray-100 dark:bg-gray-800 dark:text-gray-300"
         />

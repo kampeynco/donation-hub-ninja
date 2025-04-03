@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Separator } from "@/components/ui/separator";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import SidebarItem from "./Sidebar/SidebarItem";
@@ -23,33 +23,40 @@ const DashboardSidebar = () => {
       const hidePersonas = localStorage.getItem("hidePersonasSidebar") === "true";
       
       // Create a new array instead of modifying the existing one
-      let updatedItems = [...sidebarItems];
+      const updatedItems = [...sidebarItems];
       
       // If the user is not interested, apply that preference
       if (hidePersonas) {
-        updatedItems = updatedItems.map(item => ({
-          ...item,
-          hidden: item.name === "Personas" ? true : item.hidden
-        }));
+        for (let i = 0; i < updatedItems.length; i++) {
+          if (updatedItems[i].name === "Personas") {
+            updatedItems[i] = {
+              ...updatedItems[i],
+              hidden: true
+            };
+          }
+        }
       } else if (user) {
         // Otherwise show Personas unless explicitly hidden
-        updatedItems = updatedItems.map(item => ({
-          ...item,
-          hidden: item.name === "Personas" ? false : item.hidden
-        }));
+        for (let i = 0; i < updatedItems.length; i++) {
+          if (updatedItems[i].name === "Personas") {
+            updatedItems[i] = {
+              ...updatedItems[i],
+              hidden: false
+            };
+          }
+        }
       }
       
       // Only update state if items are different to prevent unnecessary renders
-      const itemsChanged = JSON.stringify(updatedItems) !== JSON.stringify(items);
-      if (itemsChanged) {
+      if (JSON.stringify(updatedItems) !== JSON.stringify(items)) {
         setItems(updatedItems);
       }
     };
     
     updateSidebarItems();
-  }, [location.pathname, user, items]);
+  }, [location.pathname, user]);
 
-  const toggleSidebar = () => setCollapsed(!collapsed);
+  const toggleSidebar = useCallback(() => setCollapsed(prev => !prev), []);
 
   return (
     <TooltipProvider>

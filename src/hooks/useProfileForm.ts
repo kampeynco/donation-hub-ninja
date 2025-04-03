@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
@@ -39,20 +39,22 @@ export const useProfileForm = ({
 
   const form = useForm<ProfileFormValues>({
     defaultValues: {
-      firstName: firstName,
-      lastName: lastName,
-      organization: organization,
-      mobilePhone: mobilePhone,
+      firstName,
+      lastName,
+      organization,
+      mobilePhone,
     },
   });
 
-  // Update form when props change
-  form.reset({
-    firstName,
-    lastName,
-    organization,
-    mobilePhone,
-  });
+  // Update form when props change using useEffect instead of reset
+  useEffect(() => {
+    form.reset({
+      firstName,
+      lastName,
+      organization,
+      mobilePhone,
+    });
+  }, [firstName, lastName, organization, mobilePhone, form]);
 
   const onSubmit = async (values: ProfileFormValues) => {
     if (!user) return;
