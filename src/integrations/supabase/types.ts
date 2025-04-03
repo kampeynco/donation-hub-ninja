@@ -576,7 +576,7 @@ export type Database = {
           feature_name: Database["public"]["Enums"]["feature_name"]
           id: string
           rejection_reason: string | null
-          status: string | null
+          status: Database["public"]["Enums"]["waitlist_status"] | null
           updated_at: string
           user_id: string
         }
@@ -585,7 +585,7 @@ export type Database = {
           feature_name: Database["public"]["Enums"]["feature_name"]
           id?: string
           rejection_reason?: string | null
-          status?: string | null
+          status?: Database["public"]["Enums"]["waitlist_status"] | null
           updated_at?: string
           user_id: string
         }
@@ -594,7 +594,7 @@ export type Database = {
           feature_name?: Database["public"]["Enums"]["feature_name"]
           id?: string
           rejection_reason?: string | null
-          status?: string | null
+          status?: Database["public"]["Enums"]["waitlist_status"] | null
           updated_at?: string
           user_id?: string
         }
@@ -663,6 +663,7 @@ export type Database = {
       notification_action: "user" | "system" | "donor"
       recurring_period: "once" | "weekly" | "monthly"
       text_message_option: "unknown" | "opt_in" | "opt_out"
+      waitlist_status: "joined" | "approved" | "rejected" | "declined"
     }
     CompositeTypes: {
       [_ in never]: never

@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from "react";
 import { Separator } from "@/components/ui/separator";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,7 +9,11 @@ import SidebarActions from "./Sidebar/SidebarActions";
 import sidebarItems from "./Sidebar/sidebarItems";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { checkWaitlistStatus } from "@/services/waitlistService";
+import { 
+  checkWaitlistStatus, 
+  getFeatureVisibilityPreference,
+  FeatureName
+} from "@/services/waitlistService";
 
 const DashboardSidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -19,31 +24,26 @@ const DashboardSidebar = () => {
   // Re-evaluate sidebar items when component mounts, route changes, or user changes
   useEffect(() => {
     const updateSidebarItems = async () => {
-      // Check localStorage first for not interested status
-      const hidePersonas = localStorage.getItem("hidePersonasSidebar") === "true";
+      if (!user) return;
       
       // Create a new array instead of modifying the existing one
       const updatedItems = [...sidebarItems];
       
-      // If the user is not interested, apply that preference
-      if (hidePersonas) {
-        for (let i = 0; i < updatedItems.length; i++) {
-          if (updatedItems[i].name === "Personas") {
-            updatedItems[i] = {
-              ...updatedItems[i],
-              hidden: true
-            };
-          }
-        }
-      } else if (user) {
-        // Otherwise show Personas unless explicitly hidden
-        for (let i = 0; i < updatedItems.length; i++) {
-          if (updatedItems[i].name === "Personas") {
-            updatedItems[i] = {
-              ...updatedItems[i],
-              hidden: false
-            };
-          }
+      // Check Personas feature status
+      const featureName = "Personas" as FeatureName;
+      const waitlistStatus = await checkWaitlistStatus(featureName, user.id);
+      const hidePreference = getFeatureVisibilityPreference(featureName);
+      
+      for (let i = 0; i < updatedItems.length; i++) {
+        if (updatedItems[i].name === featureName) {
+          // Hide based on preference or if declined
+          const shouldHide = hidePreference || waitlistStatus?.status === "declined";
+          
+          // Only show if approved or not hidden by preference
+          updatedItems[i] = {
+            ...updatedItems[i],
+            hidden: shouldHide
+          };
         }
       }
       

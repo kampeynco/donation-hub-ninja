@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useForm } from "react-hook-form";
 import { IconInfoCircle } from '@tabler/icons-react';
-import { declineFeature } from "@/services/waitlistService";
+import { declineFeature, setFeatureVisibilityPreference } from "@/services/waitlistService";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "@/hooks/use-toast";
 
@@ -54,11 +54,11 @@ const NotInterestedModal = ({ open, onOpenChange }: NotInterestedModalProps) => 
     setSubmitting(true);
     
     try {
-      // Use the new declineFeature function
+      // Use declineFeature to set waitlist status to "declined"
       await declineFeature("Personas", user.id, data.reason || "Not specified");
       
       // Save preference to localStorage for sidebar visibility
-      localStorage.setItem("hidePersonasSidebar", "true");
+      setFeatureVisibilityPreference("Personas", true);
       
       // Close modal
       onOpenChange(false);

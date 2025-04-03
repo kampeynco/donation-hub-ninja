@@ -2,7 +2,10 @@
 import { supabase } from "@/integrations/supabase/client";
 
 // Define a type for valid feature names based on the database schema
-type FeatureName = "Personas";
+export type FeatureName = "Personas";
+
+// Define the waitlist status type to match our database enum
+export type WaitlistStatus = "joined" | "approved" | "rejected" | "declined" | null;
 
 // Check if a user is on a specific feature's waitlist and their status
 export const checkWaitlistStatus = async (featureName: FeatureName, userId: string) => {
@@ -104,4 +107,16 @@ export const resetWaitlistStatus = async (featureName: FeatureName, userId: stri
     console.error("Unexpected error resetting waitlist status:", error);
     throw error;
   }
+};
+
+// Get the visibility preference for a feature from localStorage
+export const getFeatureVisibilityPreference = (featureName: FeatureName): boolean => {
+  const key = `hide${featureName}Sidebar`;
+  return localStorage.getItem(key) === "true";
+};
+
+// Set the visibility preference for a feature in localStorage
+export const setFeatureVisibilityPreference = (featureName: FeatureName, hidden: boolean): void => {
+  const key = `hide${featureName}Sidebar`;
+  localStorage.setItem(key, hidden.toString());
 };

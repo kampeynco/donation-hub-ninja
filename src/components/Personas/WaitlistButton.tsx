@@ -1,20 +1,24 @@
 
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { checkWaitlistStatus, joinWaitlist } from '@/services/waitlistService';
+import { 
+  checkWaitlistStatus, 
+  joinWaitlist, 
+  WaitlistStatus 
+} from '@/services/waitlistService';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from '@/hooks/use-toast';
-import { IconCheck } from '@tabler/icons-react';
+import { IconCheck, IconX } from '@tabler/icons-react';
 
 // Define the waitlist status type
-type WaitlistStatus = {
-  status: string | null;
+type WaitlistStatusResponse = {
+  status: WaitlistStatus;
   rejection_reason: string | null;
 } | null;
 
 const WaitlistButton = () => {
   const { user } = useAuth();
-  const [waitlistStatus, setWaitlistStatus] = useState<WaitlistStatus>(null);
+  const [waitlistStatus, setWaitlistStatus] = useState<WaitlistStatusResponse>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -85,6 +89,32 @@ const WaitlistButton = () => {
       <Button variant="outline" className="mr-4 border-green-500 text-green-600 hover:bg-green-50 hover:text-green-600" disabled>
         <IconCheck className="mr-1 h-4 w-4" />
         Added to Waitlist
+      </Button>
+    );
+  }
+
+  if (waitlistStatus?.status === 'approved') {
+    return (
+      <Button variant="outline" className="mr-4 border-green-500 text-green-600 hover:bg-green-50 hover:text-green-600" disabled>
+        <IconCheck className="mr-1 h-4 w-4" />
+        Access Granted
+      </Button>
+    );
+  }
+
+  if (waitlistStatus?.status === 'rejected') {
+    return (
+      <Button variant="outline" className="mr-4 border-red-500 text-red-600 hover:bg-red-50 hover:text-red-600" disabled>
+        <IconX className="mr-1 h-4 w-4" />
+        Access Denied
+      </Button>
+    );
+  }
+
+  if (waitlistStatus?.status === 'declined') {
+    return (
+      <Button onClick={handleJoinWaitlist} className="mr-4">
+        Reconsider & Join Waitlist
       </Button>
     );
   }

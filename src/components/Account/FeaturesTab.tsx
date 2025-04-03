@@ -5,22 +5,40 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 import { IconStarFilled } from "@tabler/icons-react";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { checkWaitlistStatus, joinWaitlist, declineFeature, resetWaitlistStatus } from "@/services/waitlistService";
+import { 
+  checkWaitlistStatus, 
+  joinWaitlist, 
+  resetWaitlistStatus,
+  getFeatureVisibilityPreference,
+  setFeatureVisibilityPreference,
+  WaitlistStatus,
+  FeatureName
+} from "@/services/waitlistService";
+
+interface FeatureItem {
+  id: string;
+  name: FeatureName;
+  description: string;
+  enabled: boolean;
+  status: WaitlistStatus;
+  beta: boolean;
+  hidden: boolean;
+}
 
 const FeaturesTab = () => {
   const { user } = useAuth();
-  const [features, setFeatures] = useState([
+  const [features, setFeatures] = useState<FeatureItem[]>([
     {
       id: "personas",
       name: "Personas",
       description: "Access donor personas and analytics",
       enabled: false,
       status: null,
-      beta: true
+      beta: true,
+      hidden: false
     }
   ]);
   const [loading, setLoading] = useState(true);
@@ -36,12 +54,14 @@ const FeaturesTab = () => {
         const updatedFeatures = [...features];
         for (let i = 0; i < updatedFeatures.length; i++) {
           const feature = updatedFeatures[i];
-          const status = await checkWaitlistStatus(feature.name as any, user.id);
+          const status = await checkWaitlistStatus(feature.name, user.id);
+          const isHidden = getFeatureVisibilityPreference(feature.name);
           
           updatedFeatures[i] = {
             ...feature,
             status: status?.status || null,
-            enabled: status?.status === "approved"
+            enabled: status?.status === "approved",
+            hidden: isHidden
           };
         }
         
@@ -107,7 +127,7 @@ const FeaturesTab = () => {
     try {
       if (feature.status === "joined" || feature.status === "approved") {
         // If already on waitlist or approved, remove from waitlist
-        await resetWaitlistStatus(feature.name as any, user.id);
+        await resetWaitlistStatus(feature.name, user.id);
         
         // Update local state
         const updatedFeatures = [...features];
@@ -121,7 +141,7 @@ const FeaturesTab = () => {
         toast.info(`${feature.name} has been disabled.`);
       } else {
         // Join waitlist for the feature
-        await joinWaitlist(feature.name as any, user.id);
+        await joinWaitlist(feature.name, user.id);
         
         // Update local state
         const updatedFeatures = [...features];
@@ -140,10 +160,34 @@ const FeaturesTab = () => {
     }
   };
 
-  const getStatusText = (feature: typeof features[0]) => {
+  const handleToggleVisibility = (featureId: string) => {
+    if (!user) return;
+    
+    const featureIndex = features.findIndex(f => f.id === featureId);
+    if (featureIndex === -1) return;
+    
+    const feature = features[featureIndex];
+    const newHiddenState = !feature.hidden;
+    
+    // Update UI visibility preference in localStorage
+    setFeatureVisibilityPreference(feature.name, newHiddenState);
+    
+    // Update local state
+    const updatedFeatures = [...features];
+    updatedFeatures[featureIndex] = {
+      ...feature,
+      hidden: newHiddenState
+    };
+    setFeatures(updatedFeatures);
+    
+    toast.info(`${feature.name} is now ${newHiddenState ? 'hidden from' : 'visible in'} your sidebar.`);
+  };
+
+  const getStatusText = (feature: FeatureItem) => {
     if (feature.status === "approved") return "Enabled";
     if (feature.status === "joined") return "On waitlist";
     if (feature.status === "rejected") return "Not eligible";
+    if (feature.status === "declined") return "Declined";
     return "Disabled";
   };
 
@@ -187,6 +231,21 @@ const FeaturesTab = () => {
                     </div>
                   </div>
                   <p className="text-sm text-muted-foreground">{feature.description}</p>
+                  
+                  {/* Only show UI visibility toggle if feature is enabled or declined */}
+                  {(feature.status === "approved" || feature.status === "declined") && (
+                    <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100 dark:border-gray-800">
+                      <div>
+                        <Label className="font-medium">Show in sidebar</Label>
+                        <p className="text-xs text-muted-foreground">Control visibility in your navigation menu</p>
+                      </div>
+                      <Switch
+                        checked={!feature.hidden}
+                        onCheckedChange={() => handleToggleVisibility(feature.id)}
+                      />
+                    </div>
+                  )}
+                  
                   <Separator className="my-2" />
                 </div>
               ))}
