@@ -4,20 +4,30 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import DashboardSidebar from "./DashboardSidebar";
 import { useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { refreshFeatureCache } from "@/hooks/useFeatureCache";
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
 const Layout = ({ children }: LayoutProps) => {
+  const { user } = useAuth();
   const location = useLocation();
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [displayedChildren, setDisplayedChildren] = useState(children);
+  const initialRenderRef = useRef(true);
 
   // Manage smooth transitions between routes
   useEffect(() => {
     let isMounted = true;
+    
+    // Skip transition on initial render
+    if (initialRenderRef.current) {
+      initialRenderRef.current = false;
+      return;
+    }
     
     if (children !== displayedChildren) {
       setIsTransitioning(true);
@@ -26,9 +36,14 @@ const Layout = ({ children }: LayoutProps) => {
       const timer = setTimeout(() => {
         if (isMounted) {
           setDisplayedChildren(children);
-          setIsTransitioning(false);
+          // Slight delay before showing the new content
+          setTimeout(() => {
+            if (isMounted) {
+              setIsTransitioning(false);
+            }
+          }, 50);
         }
-      }, 100);
+      }, 150);
       
       return () => {
         isMounted = false;
@@ -41,12 +56,10 @@ const Layout = ({ children }: LayoutProps) => {
 
   // Prefetch feature status when component mounts
   useEffect(() => {
-    // Importing dynamically to avoid circular dependencies
-    import("@/hooks/useFeatureCache").then(({ useFeatureCache }) => {
-      const { refreshCache } = useFeatureCache();
-      refreshCache();
-    });
-  }, []);
+    if (user?.id) {
+      refreshFeatureCache(user.id);
+    }
+  }, [user?.id]);
 
   return (
     <TooltipProvider>
@@ -56,7 +69,7 @@ const Layout = ({ children }: LayoutProps) => {
           <main className="flex-1 transition-all duration-300">
             <div className="container max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
               <div 
-                className={`transition-opacity duration-200 ${
+                className={`transition-opacity duration-300 ${
                   isTransitioning ? 'opacity-0' : 'opacity-100'
                 }`}
               >

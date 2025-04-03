@@ -1,10 +1,10 @@
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useFeatureCache } from "@/hooks/useFeatureCache";
+import { useFeatureVisibility } from "@/hooks/useFeatureVisibility";
 
 interface FeatureProtectedRouteProps {
   children: React.ReactNode;
@@ -16,18 +16,7 @@ const FeatureProtectedRoute: React.FC<FeatureProtectedRouteProps> = ({
   featureId 
 }) => {
   const { user } = useAuth();
-  const { hasFeature, isLoading: isCacheLoading } = useFeatureCache();
-  const [isLoading, setIsLoading] = useState(true);
-  const [hasAccess, setHasAccess] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    // Use the cached value if available
-    if (!isCacheLoading) {
-      const featureEnabled = hasFeature(featureId);
-      setHasAccess(featureEnabled);
-      setIsLoading(false);
-    }
-  }, [featureId, hasFeature, isCacheLoading]);
+  const { isVisible, isLoading } = useFeatureVisibility(featureId);
 
   if (!user) {
     return <Navigate to="/auth/signin" replace />;
@@ -50,7 +39,7 @@ const FeatureProtectedRoute: React.FC<FeatureProtectedRouteProps> = ({
     );
   }
 
-  if (!hasAccess) {
+  if (!isVisible) {
     toast.error(`You don't have access to this feature. Enable it in your account settings.`);
     return <Navigate to="/account?tab=features" replace />;
   }

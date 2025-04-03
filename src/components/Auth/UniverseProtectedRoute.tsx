@@ -4,7 +4,7 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useFeatureCache } from "@/hooks/useFeatureCache";
+import { useUniverseVisibility } from "@/hooks/useUniverseVisibility";
 
 interface UniverseProtectedRouteProps {
   children: React.ReactNode;
@@ -14,18 +14,7 @@ const UniverseProtectedRoute: React.FC<UniverseProtectedRouteProps> = ({
   children 
 }) => {
   const { user } = useAuth();
-  const { hasFeature, isLoading: isCacheLoading } = useFeatureCache();
-  const [hasAccess, setHasAccess] = useState<boolean | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    // Use the cached value if available
-    if (!isCacheLoading) {
-      const featureEnabled = hasFeature("universe");
-      setHasAccess(featureEnabled);
-      setIsLoading(false);
-    }
-  }, [hasFeature, isCacheLoading]);
+  const { isVisible, isLoading } = useUniverseVisibility();
 
   if (!user) {
     return <Navigate to="/auth/signin" replace />;
@@ -48,7 +37,7 @@ const UniverseProtectedRoute: React.FC<UniverseProtectedRouteProps> = ({
     );
   }
 
-  if (!hasAccess) {
+  if (!isVisible) {
     toast.error(`You don't have access to the Universe feature. Enable it in your account settings.`);
     return <Navigate to="/account?tab=features" replace />;
   }
