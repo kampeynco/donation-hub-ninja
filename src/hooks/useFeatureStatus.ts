@@ -1,7 +1,8 @@
+
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { supabase } from '@/lib/supabaseClient';
-import { Database } from '@/types/supabase';
+import { supabase } from '@/integrations/supabase/client';
+import { Database } from '@/integrations/supabase/types';
 
 // Define types for the data you're fetching
 interface Feature {
