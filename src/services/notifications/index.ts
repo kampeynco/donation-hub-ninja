@@ -130,6 +130,10 @@ export async function deleteNotification(id: string): Promise<boolean> {
     }
     
     console.log(`API: Successfully deleted notification with ID: ${id}`);
+    toast({
+      title: 'Success',
+      description: 'Notification deleted successfully',
+    });
     
     return true;
   } catch (error) {
