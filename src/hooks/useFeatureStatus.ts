@@ -27,28 +27,43 @@ export function useFeatureStatus(initialFeatures: Feature[]) {
   const [updatedFeatures, setUpdatedFeatures] = useState<Feature[]>(initialFeatures);
 
   useEffect(() => {
-    let channelSubscription: (() => void) | null = null;
+    if (!user?.id) return;
 
-    if (user?.id) {
-      channelSubscription = initChannelSubscription();
-    }
-
-    return () => {
-      if (channelSubscription) {
-        channelSubscription();
+    // Fetch current waitlist statuses for this user
+    const fetchWaitlistStatus = async () => {
+      const { data, error } = await supabase
+        .from('waitlists')
+        .select('*')
+        .eq('user_id', user.id);
+      
+      if (error) {
+        console.error('Error fetching waitlist status:', error);
+        return;
+      }
+      
+      if (data.length > 0) {
+        const updatedFeaturesState = updatedFeatures.map(feature => {
+          const matchingEntry = data.find(entry => entry.feature_name === feature.name);
+          if (matchingEntry) {
+            return {
+              ...feature,
+              waitlist_status: matchingEntry.status
+            };
+          }
+          return feature;
+        });
+        
+        setUpdatedFeatures(updatedFeaturesState);
       }
     };
-  }, [user?.id, initialFeatures]);
 
-  // Initialize the subscription to the channel
-  const initChannelSubscription = () => {
-    if (!user?.id) return null;
+    fetchWaitlistStatus();
 
-    // Fixed: Correctly using Supabase channel subscription syntax
+    // Set up realtime subscription
     const channel = supabase
       .channel('waitlist-changes')
       .on(
-        'postgres_changes', 
+        'postgres_changes',
         { 
           event: 'INSERT', 
           schema: 'public',
@@ -76,7 +91,7 @@ export function useFeatureStatus(initialFeatures: Feature[]) {
     return () => {
       channel.unsubscribe();
     };
-  };
+  }, [user?.id, initialFeatures]);
 
   return updatedFeatures;
 }
