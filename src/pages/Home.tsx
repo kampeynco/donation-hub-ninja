@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -6,17 +7,20 @@ import { IconArrowRight, IconCreditCard, IconUsers, IconReportMoney } from "@tab
 
 // Logo mark image from assets bucket
 const DARK_LOGO_MARK = "https://igjnhwvtasegwyiwcdkr.supabase.co/storage/v1/object/public/assets//updated_dc_logomark_dark.png";
+
 const Home = () => {
   const {
     user,
     loading
   } = useAuth();
   const navigate = useNavigate();
+
   useEffect(() => {
     if (!loading && user) {
       navigate("/dashboard");
     }
   }, [user, loading, navigate]);
+
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -24,41 +28,94 @@ const Home = () => {
         </div>
       </div>;
   }
-  return <div className="min-h-screen bg-white">
-      <header className="bg-primary text-white">
+
+  return <div className="min-h-screen bg-donor-gray">
+      <header className="bg-white">
         <div className="container mx-auto px-4 py-6 flex justify-between items-center">
           <Link to="/" className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10">
               <img src={DARK_LOGO_MARK} alt="Donor Camp Logo" className="w-5 h-5" />
             </div>
             <span className="text-xl font-semibold tracking-tight">Donor Camp</span>
           </Link>
           <div className="flex gap-4">
             <Link to="/auth/signin">
-              <Button variant="outline" className="bg-white text-primary hover:bg-gray-100">
-                Sign In
+              <Button variant="ghost" className="text-primary hover:bg-gray-100">
+                Log in
               </Button>
             </Link>
             <Link to="/auth/signup">
-              <Button className="bg-white text-primary hover:bg-gray-100">
-                Get Started
+              <Button className="bg-primary text-white hover:bg-primary/90">
+                Get started
               </Button>
             </Link>
           </div>
         </div>
         
-        <div className="container mx-auto px-4 py-20 md:py-32 flex flex-col items-center text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 max-w-4xl">Donor intent is hiding in plain sight. </h1>
-          <p className="text-xl md:text-2xl mb-10 max-w-2xl">Engage the right donors at the right time. Donor Camp captures intent and connects it to the tools your team already uses.</p>
-          <Link to="/auth/signup">
-            <Button size="lg" className="bg-white text-primary hover:bg-gray-100 font-semibold px-8">
-              Get Started Free <IconArrowRight className="ml-2" />
-            </Button>
-          </Link>
+        <div className="container mx-auto px-4 py-20 md:py-32 max-w-7xl">
+          <div className="relative">
+            {/* Testimonial cards positioned absolutely */}
+            <div className="hidden md:block absolute -left-4 top-1/4 transform -translate-y-1/2 max-w-xs">
+              <div className="bg-white rounded-lg shadow-md p-4 border border-gray-100">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                    <IconUsers className="text-primary" size={20} />
+                  </div>
+                  <p className="text-sm font-medium">Monthly donations increased 12% with donor automation</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="hidden md:block absolute -right-4 top-1/4 transform -translate-y-1/2 max-w-xs">
+              <div className="bg-white rounded-lg shadow-md p-4 border border-gray-100">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                    <IconCreditCard className="text-primary" size={20} />
+                  </div>
+                  <p className="text-sm font-medium">Renewed 87% of lapsed donors this quarter</p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Main hero content */}
+            <div className="text-center max-w-4xl mx-auto z-10 relative">
+              <h1 className="text-4xl md:text-6xl font-bold mb-6">
+                Donor intent is hiding in plain sight.
+              </h1>
+              <h2 className="text-4xl md:text-6xl font-bold mb-8">
+                Donor Camp reveals it—<span className="bg-primary/10 px-2 py-1 rounded">and automates your next move</span>.
+              </h2>
+              <p className="text-xl md:text-2xl mb-10 max-w-2xl mx-auto">
+                Engage the right donors at the right time. Donor Camp captures intent and connects it to the tools your team already uses.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link to="/auth/signup">
+                  <Button size="lg" className="bg-primary hover:bg-primary/90 font-semibold px-8 w-full sm:w-auto">
+                    Get Started Free
+                  </Button>
+                </Link>
+                <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary/10 font-semibold px-8 w-full sm:w-auto">
+                  Book a Demo
+                </Button>
+              </div>
+            </div>
+            
+            {/* Bottom testimonial card */}
+            <div className="hidden md:block absolute bottom-0 right-1/4 transform translate-y-1/2 max-w-xs">
+              <div className="bg-white rounded-lg shadow-md p-4 border border-gray-100">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                    <IconReportMoney className="text-primary" size={20} />
+                  </div>
+                  <p className="text-sm font-medium">See your donor dashboard in minutes</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </header>
 
-      <section className="py-20">
+      <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">
             Everything you need to manage your fundraising
@@ -131,4 +188,5 @@ const Home = () => {
       </footer>
     </div>;
 };
+
 export default Home;
