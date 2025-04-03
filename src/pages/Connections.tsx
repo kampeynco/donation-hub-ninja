@@ -13,9 +13,7 @@ const Connections = () => {
       <Card>
         <CardHeader className="pb-3">
           
-          <CardDescription>
-            Connect your Donor Camp account with third-party services
-          </CardDescription>
+          
         </CardHeader>
         <div className="px-6 pb-6">
           <IntegrationsTab />
