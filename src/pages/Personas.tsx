@@ -20,11 +20,7 @@ const Personas = () => {
               <span className="text-sm font-medium">Paid Plans</span>
             </div>
             <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-6">Get started with Personas today</h1>
-            <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
-              Donor Personas is the only solution designed to help campaigns build and share real-time profiles
-              at scale and enable marketers with self-service access a complete view of the donor
-              in the warehouse.
-            </p>
+            <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">Donor Personas is the only solution designed to help campaigns build and share real-time profiles at scale and enable fundraisers with self-service access to a complete view of your donor insights.</p>
             <div className="flex items-center gap-4">
               <WaitlistButton />
               <Button variant="link" onClick={() => setModalOpen(true)} className="text-donor-blue flex items-center">
