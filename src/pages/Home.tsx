@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -53,7 +54,8 @@ const Home = () => {
         
         <div className="container mx-auto px-4 py-20 md:py-32 max-w-7xl">
           <div className="relative">
-            <div className="hidden md:block absolute -left-4 top-1/4 transform -translate-y-1/2 max-w-xs">
+            {/* First testimonial card - adjusted position to avoid overlap */}
+            <div className="hidden md:block absolute -left-4 top-0 transform -translate-y-full max-w-xs">
               <div className="bg-white rounded-lg shadow-md p-4 border border-gray-100">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
@@ -64,7 +66,8 @@ const Home = () => {
               </div>
             </div>
             
-            <div className="hidden md:block absolute -right-4 top-1/4 transform -translate-y-1/2 max-w-xs">
+            {/* Second testimonial card - adjusted position to avoid overlap */}
+            <div className="hidden md:block absolute -right-4 top-0 transform -translate-y-full max-w-xs">
               <div className="bg-white rounded-lg shadow-md p-4 border border-gray-100">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
@@ -75,7 +78,8 @@ const Home = () => {
               </div>
             </div>
             
-            <div className="text-center max-w-4xl mx-auto z-10 relative">
+            {/* Main hero content - increased z-index to ensure it's on top */}
+            <div className="text-center max-w-4xl mx-auto z-20 relative py-10">
               <h1 className="text-4xl md:text-6xl font-bold mb-6">
                 Donor intent is hiding<br />
                 in plain sight.
@@ -99,7 +103,8 @@ const Home = () => {
               </div>
             </div>
             
-            <div className="hidden md:block absolute bottom-0 right-1/4 transform translate-y-1/2 max-w-xs">
+            {/* Bottom testimonial card - adjusted position to avoid overlap */}
+            <div className="hidden md:block absolute bottom-0 right-1/4 transform translate-y-1/2 max-w-xs z-10">
               <div className="bg-white rounded-lg shadow-md p-4 border border-gray-100">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
