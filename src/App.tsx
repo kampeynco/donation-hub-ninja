@@ -23,7 +23,15 @@ import Connections from "./pages/Connections";
 import NotFound from "./pages/NotFound";
 
 // Create a client
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60 * 1000, // 1 minute
+      cacheTime: 10 * 60 * 1000, // 10 minutes
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 // Define the App component with brackets instead of parentheses
 const App = () => {

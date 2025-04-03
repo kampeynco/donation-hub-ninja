@@ -1,44 +1,16 @@
 
 import { useState, useEffect } from "react";
-import { useAuth } from "@/context/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import { useFeatureCache } from "./useFeatureCache";
 
 export function useFeatureVisibility(featureId: string) {
-  const { user } = useAuth();
+  const { hasFeature, isLoading } = useFeatureCache();
   const [isVisible, setIsVisible] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    async function checkFeatureVisibility() {
-      if (!user) {
-        setIsVisible(false);
-        setIsLoading(false);
-        return;
-      }
-
-      try {
-        const { data, error } = await supabase
-          .from('features')
-          .select('*')
-          .eq('user_id', user.id)
-          .maybeSingle();
-
-        if (error || !data) {
-          console.error("Error checking feature visibility:", error);
-          setIsVisible(false);
-        } else {
-          setIsVisible(!!data[featureId]);
-        }
-      } catch (error) {
-        console.error("Unexpected error:", error);
-        setIsVisible(false);
-      } finally {
-        setIsLoading(false);
-      }
+    if (!isLoading) {
+      setIsVisible(hasFeature(featureId));
     }
-
-    checkFeatureVisibility();
-  }, [user, featureId]);
+  }, [hasFeature, featureId, isLoading]);
 
   return { isVisible, isLoading };
 }

@@ -1,10 +1,10 @@
 
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useFeatureCache } from "@/hooks/useFeatureCache";
 
 interface FeatureProtectedRouteProps {
   children: React.ReactNode;
@@ -16,44 +16,18 @@ const FeatureProtectedRoute: React.FC<FeatureProtectedRouteProps> = ({
   featureId 
 }) => {
   const { user } = useAuth();
-  const [hasAccess, setHasAccess] = useState<boolean | null>(null);
+  const { hasFeature, isLoading: isCacheLoading } = useFeatureCache();
   const [isLoading, setIsLoading] = useState(true);
+  const [hasAccess, setHasAccess] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const checkFeatureAccess = async () => {
-      if (!user) {
-        setHasAccess(false);
-        setIsLoading(false);
-        return;
-      }
-
-      try {
-        const { data, error } = await supabase
-          .from('features')
-          .select('*')
-          .eq('user_id', user.id)
-          .maybeSingle();
-        
-        if (error || !data) {
-          console.error('Error checking feature access:', error);
-          setHasAccess(false);
-        } else {
-          setHasAccess(!!data[featureId]);
-        }
-      } catch (error) {
-        console.error('Unexpected error checking feature access:', error);
-        setHasAccess(false);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (user) {
-      checkFeatureAccess();
-    } else {
+    // Use the cached value if available
+    if (!isCacheLoading) {
+      const featureEnabled = hasFeature(featureId);
+      setHasAccess(featureEnabled);
       setIsLoading(false);
     }
-  }, [user, featureId]);
+  }, [featureId, hasFeature, isCacheLoading]);
 
   if (!user) {
     return <Navigate to="/auth/signin" replace />;
