@@ -115,11 +115,11 @@ export async function deleteNotification(id: string): Promise<boolean> {
     // Add debug logging
     console.log(`Attempting to delete notification with ID: ${id}`);
     
-    const { error, count } = await supabase
+    // Fixed: Removed the "count" selection which was causing the SQL error
+    const { error } = await supabase
       .from('notifications')
       .delete()
-      .eq('id', id)
-      .select('count');
+      .eq('id', id);
       
     if (error) {
       console.error('Error deleting notification:', error);
@@ -132,7 +132,7 @@ export async function deleteNotification(id: string): Promise<boolean> {
     }
     
     // Log successful deletion
-    console.log(`Successfully deleted notification. Affected rows: ${count}`);
+    console.log(`Successfully deleted notification with ID: ${id}`);
     
     return true;
   } catch (error) {
