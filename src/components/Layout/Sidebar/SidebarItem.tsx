@@ -49,7 +49,7 @@ const SidebarItem = ({
                   }`}
                 >
                   <Icon className="h-5 w-5" />
-                  {!collapsed && <span className="ml-2 whitespace-nowrap">{name}</span>}
+                  {!collapsed && <span className="ml-2">{name}</span>}
                 </Button>
                 
                 {!collapsed && badge && (

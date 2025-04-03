@@ -3,8 +3,9 @@ import { Notification } from './NotificationBell';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { IconCalendar, IconCreditCard, IconUser, IconX } from '@tabler/icons-react';
+import { IconX } from '@tabler/icons-react';
 import { format } from 'date-fns';
+import NotificationIcon from '../Logs/NotificationIcon';
 
 interface NotificationsListProps {
   notifications: Notification[];
@@ -23,18 +24,6 @@ const NotificationsList = ({
   deleteNotification,
   onClose
 }: NotificationsListProps) => {
-  const getNotificationIcon = (action: string) => {
-    switch (action) {
-      case 'donor':
-        return <IconCalendar className="w-5 h-5 text-blue-500" />;
-      case 'user':
-        return <IconUser className="w-5 h-5 text-primary" />;
-      case 'system':
-      default:
-        return <IconCreditCard className="w-5 h-5 text-green-500" />;
-    }
-  };
-
   return (
     <div className="flex flex-col max-h-[500px]">
       <div className="flex items-center justify-between px-4 py-3 bg-primary-50">
@@ -72,7 +61,7 @@ const NotificationsList = ({
               >
                 <div className="flex items-start gap-3">
                   <div className="mt-0.5">
-                    {getNotificationIcon(notification.action)}
+                    <NotificationIcon action={notification.action} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm">{notification.message}</p>
