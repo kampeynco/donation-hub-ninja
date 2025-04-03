@@ -75,7 +75,7 @@ export const useFeatures = () => {
           description: "Access donor personas and analytics",
           enabled: featureData[0].personas,
           beta: true,
-          hidden: !featureData[0].personas // hide if not enabled
+          hidden: false // Always show in the features tab
         }
       ];
       
