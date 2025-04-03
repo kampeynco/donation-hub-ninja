@@ -81,8 +81,8 @@ const Home = () => {
             {/* Main hero content */}
             <div className="text-center max-w-4xl mx-auto z-20 relative py-10">
               <h1 className="text-4xl md:text-6xl font-bold mb-6">
-                Donor intent is hiding<br />
-                in plain sight.<br />
+                Donor intent is<br />
+                hiding in plain sight.<br />
                 Donor Camp reveals it<br />
                 so you can act on it.
               </h1>
