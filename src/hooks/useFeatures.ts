@@ -1,77 +1,157 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { INITIAL_FEATURES, FeatureItem } from "@/types/features";
+import { FeatureItem } from "@/types/features";
 import { supabase } from "@/integrations/supabase/client";
-import { getFeatureVisibilityPreference } from "@/services/waitlistService";
-import { useFeatureActions } from "./useFeatureActions";
-import { useFeatureRealtime } from "./useFeatureRealtime";
+import { toast } from "sonner";
+
+export interface Feature {
+  personas: boolean;
+}
 
 export const useFeatures = () => {
   const { user } = useAuth();
-  const [features, setFeatures] = useState<FeatureItem[]>(INITIAL_FEATURES);
+  const [features, setFeatures] = useState<FeatureItem[]>([]);
   const [loading, setLoading] = useState(true);
-  
-  const { handleToggleFeature, handleToggleVisibility, isProcessing } = useFeatureActions(features, setFeatures);
-  
-  // Use the realtime hook to update features when they change in the database
-  useFeatureRealtime(user?.id, features, setFeatures);
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  // Memoize the fetch function to avoid recreating it on every render
-  const fetchFeatureStatus = useCallback(async () => {
+  // Fetch features from database
+  const fetchFeatures = useCallback(async () => {
     if (!user?.id) return;
     
     try {
       setLoading(true);
       
-      // Get waitlist statuses
-      const { data: waitlistData, error } = await supabase
-        .from('waitlists')
+      // Get features from the database
+      const { data, error } = await supabase
+        .from('features')
         .select('*')
-        .eq('user_id', user.id);
+        .eq('user_id', user.id)
+        .single();
       
       if (error) {
-        console.error('Error fetching waitlist status:', error);
+        console.error('Error fetching features:', error);
+        
+        // If no row found, create a new row
+        if (error.code === 'PGRST116') {
+          const { error: insertError } = await supabase
+            .from('features')
+            .insert({ user_id: user.id })
+            .select();
+          
+          if (insertError) {
+            console.error('Error creating features:', insertError);
+            return;
+          }
+        }
         return;
       }
       
-      // Apply waitlist statuses and visibility preferences to features
-      const updatedFeatures = INITIAL_FEATURES.map(feature => {
-        // Find matching waitlist entry
-        const waitlistEntry = waitlistData?.find(entry => entry.feature_name === feature.name);
-        
-        // Get visibility preference
-        const hidden = getFeatureVisibilityPreference(feature.name);
-        
-        // Update feature with waitlist status and visibility
-        return {
-          ...feature,
-          status: waitlistEntry?.status || null,
-          enabled: waitlistEntry?.status === "approved",
-          hidden
-        };
-      });
+      // Convert the database feature flags to FeatureItem[]
+      const featureItems: FeatureItem[] = [
+        {
+          id: "personas",
+          name: "Personas",
+          description: "Access donor personas and analytics",
+          enabled: data.personas,
+          beta: true,
+          hidden: !data.personas // hide if not enabled
+        }
+      ];
       
-      setFeatures(updatedFeatures);
+      setFeatures(featureItems);
     } catch (err) {
-      console.error('Unexpected error fetching feature status:', err);
+      console.error('Unexpected error fetching features:', err);
     } finally {
       setLoading(false);
     }
   }, [user?.id]);
 
-  // Fetch waitlist statuses and apply visibility preferences on mount and when user changes
+  // Toggle feature
+  const handleToggleFeature = async (featureId: string) => {
+    if (!user?.id || isProcessing) return;
+    
+    try {
+      setIsProcessing(true);
+      
+      // Find the feature
+      const featureIndex = features.findIndex(f => f.id === featureId);
+      if (featureIndex === -1) return;
+      
+      const feature = features[featureIndex];
+      const newEnabledState = !feature.enabled;
+      
+      // Update the database
+      const { error } = await supabase
+        .from('features')
+        .update({ [featureId]: newEnabledState })
+        .eq('user_id', user.id);
+      
+      if (error) {
+        console.error(`Error updating feature ${featureId}:`, error);
+        toast.error("There was an error updating the feature status.");
+        return;
+      }
+      
+      // Update the local state
+      const updatedFeatures = [...features];
+      updatedFeatures[featureIndex] = {
+        ...feature,
+        enabled: newEnabledState,
+        hidden: !newEnabledState // hide if disabled
+      };
+      
+      setFeatures(updatedFeatures);
+      
+      toast.success(`${feature.name} has been ${newEnabledState ? 'enabled' : 'disabled'}.`);
+    } catch (error) {
+      console.error(`Error toggling feature ${featureId}:`, error);
+      toast.error("There was an error updating the feature status.");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  // Set up realtime subscription
   useEffect(() => {
-    fetchFeatureStatus();
-  }, [fetchFeatureStatus]);
+    if (!user?.id) return;
+
+    let isMounted = true;
+
+    const channel = supabase
+      .channel('features-changes')
+      .on(
+        'postgres_changes', 
+        {
+          event: '*',
+          schema: 'public',
+          table: 'features',
+          filter: `user_id=eq.${user.id}`
+        },
+        (payload) => {
+          if (!isMounted) return;
+          
+          console.log('Realtime features update received:', payload);
+          fetchFeatures();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      isMounted = false;
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id, fetchFeatures]);
+
+  // Fetch features on mount
+  useEffect(() => {
+    fetchFeatures();
+  }, [fetchFeatures]);
 
   return {
     features,
     loading: loading || isProcessing,
     handleToggleFeature,
-    handleToggleVisibility,
-    refetchFeatures: fetchFeatureStatus
+    refetchFeatures: fetchFeatures
   };
 };
-
-export type { FeatureItem };

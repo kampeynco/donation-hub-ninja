@@ -15,6 +15,7 @@ import SignUp from "./pages/Auth/SignUp";
 import Dashboard from "./pages/Dashboard";
 import Account from "./pages/Account";
 import Personas from "./pages/Personas";
+import FeatureProtectedRoute from "./components/Auth/FeatureProtectedRoute";
 import Logs from "./pages/Logs";
 import Connections from "./pages/Connections";
 import NotFound from "./pages/NotFound";
@@ -71,11 +72,11 @@ const App = () => (
                 <Route 
                   path="/personas" 
                   element={
-                    <ProtectedRoute>
+                    <FeatureProtectedRoute featureId="personas">
                       <Layout>
                         <Personas />
                       </Layout>
-                    </ProtectedRoute>
+                    </FeatureProtectedRoute>
                   } 
                 />
                 <Route 

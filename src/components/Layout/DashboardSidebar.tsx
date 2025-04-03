@@ -9,11 +9,7 @@ import SidebarActions from "./Sidebar/SidebarActions";
 import sidebarItems from "./Sidebar/sidebarItems";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { 
-  checkWaitlistStatus, 
-  getFeatureVisibilityPreference,
-  FeatureName
-} from "@/services/waitlistService";
+import { supabase } from "@/integrations/supabase/client";
 
 const DashboardSidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -21,40 +17,73 @@ const DashboardSidebar = () => {
   const location = useLocation();
   const { user } = useAuth();
 
-  // Re-evaluate sidebar items when component mounts, route changes, or user changes
-  useEffect(() => {
-    const updateSidebarItems = async () => {
-      if (!user) return;
+  // Fetch feature flags from database
+  const fetchFeatures = useCallback(async () => {
+    if (!user) return;
+
+    try {
+      // Get features from the database
+      const { data, error } = await supabase
+        .from('features')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
       
-      // Create a new array instead of modifying the existing one
-      const updatedItems = [...sidebarItems];
+      if (error) {
+        console.error('Error fetching features:', error);
+        return;
+      }
       
-      // Check Personas feature status
-      const featureName = "Personas" as FeatureName;
-      const waitlistStatus = await checkWaitlistStatus(featureName, user.id);
-      const hidePreference = getFeatureVisibilityPreference(featureName);
-      
-      for (let i = 0; i < updatedItems.length; i++) {
-        if (updatedItems[i].name === featureName) {
-          // Hide based on preference or if declined
-          const shouldHide = hidePreference || waitlistStatus?.status === "declined";
-          
-          // Only show if approved or not hidden by preference
-          updatedItems[i] = {
-            ...updatedItems[i],
-            hidden: shouldHide
+      // Create a new array of sidebar items with visibility based on features
+      const updatedItems = sidebarItems.map(item => {
+        if (item.name === "Personas") {
+          return {
+            ...item,
+            hidden: !data.personas
           };
         }
-      }
+        return item;
+      });
       
-      // Only update state if items are different to prevent unnecessary renders
-      if (JSON.stringify(updatedItems) !== JSON.stringify(items)) {
-        setItems(updatedItems);
-      }
+      setItems(updatedItems);
+    } catch (err) {
+      console.error('Unexpected error fetching features:', err);
+    }
+  }, [user]);
+
+  // Set up realtime subscription for features
+  useEffect(() => {
+    if (!user?.id) return;
+
+    let isMounted = true;
+
+    const channel = supabase
+      .channel('sidebar-features-changes')
+      .on(
+        'postgres_changes', 
+        {
+          event: '*',
+          schema: 'public',
+          table: 'features',
+          filter: `user_id=eq.${user.id}`
+        },
+        () => {
+          if (!isMounted) return;
+          fetchFeatures();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      isMounted = false;
+      supabase.removeChannel(channel);
     };
-    
-    updateSidebarItems();
-  }, [location.pathname, user]);
+  }, [user?.id, fetchFeatures]);
+
+  // Re-evaluate sidebar items when component mounts, route changes, or user changes
+  useEffect(() => {
+    fetchFeatures();
+  }, [location.pathname, user, fetchFeatures]);
 
   const toggleSidebar = useCallback(() => setCollapsed(prev => !prev), []);
 
