@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
 import { Tabs } from '@/components/ui/tabs';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNotificationsContext } from '@/context/NotificationsContext';
 import LogsHeader from '@/components/Logs/LogsHeader';
 import NotificationTabs from '@/components/Logs/NotificationTabs';
@@ -48,19 +47,11 @@ const Logs = () => {
     <div className="container mx-auto py-8 space-y-8">
       <LogsHeader title="Activity Logs" hasUnread={hasUnread} onMarkAllAsRead={markAllAsRead} />
       
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="all" value={activeTab} onValueChange={handleTabChange}>
-            <NotificationTabs activeTab={activeTab} unreadCounts={unreadCounts} />
-            
-            <NotificationTabContent activeTab={activeTab} notifications={filteredNotifications} loading={loading} error={error} onMarkAsRead={markAsRead} onDelete={handleDeleteNotification} />
-          </Tabs>
-        </CardContent>
-      </Card>
+      <Tabs defaultValue="all" value={activeTab} onValueChange={handleTabChange}>
+        <NotificationTabs activeTab={activeTab} unreadCounts={unreadCounts} />
+        
+        <NotificationTabContent activeTab={activeTab} notifications={filteredNotifications} loading={loading} error={error} onMarkAsRead={markAsRead} onDelete={handleDeleteNotification} />
+      </Tabs>
     </div>
   );
 };
