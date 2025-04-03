@@ -18,6 +18,15 @@ export const FeatureItem: React.FC<FeatureItemProps> = ({
   onToggleVisibility 
 }) => {
   const isEnabled = feature.status === "approved" || feature.status === "joined";
+  const isRejected = feature.status === "rejected";
+  
+  const handleToggleFeature = () => {
+    onToggleFeature(feature.id);
+  };
+  
+  const handleToggleVisibility = () => {
+    onToggleVisibility(feature.id);
+  };
   
   return (
     <div className="space-y-2">
@@ -27,23 +36,26 @@ export const FeatureItem: React.FC<FeatureItemProps> = ({
           <FeatureStatusBadge status={feature.status} beta={feature.beta} />
           <Switch
             checked={isEnabled}
-            onCheckedChange={() => onToggleFeature(feature.id)}
-            disabled={feature.status === "rejected"}
+            onCheckedChange={handleToggleFeature}
+            disabled={isRejected}
+            aria-label={`Toggle ${feature.name}`}
           />
         </div>
       </div>
       <p className="text-sm text-muted-foreground">{feature.description}</p>
       
-      {/* Only show UI visibility toggle if feature is enabled or declined */}
+      {/* Only show UI visibility toggle if feature is enabled or has been declined */}
       {(feature.status === "approved" || feature.status === "declined") && (
         <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100 dark:border-gray-800">
           <div>
-            <Label className="font-medium">Show in sidebar</Label>
+            <Label htmlFor={`visibility-${feature.id}`} className="font-medium">Show in sidebar</Label>
             <p className="text-xs text-muted-foreground">Control visibility in your navigation menu</p>
           </div>
           <Switch
+            id={`visibility-${feature.id}`}
             checked={!feature.hidden}
-            onCheckedChange={() => onToggleVisibility(feature.id)}
+            onCheckedChange={handleToggleVisibility}
+            aria-label={`Toggle visibility of ${feature.name} in sidebar`}
           />
         </div>
       )}

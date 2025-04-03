@@ -19,6 +19,10 @@ const FeaturesTab = () => {
 
           {loading ? (
             <FeaturesLoading />
+          ) : features.length === 0 ? (
+            <div className="p-4 border rounded-md bg-gray-50 dark:bg-gray-900 text-center">
+              <p className="text-muted-foreground">No features are available right now.</p>
+            </div>
           ) : (
             <div className="space-y-4">
               {features.map(feature => (

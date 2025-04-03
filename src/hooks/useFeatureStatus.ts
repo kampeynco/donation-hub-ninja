@@ -3,13 +3,14 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
+import { WaitlistStatus } from '@/services/waitlistService';
 
 // Define types for the data you're fetching
-interface Feature {
+export interface Feature {
   id: number | string;
   name: string;
   description: string;
-  waitlist_status: string | null;
+  waitlist_status: WaitlistStatus;
 }
 
 interface RealtimePayload {
@@ -19,41 +20,61 @@ interface RealtimePayload {
   record: Database['public']['Tables']['waitlists']['Row'];
   old_record: Database['public']['Tables']['waitlists']['Row'] | null;
   errors: string[] | null;
-  new: Database['public']['Tables']['waitlists']['Row'];
+  new: {
+    feature_name: string;
+    status: WaitlistStatus;
+    user_id: string;
+    [key: string]: any;
+  };
 }
 
 export function useFeatureStatus(initialFeatures: Feature[]) {
   const { user } = useAuth();
   const [updatedFeatures, setUpdatedFeatures] = useState<Feature[]>(initialFeatures);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      setIsLoading(false);
+      return;
+    }
+
+    let isMounted = true;
+    setIsLoading(true);
 
     // Fetch current waitlist statuses for this user
     const fetchWaitlistStatus = async () => {
-      const { data, error } = await supabase
-        .from('waitlists')
-        .select('*')
-        .eq('user_id', user.id);
-      
-      if (error) {
-        console.error('Error fetching waitlist status:', error);
-        return;
-      }
-      
-      if (data.length > 0) {
-        const updatedFeaturesState = updatedFeatures.map(feature => {
-          const matchingEntry = data.find(entry => entry.feature_name === feature.name);
-          if (matchingEntry) {
-            return {
-              ...feature,
-              waitlist_status: matchingEntry.status
-            };
-          }
-          return feature;
-        });
+      try {
+        const { data, error } = await supabase
+          .from('waitlists')
+          .select('*')
+          .eq('user_id', user.id);
         
-        setUpdatedFeatures(updatedFeaturesState);
+        if (error) {
+          console.error('Error fetching waitlist status:', error);
+          return;
+        }
+        
+        if (data.length > 0 && isMounted) {
+          const updatedFeaturesState = initialFeatures.map(feature => {
+            const matchingEntry = data.find(entry => entry.feature_name === feature.name);
+            if (matchingEntry) {
+              return {
+                ...feature,
+                waitlist_status: matchingEntry.status as WaitlistStatus
+              };
+            }
+            return feature;
+          });
+          
+          setUpdatedFeatures(updatedFeaturesState);
+        }
+      } catch (err) {
+        console.error('Unexpected error fetching waitlist status:', err);
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
@@ -65,33 +86,40 @@ export function useFeatureStatus(initialFeatures: Feature[]) {
       .on(
         'postgres_changes',
         { 
-          event: 'INSERT', 
+          event: '*', // Listen to all events (INSERT, UPDATE, DELETE)
           schema: 'public',
           table: 'waitlists',
           filter: `user_id=eq.${user.id}`
         },
         (payload: RealtimePayload) => {
-          // Update the local state when waitlist status changes
-          const updatedFeaturesState = updatedFeatures.map(feature => {
-            // Match the feature name instead of non-existent feature_id
-            if (feature.name === payload.new.feature_name) {
-              return {
-                ...feature,
-                waitlist_status: payload.new.status
-              };
-            }
-            return feature;
-          });
+          if (!isMounted) return;
           
-          setUpdatedFeatures(updatedFeaturesState);
+          console.log('Realtime waitlist update received:', payload);
+          
+          // Update the local state when waitlist status changes
+          setUpdatedFeatures(prevFeatures => 
+            prevFeatures.map(feature => {
+              // Match the feature name with payload data
+              if (feature.name === payload.new.feature_name) {
+                return {
+                  ...feature,
+                  waitlist_status: payload.new.status
+                };
+              }
+              return feature;
+            })
+          );
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Supabase channel status:', status);
+      });
 
     return () => {
+      isMounted = false;
       channel.unsubscribe();
     };
   }, [user?.id, initialFeatures]);
 
-  return updatedFeatures;
+  return { features: updatedFeatures, isLoading };
 }

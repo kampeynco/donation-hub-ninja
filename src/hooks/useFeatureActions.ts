@@ -8,6 +8,7 @@ import {
 } from "@/services/waitlistService";
 import { toast } from "sonner";
 import { FeatureItem } from "@/types/features";
+import { supabase } from "@/integrations/supabase/client";
 
 export const useFeatureActions = (features: FeatureItem[], setFeatures: React.Dispatch<React.SetStateAction<FeatureItem[]>>) => {
   const { user } = useAuth();
@@ -24,12 +25,11 @@ export const useFeatureActions = (features: FeatureItem[], setFeatures: React.Di
     try {
       setIsProcessing(true);
       
+      // Show immediate feedback with optimistic UI update
+      const updatedFeatures = [...features];
+      
       if (feature.status === "joined" || feature.status === "approved") {
-        // If already on waitlist or approved, remove from waitlist
-        await resetWaitlistStatus(feature.name, user.id);
-        
-        // Update local state
-        const updatedFeatures = [...features];
+        // Optimistic UI update
         updatedFeatures[featureIndex] = {
           ...feature,
           status: null,
@@ -37,13 +37,11 @@ export const useFeatureActions = (features: FeatureItem[], setFeatures: React.Di
         };
         setFeatures(updatedFeatures);
         
+        // If already on waitlist or approved, remove from waitlist
+        await resetWaitlistStatus(feature.name, user.id);
         toast.info(`${feature.name} has been disabled.`);
       } else {
-        // Join waitlist for the feature
-        await joinWaitlist(feature.name, user.id);
-        
-        // Update local state
-        const updatedFeatures = [...features];
+        // Optimistic UI update
         updatedFeatures[featureIndex] = {
           ...feature,
           status: "joined",
@@ -51,11 +49,30 @@ export const useFeatureActions = (features: FeatureItem[], setFeatures: React.Di
         };
         setFeatures(updatedFeatures);
         
+        // Join waitlist for the feature
+        await joinWaitlist(feature.name, user.id);
         toast.success(`You've been added to the waitlist for ${feature.name}.`);
       }
     } catch (error) {
       console.error(`Error updating feature ${featureId}:`, error);
       toast.error("There was an error updating the feature status.");
+      
+      // Revert optimistic update in case of error
+      const { data } = await supabase
+        .from('waitlists')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('feature_name', feature.name)
+        .single();
+        
+      // Restore the correct state
+      const updatedFeatures = [...features];
+      updatedFeatures[featureIndex] = {
+        ...feature,
+        status: data ? data.status : null,
+        enabled: (data && data.status === "approved")
+      };
+      setFeatures(updatedFeatures);
     } finally {
       setIsProcessing(false);
     }

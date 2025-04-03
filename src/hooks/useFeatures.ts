@@ -6,14 +6,16 @@ import { useFeatureStatus } from "./useFeatureStatus";
 import { useFeatureVisibility } from "./useFeatureVisibility";
 import { useFeatureActions } from "./useFeatureActions";
 import { WaitlistStatus } from "@/services/waitlistService";
+import { toast } from "sonner";
 
 export type { FeatureItem } from "@/types/features";
 
 export const useFeatures = () => {
   const { user } = useAuth();
   const [features, setFeatures] = useState<FeatureItem[]>(INITIAL_FEATURES);
+  const [loading, setLoading] = useState(true);
   
-  // Get feature statuses from waitlist - convert INITIAL_FEATURES to the expected format
+  // Get feature statuses from waitlist
   const featuresForStatus = INITIAL_FEATURES.map(feature => ({
     id: feature.id,
     name: feature.name,
@@ -21,23 +23,23 @@ export const useFeatures = () => {
     waitlist_status: feature.status
   }));
   
-  const updatedFeaturesWithStatus = useFeatureStatus(featuresForStatus);
+  const { features: updatedFeaturesWithStatus, isLoading: statusLoading } = useFeatureStatus(featuresForStatus);
   
   // Apply feature statuses to our features
   useEffect(() => {
     if (updatedFeaturesWithStatus.length > 0) {
-      const updatedFeatures = features.map(feature => {
-        const statusFeature = updatedFeaturesWithStatus.find(f => f.name === feature.name);
-        if (statusFeature) {
-          return {
-            ...feature,
-            status: statusFeature.waitlist_status as WaitlistStatus
-          };
-        }
-        return feature;
-      });
-      
-      setFeatures(updatedFeatures);
+      setFeatures(prevFeatures => 
+        prevFeatures.map(feature => {
+          const statusFeature = updatedFeaturesWithStatus.find(f => f.name === feature.name);
+          if (statusFeature) {
+            return {
+              ...feature,
+              status: statusFeature.waitlist_status
+            };
+          }
+          return feature;
+        })
+      );
     }
   }, [updatedFeaturesWithStatus]);
   
@@ -57,9 +59,14 @@ export const useFeatures = () => {
     }
   }, [featuresWithVisibility]);
 
+  // Set loading state based on all loading states
+  useEffect(() => {
+    setLoading(statusLoading || isProcessing);
+  }, [statusLoading, isProcessing]);
+
   return {
     features,
-    loading: isProcessing,
+    loading,
     handleToggleFeature,
     handleToggleVisibility
   };
