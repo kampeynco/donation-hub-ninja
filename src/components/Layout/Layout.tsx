@@ -72,7 +72,7 @@ const Layout = ({ children }: LayoutProps) => {
             <div className="container max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
               <div 
                 className={`transition-opacity duration-200 ${
-                  isTransitioning ? 'opacity-30' : 'opacity-100'
+                  isTransitioning ? 'opacity-70' : 'opacity-100'
                 }`}
               >
                 {displayedChildren}
