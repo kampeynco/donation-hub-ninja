@@ -77,13 +77,15 @@ const Home = () => {
               </div>
             </div>
             
-            {/* Main hero content */}
+            {/* Main hero content with updated line breaks */}
             <div className="text-center max-w-4xl mx-auto z-10 relative">
               <h1 className="text-4xl md:text-6xl font-bold mb-6">
-                Donor intent is hiding in plain sight.
+                Donor intent is hiding<br />
+                in plain sight.
               </h1>
               <h2 className="text-4xl md:text-6xl font-bold mb-8">
-                Donor Camp reveals it—<span className="bg-primary/10 px-2 py-1 rounded">and automates your next move</span>.
+                Donor Camp reveals it,<br />
+                <span className="bg-primary/10 px-2 py-1 rounded">and automates your next move</span>.
               </h2>
               <p className="text-xl md:text-2xl mb-10 max-w-2xl mx-auto">
                 Engage the right donors at the right time. Donor Camp captures intent and connects it to the tools your team already uses.
