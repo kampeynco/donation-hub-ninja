@@ -15,7 +15,9 @@ import SignUp from "./pages/Auth/SignUp";
 import Dashboard from "./pages/Dashboard";
 import Account from "./pages/Account";
 import Personas from "./pages/Personas";
+import Universe from "./pages/Universe";
 import FeatureProtectedRoute from "./components/Auth/FeatureProtectedRoute";
+import UniverseProtectedRoute from "./components/Auth/UniverseProtectedRoute";
 import Logs from "./pages/Logs";
 import Connections from "./pages/Connections";
 import NotFound from "./pages/NotFound";
@@ -74,6 +76,16 @@ const App = () => (
                   <FeatureProtectedRoute featureId="personas">
                     <Layout>
                       <Personas />
+                    </Layout>
+                  </FeatureProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/universe" 
+                element={
+                  <UniverseProtectedRoute>
+                    <Layout>
+                      <Universe />
                     </Layout>
                   </FeatureProtectedRoute>
                 } 

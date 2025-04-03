@@ -5,7 +5,8 @@ import {
   IconCurrentLocation,
   IconAdjustments,
   IconStarFilled,
-  IconPlugConnected
+  IconPlugConnected,
+  IconWorld
 } from "@tabler/icons-react";
 
 export interface SidebarItemType {
@@ -39,6 +40,18 @@ const sidebarItems: SidebarItemType[] = [
     name: "Personas",
     path: "/personas",
     icon: IconCurrentLocation,
+    badge: {
+      text: "Beta",
+      variant: "beta",
+      icon: IconStarFilled
+    },
+    // Initial state is visible, will be updated by DashboardSidebar
+    hidden: false
+  },
+  {
+    name: "Universe",
+    path: "/universe",
+    icon: IconWorld,
     badge: {
       text: "Beta",
       variant: "beta",

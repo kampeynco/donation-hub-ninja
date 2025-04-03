@@ -16,6 +16,13 @@ export const INITIAL_FEATURES: FeatureItem[] = [
     enabled: true,
     beta: true,
     hidden: true
+  },
+  {
+    id: "universe",
+    name: "Universe",
+    description: "View donor activity across the platform",
+    enabled: true,
+    beta: true,
+    hidden: true
   }
 ];
-

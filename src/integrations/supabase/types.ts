@@ -280,6 +280,7 @@ export type Database = {
           created_at: string
           id: string
           personas: boolean
+          universe: boolean
           updated_at: string
           user_id: string
         }
@@ -287,6 +288,7 @@ export type Database = {
           created_at?: string
           id?: string
           personas?: boolean
+          universe?: boolean
           updated_at?: string
           user_id: string
         }
@@ -294,6 +296,7 @@ export type Database = {
           created_at?: string
           id?: string
           personas?: boolean
+          universe?: boolean
           updated_at?: string
           user_id?: string
         }
