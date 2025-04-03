@@ -1,8 +1,11 @@
 
 import { supabase } from "@/integrations/supabase/client";
 
+// Define a type for valid feature names based on the database schema
+type FeatureName = "Personas";
+
 // Check if a user is on a specific feature's waitlist and their status
-export const checkWaitlistStatus = async (featureName: string, userId: string) => {
+export const checkWaitlistStatus = async (featureName: FeatureName, userId: string) => {
   try {
     const { data, error } = await supabase
       .from("waitlists")
@@ -24,7 +27,7 @@ export const checkWaitlistStatus = async (featureName: string, userId: string) =
 };
 
 // Join a waitlist for a feature
-export const joinWaitlist = async (featureName: string, userId: string) => {
+export const joinWaitlist = async (featureName: FeatureName, userId: string) => {
   try {
     const { error } = await supabase
       .from("waitlists")
@@ -50,7 +53,7 @@ export const joinWaitlist = async (featureName: string, userId: string) => {
 };
 
 // Decline a feature with a reason
-export const declineFeature = async (featureName: string, userId: string, reason: string) => {
+export const declineFeature = async (featureName: FeatureName, userId: string, reason: string) => {
   try {
     const { error } = await supabase
       .from("waitlists")
@@ -77,7 +80,7 @@ export const declineFeature = async (featureName: string, userId: string, reason
 };
 
 // Reset waitlist status (remove from waitlist)
-export const resetWaitlistStatus = async (featureName: string, userId: string) => {
+export const resetWaitlistStatus = async (featureName: FeatureName, userId: string) => {
   try {
     const { error } = await supabase
       .from("waitlists")
