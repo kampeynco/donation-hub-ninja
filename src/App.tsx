@@ -87,7 +87,7 @@ const App = () => (
                     <Layout>
                       <Universe />
                     </Layout>
-                  </FeatureProtectedRoute>
+                  </UniverseProtectedRoute>
                 } 
               />
               <Route 
