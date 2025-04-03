@@ -4,6 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import { FeatureItem } from "@/types/features";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { INITIAL_FEATURES } from "@/types/features";
 
 export interface Feature {
   personas: boolean;
@@ -27,24 +28,41 @@ export const useFeatures = () => {
         .from('features')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .limit(1); // Add limit to avoid multiple results
       
       if (error) {
         console.error('Error fetching features:', error);
-        
-        // If no row found, create a new row
-        if (error.code === 'PGRST116') {
-          const { error: insertError } = await supabase
-            .from('features')
-            .insert({ user_id: user.id })
-            .select();
-          
-          if (insertError) {
-            console.error('Error creating features:', insertError);
-            return;
-          }
-        }
+        setFeatures(INITIAL_FEATURES);
         return;
+      }
+      
+      if (!data || data.length === 0) {
+        // No features found, create a new row
+        const { error: insertError } = await supabase
+          .from('features')
+          .insert({ user_id: user.id })
+          .select();
+        
+        if (insertError) {
+          console.error('Error creating features:', insertError);
+          setFeatures(INITIAL_FEATURES);
+          return;
+        }
+        
+        // Re-fetch after insert
+        const { data: newData, error: refetchError } = await supabase
+          .from('features')
+          .select('*')
+          .eq('user_id', user.id)
+          .limit(1);
+          
+        if (refetchError || !newData || newData.length === 0) {
+          console.error('Error fetching features after creation:', refetchError);
+          setFeatures(INITIAL_FEATURES);
+          return;
+        }
+        
+        data = newData;
       }
       
       // Convert the database feature flags to FeatureItem[]
@@ -53,15 +71,16 @@ export const useFeatures = () => {
           id: "personas",
           name: "Personas",
           description: "Access donor personas and analytics",
-          enabled: data.personas,
+          enabled: data[0].personas,
           beta: true,
-          hidden: !data.personas // hide if not enabled
+          hidden: !data[0].personas // hide if not enabled
         }
       ];
       
       setFeatures(featureItems);
     } catch (err) {
       console.error('Unexpected error fetching features:', err);
+      setFeatures(INITIAL_FEATURES);
     } finally {
       setLoading(false);
     }

@@ -29,15 +29,15 @@ const FeatureProtectedRoute: React.FC<FeatureProtectedRouteProps> = ({
       try {
         const { data, error } = await supabase
           .from('features')
-          .select(featureId)
+          .select('*')
           .eq('user_id', user.id)
-          .single();
+          .limit(1);
         
-        if (error) {
+        if (error || !data || data.length === 0) {
           console.error('Error checking feature access:', error);
           setHasAccess(false);
         } else {
-          setHasAccess(!!data[featureId]);
+          setHasAccess(!!data[0][featureId]);
         }
       } catch (error) {
         console.error('Unexpected error checking feature access:', error);

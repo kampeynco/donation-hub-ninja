@@ -19,15 +19,15 @@ export function useFeatureVisibility(featureId: string) {
       try {
         const { data, error } = await supabase
           .from('features')
-          .select(featureId)
+          .select('*')
           .eq('user_id', user.id)
-          .single();
+          .limit(1);
 
-        if (error) {
+        if (error || !data || data.length === 0) {
           console.error("Error checking feature visibility:", error);
           setIsVisible(false);
         } else {
-          setIsVisible(!!data[featureId]);
+          setIsVisible(!!data[0][featureId]);
         }
       } catch (error) {
         console.error("Unexpected error:", error);

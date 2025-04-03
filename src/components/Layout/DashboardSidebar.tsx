@@ -27,10 +27,14 @@ const DashboardSidebar = () => {
         .from('features')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .limit(1);
       
       if (error) {
         console.error('Error fetching features:', error);
+        return;
+      }
+      
+      if (!data || data.length === 0) {
         return;
       }
       
@@ -39,7 +43,7 @@ const DashboardSidebar = () => {
         if (item.name === "Personas") {
           return {
             ...item,
-            hidden: !data.personas
+            hidden: !data[0].personas
           };
         }
         return item;

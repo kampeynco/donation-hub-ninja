@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 
-// This is a simplified version that will be replaced by the database-based implementation
 export function useFeatureActions() {
   const [isUpdating, setIsUpdating] = useState(false);
   const { user } = useAuth();
