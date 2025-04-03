@@ -4,6 +4,59 @@ import { supabase } from "@/integrations/supabase/client";
 import { getCurrentUserId, handleDonationError } from "./helpers";
 
 /**
+ * Helper function to fetch recent activity (notifications from the last 24 hours)
+ */
+async function fetchRecentActivityCount() {
+  try {
+    const userId = await getCurrentUserId();
+    if (!userId) {
+      return 0;
+    }
+
+    const oneDayAgo = new Date();
+    oneDayAgo.setHours(oneDayAgo.getHours() - 24);
+    
+    // Count notifications from the last 24 hours
+    const { count, error } = await supabase
+      .from('notifications')
+      .select('*', { count: 'exact', head: true })
+      .gte('date', oneDayAgo.toISOString());
+    
+    if (error) throw error;
+    
+    return count || 0;
+  } catch (error) {
+    console.error('Error fetching recent activity count:', error);
+    return 0;
+  }
+}
+
+/**
+ * Helper function to fetch total unique donors
+ */
+async function fetchTotalDonorsCount() {
+  try {
+    const userId = await getCurrentUserId();
+    if (!userId) {
+      return 0;
+    }
+
+    // Get count of unique donors associated with the current user
+    const { count, error } = await supabase
+      .from('user_donors')
+      .select('donor_id', { count: 'exact', head: true })
+      .eq('user_id', userId);
+    
+    if (error) throw error;
+    
+    return count || 0;
+  } catch (error) {
+    console.error('Error fetching total donors count:', error);
+    return 0;
+  }
+}
+
+/**
  * Helper function to fetch last 30 days stats
  */
 async function fetchLast30DaysStats() {
@@ -153,10 +206,12 @@ async function fetchMonthlyDonorsCount() {
 export async function fetchDonationStats(): Promise<DonationStats> {
   try {
     // Fetch all stats in parallel for better performance
-    const [lastThirtyDays, allTime, monthlyDonorsCount] = await Promise.all([
+    const [lastThirtyDays, allTime, monthlyDonorsCount, recentActivityCount, totalDonorsCount] = await Promise.all([
       fetchLast30DaysStats(),
       fetchAllTimeStats(),
-      fetchMonthlyDonorsCount()
+      fetchMonthlyDonorsCount(),
+      fetchRecentActivityCount(),
+      fetchTotalDonorsCount()
     ]);
     
     return {
@@ -164,6 +219,12 @@ export async function fetchDonationStats(): Promise<DonationStats> {
       allTime,
       monthly: {
         donors: monthlyDonorsCount
+      },
+      recentActivity: {
+        count: recentActivityCount
+      },
+      totalDonors: {
+        count: totalDonorsCount
       }
     };
   } catch (error) {
@@ -171,7 +232,9 @@ export async function fetchDonationStats(): Promise<DonationStats> {
     return {
       lastThirtyDays: { total: 0, count: 0 },
       allTime: { total: 0, count: 0 },
-      monthly: { donors: 0 }
+      monthly: { donors: 0 },
+      recentActivity: { count: 0 },
+      totalDonors: { count: 0 }
     };
   }
 }

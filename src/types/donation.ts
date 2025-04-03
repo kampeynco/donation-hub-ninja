@@ -21,4 +21,10 @@ export interface DonationStats {
   monthly: {
     donors: number;
   };
+  recentActivity: {
+    count: number;
+  };
+  totalDonors: {
+    count: number;
+  };
 }
