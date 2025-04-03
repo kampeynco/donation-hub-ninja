@@ -17,6 +17,7 @@ interface NotificationRowProps {
 const NotificationRow = ({ notification, onMarkAsRead, onDelete }: NotificationRowProps) => {
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
+    console.log(`NotificationRow: Deleting notification with ID: ${notification.id}`);
     onDelete(notification.id);
   };
 

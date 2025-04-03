@@ -112,10 +112,8 @@ export async function markAllNotificationsAsRead(): Promise<boolean> {
  */
 export async function deleteNotification(id: string): Promise<boolean> {
   try {
-    // Add debug logging
-    console.log(`Attempting to delete notification with ID: ${id}`);
+    console.log(`API: Attempting to delete notification with ID: ${id}`);
     
-    // Fixed: Removed the "count" selection which was causing the SQL error
     const { error } = await supabase
       .from('notifications')
       .delete()
@@ -131,8 +129,7 @@ export async function deleteNotification(id: string): Promise<boolean> {
       return false;
     }
     
-    // Log successful deletion
-    console.log(`Successfully deleted notification with ID: ${id}`);
+    console.log(`API: Successfully deleted notification with ID: ${id}`);
     
     return true;
   } catch (error) {

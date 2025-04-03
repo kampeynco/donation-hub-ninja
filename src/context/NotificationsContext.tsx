@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { Notification } from '@/components/Notifications/NotificationBell';
 import { supabase } from '@/integrations/supabase/client';
@@ -81,6 +82,7 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
           table: 'notifications'
         },
         (payload) => {
+          console.log('DELETE event received for notification:', payload.old.id);
           setNotifications(prev => prev.filter(n => n.id !== payload.old.id));
         }
       )
@@ -152,10 +154,18 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const handleDeleteNotification = async (id: string) => {
+    console.log(`Context: Handling deletion for notification ID: ${id}`);
     try {
       const success = await deleteNotification(id);
       if (success) {
+        console.log(`Context: Successfully deleted notification ID: ${id}, updating state`);
         setNotifications(prev => prev.filter(n => n.id !== id));
+        toast({
+          title: 'Success',
+          description: 'Notification deleted',
+        });
+      } else {
+        console.error(`Context: Failed to delete notification ID: ${id}`);
       }
     } catch (err) {
       console.error('Error deleting notification:', err);

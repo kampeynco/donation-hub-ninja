@@ -24,6 +24,11 @@ const NotificationsList = ({
   deleteNotification,
   onClose
 }: NotificationsListProps) => {
+  const handleDeleteNotification = (id: string) => {
+    console.log(`NotificationsList: Deleting notification with ID: ${id}`);
+    deleteNotification(id);
+  };
+
   return (
     <div className="flex flex-col max-h-[500px]">
       <div className="flex items-center justify-between px-4 py-3 bg-primary-50">
@@ -73,7 +78,7 @@ const NotificationsList = ({
                     className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 p-1"
                     onClick={(e) => {
                       e.stopPropagation();
-                      deleteNotification(notification.id);
+                      handleDeleteNotification(notification.id);
                     }}
                   >
                     <IconX size={16} />
