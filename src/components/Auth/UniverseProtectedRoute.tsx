@@ -1,10 +1,7 @@
 
-import React, { useState, useEffect } from "react";
-import { Navigate } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext";
-import { toast } from "sonner";
-import { Skeleton } from "@/components/ui/skeleton";
+import React from "react";
 import { useFeatureCache } from "@/hooks/useFeatureCache";
+import ProtectedRouteBase from "./ProtectedRouteBase";
 
 interface UniverseProtectedRouteProps {
   children: React.ReactNode;
@@ -13,47 +10,20 @@ interface UniverseProtectedRouteProps {
 const UniverseProtectedRoute: React.FC<UniverseProtectedRouteProps> = ({ 
   children 
 }) => {
-  const { user } = useAuth();
-  const { hasFeature, isLoading: isCacheLoading } = useFeatureCache();
-  const [hasAccess, setHasAccess] = useState<boolean | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { hasFeature } = useFeatureCache();
 
-  useEffect(() => {
-    // Use the cached value if available
-    if (!isCacheLoading) {
-      const featureEnabled = hasFeature("universe");
-      setHasAccess(featureEnabled);
-      setIsLoading(false);
-    }
-  }, [hasFeature, isCacheLoading]);
+  const checkAccess = async () => {
+    return hasFeature("universe");
+  };
 
-  if (!user) {
-    return <Navigate to="/auth/signin" replace />;
-  }
-
-  if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-120px)] p-4">
-        <div className="w-full max-w-6xl">
-          <Skeleton className="h-12 w-1/3 mb-6" />
-          <Skeleton className="h-8 w-2/3 mb-4" />
-          <Skeleton className="h-8 w-1/2 mb-10" />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Skeleton className="h-48 rounded-lg" />
-            <Skeleton className="h-48 rounded-lg" />
-            <Skeleton className="h-48 rounded-lg" />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!hasAccess) {
-    toast.error(`You don't have access to the Universe feature. Enable it in your account settings.`);
-    return <Navigate to="/account?tab=features" replace />;
-  }
-
-  return <>{children}</>;
+  return (
+    <ProtectedRouteBase 
+      checkAccess={checkAccess}
+      errorMessage={`You don't have access to the Universe feature. Enable it in your account settings.`}
+    >
+      {children}
+    </ProtectedRouteBase>
+  );
 };
 
 export default UniverseProtectedRoute;
