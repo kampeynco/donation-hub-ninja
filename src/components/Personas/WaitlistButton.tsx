@@ -12,20 +12,36 @@ const WaitlistButton = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
     const checkStatus = async () => {
-      if (!user) return;
+      if (!user) {
+        if (isMounted) {
+          setLoading(false);
+          setIsJoined(null);
+        }
+        return;
+      }
       
       try {
         const status = await checkWaitlistStatus('Personas', user.id);
-        setIsJoined(status === true);
+        if (isMounted) {
+          setIsJoined(status === true);
+          setLoading(false);
+        }
       } catch (error) {
         console.error('Error checking waitlist status:', error);
-      } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     checkStatus();
+    
+    // Cleanup function to prevent updates if component unmounts
+    return () => {
+      isMounted = false;
+    };
   }, [user]);
 
   const handleJoinWaitlist = async () => {

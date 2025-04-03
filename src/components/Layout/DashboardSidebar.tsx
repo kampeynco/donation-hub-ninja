@@ -31,30 +31,23 @@ const DashboardSidebar = () => {
           ...item,
           hidden: item.name === "Personas" ? true : item.hidden
         }));
-        
-        setItems(updatedItems);
-        return;
+      } else if (user) {
+        // Otherwise show Personas unless explicitly hidden
+        updatedItems = updatedItems.map(item => ({
+          ...item,
+          hidden: item.name === "Personas" ? false : item.hidden
+        }));
       }
       
-      // Otherwise check waitlist status if user is logged in
-      if (user) {
-        try {
-          // No need to check waitlist status to determine visibility
-          // We'll always show Personas unless explicitly hidden by "not interested"
-          updatedItems = updatedItems.map(item => ({
-            ...item,
-            hidden: item.name === "Personas" ? false : item.hidden
-          }));
-          
-          setItems(updatedItems);
-        } catch (error) {
-          console.error("Error checking waitlist status:", error);
-        }
+      // Only update state if items are different to prevent unnecessary renders
+      const itemsChanged = JSON.stringify(updatedItems) !== JSON.stringify(items);
+      if (itemsChanged) {
+        setItems(updatedItems);
       }
     };
     
     updateSidebarItems();
-  }, [location.pathname, user]);
+  }, [location.pathname, user, items]);
 
   const toggleSidebar = () => setCollapsed(!collapsed);
 

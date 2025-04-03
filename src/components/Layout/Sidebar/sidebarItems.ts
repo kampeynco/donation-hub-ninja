@@ -20,11 +20,8 @@ export interface SidebarItemType {
   hidden?: boolean;
 }
 
-// Function to check if Personas should be hidden
-const shouldHidePersonas = (): boolean => {
-  return localStorage.getItem("hidePersonasSidebar") === "true";
-};
-
+// Define the initial sidebar items without checking localStorage
+// This prevents issues with rendering on server-side or during initialization
 const sidebarItems: SidebarItemType[] = [
   {
     name: "Camp",
@@ -46,7 +43,8 @@ const sidebarItems: SidebarItemType[] = [
       variant: "beta",
       icon: IconSparkles
     },
-    hidden: shouldHidePersonas()
+    // Initial state is visible, will be updated by DashboardSidebar
+    hidden: false
   },
   {
     name: "Settings",
