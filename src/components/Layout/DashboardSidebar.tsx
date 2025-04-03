@@ -9,94 +9,41 @@ import SidebarActions from "./Sidebar/SidebarActions";
 import sidebarItems from "./Sidebar/sidebarItems";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import { useFeatureCache } from "@/hooks/useFeatureCache";
 
 const DashboardSidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [items, setItems] = useState(sidebarItems);
   const location = useLocation();
   const { user } = useAuth();
+  const { hasFeature, isLoading, featureCache } = useFeatureCache();
 
-  // Fetch feature flags from database
-  const fetchFeatures = useCallback(async () => {
-    if (!user) return;
-
-    try {
-      // Get features from the database
-      const { data, error } = await supabase
-        .from('features')
-        .select('*')
-        .eq('user_id', user.id)
-        .maybeSingle(); // Use maybeSingle instead of limit(1)
-      
-      if (error) {
-        console.error('Error fetching features:', error);
-        return;
-      }
-      
-      if (!data) {
-        console.log('No features found for sidebar. Using default visibility.');
-        return;
-      }
-      
-      // Create a new array of sidebar items with visibility based on features
-      const updatedItems = sidebarItems.map(item => {
-        // Hide Personas from sidebar navigation if feature is disabled
-        if (item.name === "Personas") {
-          return {
-            ...item,
-            hidden: !data.personas
-          };
-        }
-        // Hide Universe from sidebar navigation if feature is disabled
-        if (item.name === "Universe") {
-          return {
-            ...item,
-            hidden: !data.universe
-          };
-        }
-        return item;
-      });
-      
-      setItems(updatedItems);
-    } catch (err) {
-      console.error('Unexpected error fetching features:', err);
-    }
-  }, [user]);
-
-  // Set up realtime subscription for features
+  // Update sidebar items based on feature flags
   useEffect(() => {
-    if (!user?.id) return;
-
-    let isMounted = true;
-
-    const channel = supabase
-      .channel('sidebar-features-changes')
-      .on(
-        'postgres_changes', 
-        {
-          event: '*',
-          schema: 'public',
-          table: 'features',
-          filter: `user_id=eq.${user.id}`
-        },
-        () => {
-          if (!isMounted) return;
-          fetchFeatures();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      isMounted = false;
-      supabase.removeChannel(channel);
-    };
-  }, [user?.id, fetchFeatures]);
-
-  // Re-evaluate sidebar items when component mounts, route changes, or user changes
-  useEffect(() => {
-    fetchFeatures();
-  }, [location.pathname, user, fetchFeatures]);
+    // Skip if still loading or no cache data
+    if (isLoading || Object.keys(featureCache).length === 0) return;
+    
+    // Create a new array of sidebar items with visibility based on features
+    const updatedItems = sidebarItems.map(item => {
+      // Hide Personas from sidebar navigation if feature is disabled
+      if (item.name === "Personas") {
+        return {
+          ...item,
+          hidden: !hasFeature("personas")
+        };
+      }
+      // Hide Universe from sidebar navigation if feature is disabled
+      if (item.name === "Universe") {
+        return {
+          ...item,
+          hidden: !hasFeature("universe")
+        };
+      }
+      return item;
+    });
+    
+    setItems(updatedItems);
+  }, [hasFeature, isLoading, featureCache]);
 
   const toggleSidebar = useCallback(() => setCollapsed(prev => !prev), []);
 

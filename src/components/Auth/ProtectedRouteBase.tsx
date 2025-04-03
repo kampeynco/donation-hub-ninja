@@ -39,20 +39,12 @@ const ProtectedRouteBase: React.FC<ProtectedRouteBaseProps> = ({
       }
 
       try {
-        // Add a minimum loading time to prevent flickering
-        const startTime = Date.now();
         const accessGranted = await checkAccess();
         
-        // Ensure loading state displays for at least 500ms
-        const elapsedTime = Date.now() - startTime;
-        const minimumDelay = Math.max(0, 500 - elapsedTime);
-        
-        setTimeout(() => {
-          if (isMounted) {
-            setHasAccess(accessGranted);
-            setIsLoading(false);
-          }
-        }, minimumDelay);
+        if (isMounted) {
+          setHasAccess(accessGranted);
+          setIsLoading(false);
+        }
       } catch (error) {
         console.error("Error checking access:", error);
         if (isMounted) {

@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,12 +10,16 @@ interface FeatureCache {
 // Global cache shared across components
 let globalFeatureCache: FeatureCache = {};
 let lastFetchTimestamp = 0;
-const CACHE_TTL = 10 * 60 * 1000; // 10 minutes in milliseconds
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes in milliseconds (reduced from 10)
 let isFetchingPromise: Promise<void> | null = null;
 
 export function useFeatureCache() {
   const { user } = useAuth();
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState<boolean>(() => {
+    // If cache exists and is fresh, we're not loading
+    return !(Object.keys(globalFeatureCache).length > 0 && 
+           Date.now() - lastFetchTimestamp < CACHE_TTL);
+  });
   const [featureCache, setFeatureCache] = useState<FeatureCache>(globalFeatureCache);
 
   // Fetch and update the feature cache
@@ -50,7 +55,6 @@ export function useFeatureCache() {
     // Create a new fetching promise
     isFetchingPromise = (async () => {
       try {
-        setIsLoading(true);
         const { data, error } = await supabase
           .from('features')
           .select('*')
@@ -99,7 +103,20 @@ export function useFeatureCache() {
       return;
     }
 
-    updateFeatureCache();
+    // If we already have data in the cache, set it immediately
+    if (Object.keys(globalFeatureCache).length > 0) {
+      setFeatureCache(globalFeatureCache);
+      // Still check for fresh data, but don't block UI
+      const cacheAge = Date.now() - lastFetchTimestamp;
+      if (cacheAge > CACHE_TTL) {
+        updateFeatureCache();
+      } else {
+        setIsLoading(false);
+      }
+    } else {
+      // No cache, need to fetch
+      updateFeatureCache();
+    }
 
     const channel = supabase
       .channel('feature-cache-changes')
