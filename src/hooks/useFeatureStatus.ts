@@ -91,15 +91,17 @@ export function useFeatureStatus(initialFeatures: Feature[]) {
           console.log('Realtime waitlist update received:', payload);
           
           // Check if payload.new exists and has feature_name and status properties
-          if (payload.new && 'feature_name' in payload.new && 'status' in payload.new) {
+          const newData = payload.new as { feature_name?: string; status?: WaitlistStatus } | null;
+          
+          if (newData && typeof newData.feature_name === 'string' && newData.status !== undefined) {
             // Update the local state when waitlist status changes
             setUpdatedFeatures(prevFeatures => 
               prevFeatures.map(feature => {
                 // Match the feature name with payload data
-                if (feature.name === payload.new.feature_name) {
+                if (feature.name === newData.feature_name) {
                   return {
                     ...feature,
-                    waitlist_status: payload.new.status
+                    waitlist_status: newData.status
                   };
                 }
                 return feature;

@@ -99,14 +99,16 @@ export const useFeatures = () => {
           console.log('Realtime waitlist update received:', payload);
           
           // Check if payload.new exists and has necessary properties
-          if (payload.new && 'feature_name' in payload.new && 'status' in payload.new) {
+          const newData = payload.new as { feature_name?: string; status?: WaitlistStatus } | null;
+          
+          if (newData && typeof newData.feature_name === 'string' && newData.status !== undefined) {
             setFeatures(prevFeatures => 
               prevFeatures.map(feature => {
-                if (feature.name === payload.new.feature_name) {
+                if (feature.name === newData.feature_name) {
                   return {
                     ...feature,
-                    status: payload.new.status,
-                    enabled: payload.new.status === "approved"
+                    status: newData.status,
+                    enabled: newData.status === "approved"
                   };
                 }
                 return feature;

@@ -22,7 +22,7 @@ import { useForm } from "react-hook-form";
 import { IconInfoCircle } from '@tabler/icons-react';
 import { declineFeature, setFeatureVisibilityPreference } from "@/services/waitlistService";
 import { useAuth } from "@/context/AuthContext";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 interface NotInterestedModalProps {
   open: boolean;
@@ -67,17 +67,10 @@ const NotInterestedModal = ({ open, onOpenChange }: NotInterestedModalProps) => 
       navigate("/dashboard");
       
       // Show success toast
-      toast({
-        title: "Feedback saved",
-        description: "Thank you for your feedback."
-      });
+      toast.success("Feedback saved. Thank you for your feedback.");
     } catch (error: any) {
       console.error("Error saving feedback:", error);
-      toast({
-        title: "Error saving feedback",
-        description: error.message || "An unexpected error occurred.",
-        variant: "destructive"
-      });
+      toast.error("Error saving feedback: " + (error.message || "An unexpected error occurred."));
     } finally {
       setSubmitting(false);
     }
