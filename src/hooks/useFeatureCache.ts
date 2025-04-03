@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,17 +9,37 @@ interface FeatureCache {
 // Global cache shared across components
 let globalFeatureCache: FeatureCache = {};
 let lastFetchTimestamp = 0;
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes in milliseconds (reduced from 10)
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes in milliseconds
 let isFetchingPromise: Promise<void> | null = null;
 
 export function useFeatureCache() {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState<boolean>(() => {
-    // If cache exists and is fresh, we're not loading
-    return !(Object.keys(globalFeatureCache).length > 0 && 
-           Date.now() - lastFetchTimestamp < CACHE_TTL);
+    // Initial loading state depends on cache freshness
+    return !isCacheFresh();
   });
   const [featureCache, setFeatureCache] = useState<FeatureCache>(globalFeatureCache);
+
+  // Check if cache is fresh
+  const isCacheFresh = useCallback(() => {
+    return Object.keys(globalFeatureCache).length > 0 && 
+           Date.now() - lastFetchTimestamp < CACHE_TTL;
+  }, []);
+
+  // Process feature data from database response
+  const processFeatureData = useCallback((data: any): FeatureCache => {
+    const newCache: FeatureCache = {};
+    if (data) {
+      Object.entries(data).forEach(([key, value]) => {
+        // Skip non-boolean and internal properties
+        if (typeof value === 'boolean' && 
+            !['id', 'user_id', 'created_at', 'updated_at'].includes(key)) {
+          newCache[key] = value;
+        }
+      });
+    }
+    return newCache;
+  }, []);
 
   // Fetch and update the feature cache
   const updateFeatureCache = useCallback(async () => {
@@ -29,11 +48,8 @@ export function useFeatureCache() {
       return;
     }
 
-    const currentTime = Date.now();
-    
     // Skip fetching if cache is fresh
-    if (Object.keys(globalFeatureCache).length > 0 && 
-        currentTime - lastFetchTimestamp < CACHE_TTL) {
+    if (isCacheFresh()) {
       setFeatureCache(globalFeatureCache);
       setIsLoading(false);
       return;
@@ -63,23 +79,13 @@ export function useFeatureCache() {
         
         if (error) {
           console.error('Error fetching feature flags:', error);
-        } else if (data) {
-          // Extract feature flags from data
-          const newCache: FeatureCache = {};
-          Object.entries(data).forEach(([key, value]) => {
-            // Skip non-boolean and internal properties
-            if (typeof value === 'boolean' && 
-                !['id', 'user_id', 'created_at', 'updated_at'].includes(key)) {
-              newCache[key] = value;
-            }
-          });
-          
+        } else {
           // Update global cache and timestamp
-          globalFeatureCache = newCache;
-          lastFetchTimestamp = currentTime;
+          globalFeatureCache = processFeatureData(data);
+          lastFetchTimestamp = Date.now();
           
           // Update local state
-          setFeatureCache(newCache);
+          setFeatureCache(globalFeatureCache);
         }
       } catch (error) {
         console.error('Unexpected error fetching features:', error);
@@ -94,7 +100,7 @@ export function useFeatureCache() {
     } catch (error) {
       console.error("Error during feature fetch:", error);
     }
-  }, [user]);
+  }, [user, processFeatureData, isCacheFresh]);
 
   // Set up realtime subscription to keep cache updated
   useEffect(() => {
@@ -103,21 +109,15 @@ export function useFeatureCache() {
       return;
     }
 
-    // If we already have data in the cache, set it immediately
-    if (Object.keys(globalFeatureCache).length > 0) {
+    // Handle initial cache state
+    if (isCacheFresh()) {
       setFeatureCache(globalFeatureCache);
-      // Still check for fresh data, but don't block UI
-      const cacheAge = Date.now() - lastFetchTimestamp;
-      if (cacheAge > CACHE_TTL) {
-        updateFeatureCache();
-      } else {
-        setIsLoading(false);
-      }
+      setIsLoading(false);
     } else {
-      // No cache, need to fetch
       updateFeatureCache();
     }
 
+    // Set up realtime subscription
     const channel = supabase
       .channel('feature-cache-changes')
       .on(
@@ -139,12 +139,12 @@ export function useFeatureCache() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user?.id, updateFeatureCache]);
+  }, [user?.id, updateFeatureCache, isCacheFresh]);
 
   return {
     featureCache,
     isLoading,
-    hasFeature: (featureId: string) => featureCache[featureId] || false,
+    hasFeature: useCallback((featureId: string) => featureCache[featureId] || false, [featureCache]),
     refreshCache: updateFeatureCache
   };
 }
