@@ -56,7 +56,7 @@ const Personas = () => {
               <div className="w-12 h-12 flex items-center justify-center rounded-full bg-green-100 mb-4">
                 <IconArrowRight className="h-6 w-6 text-green-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">Visualize unified donor profiles</h3>
+              <h3 className="text-xl font-semibold mb-3">Visualize unified donor data</h3>
               <p className="text-gray-600 dark:text-gray-300">Visually explore donor profiles in one place to understand donor behavior and traits.</p>
             </CardContent>
           </Card>
@@ -66,7 +66,7 @@ const Personas = () => {
               <div className="w-12 h-12 flex items-center justify-center rounded-full bg-purple-100 mb-4">
                 <IconArrowRight className="h-6 w-6 text-purple-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">Sync profiles to your warehouse</h3>
+              <h3 className="text-xl font-semibold mb-3">Sync donors to your camp</h3>
               <p className="text-gray-600 dark:text-gray-300">
                 Defines relationships between any entity data set in the warehouse and the Segment Profiles you send with Profiles Sync.
               </p>
