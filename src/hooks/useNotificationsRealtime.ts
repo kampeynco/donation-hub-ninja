@@ -5,9 +5,9 @@ import { Notification } from '@/components/Notifications/NotificationBell';
 import { toast } from '@/hooks/use-toast';
 
 export function useNotificationsRealtime(
-  userId?: string,
+  userId: string | undefined,
   updateNotifications: (updater: (prev: Notification[]) => Notification[]) => void,
-  isInitialized = false
+  isInitialized: boolean = false
 ) {
   // Subscribe to real-time notifications
   useEffect(() => {
