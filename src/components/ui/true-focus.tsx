@@ -13,9 +13,9 @@ function TrueFocus({
 }) {
   const words = sentence.split(" ");
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [lastActiveIndex, setLastActiveIndex] = useState(null);
-  const containerRef = useRef(null);
-  const wordRefs = useRef([]);
+  const [lastActiveIndex, setLastActiveIndex] = useState<number | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const wordRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const [focusRect, setFocusRect] = useState({ x: 0, y: 0, width: 0, height: 0 });
 
   useEffect(() => {
@@ -33,7 +33,7 @@ function TrueFocus({
     if (!wordRefs.current[currentIndex] || !containerRef.current) return;
 
     const parentRect = containerRef.current.getBoundingClientRect();
-    const activeRect = wordRefs.current[currentIndex].getBoundingClientRect();
+    const activeRect = wordRefs.current[currentIndex]!.getBoundingClientRect();
 
     setFocusRect({
       x: activeRect.left - parentRect.left,
@@ -43,7 +43,7 @@ function TrueFocus({
     });
   }, [currentIndex, words.length]);
 
-  const handleMouseEnter = (index) => {
+  const handleMouseEnter = (index: number) => {
     if (manualMode) {
       setLastActiveIndex(index);
       setCurrentIndex(index);
@@ -52,7 +52,7 @@ function TrueFocus({
 
   const handleMouseLeave = () => {
     if (manualMode) {
-      setCurrentIndex(lastActiveIndex);
+      setCurrentIndex(lastActiveIndex || 0);
     }
   };
 
@@ -76,8 +76,6 @@ function TrueFocus({
                 : isActive
                   ? `blur(0px)`
                   : `blur(${blurAmount}px)`,
-              "--border-color": borderColor,
-              "--glow-color": glowColor,
               transition: `filter ${animationDuration}s ease`,
             }}
             onMouseEnter={() => handleMouseEnter(index)}
@@ -100,37 +98,33 @@ function TrueFocus({
         transition={{
           duration: animationDuration,
         }}
-        style={{
-          "--border-color": borderColor,
-          "--glow-color": glowColor,
-        }}
       >
         <span
           className="absolute w-4 h-4 border-[3px] rounded-[3px] top-[-10px] left-[-10px] border-r-0 border-b-0"
           style={{
-            borderColor: "var(--border-color)",
-            filter: "drop-shadow(0 0 4px var(--border-color))",
+            borderColor: borderColor,
+            filter: `drop-shadow(0 0 4px ${borderColor})`,
           }}
         ></span>
         <span
           className="absolute w-4 h-4 border-[3px] rounded-[3px] top-[-10px] right-[-10px] border-l-0 border-b-0"
           style={{
-            borderColor: "var(--border-color)",
-            filter: "drop-shadow(0 0 4px var(--border-color))",
+            borderColor: borderColor,
+            filter: `drop-shadow(0 0 4px ${borderColor})`,
           }}
         ></span>
         <span
           className="absolute w-4 h-4 border-[3px] rounded-[3px] bottom-[-10px] left-[-10px] border-r-0 border-t-0"
           style={{
-            borderColor: "var(--border-color)",
-            filter: "drop-shadow(0 0 4px var(--border-color))",
+            borderColor: borderColor,
+            filter: `drop-shadow(0 0 4px ${borderColor})`,
           }}
         ></span>
         <span
           className="absolute w-4 h-4 border-[3px] rounded-[3px] bottom-[-10px] right-[-10px] border-l-0 border-t-0"
           style={{
-            borderColor: "var(--border-color)",
-            filter: "drop-shadow(0 0 4px var(--border-color))",
+            borderColor: borderColor,
+            filter: `drop-shadow(0 0 4px ${borderColor})`,
           }}
         ></span>
       </motion.div>
