@@ -15,7 +15,7 @@ const HeroSection = () => {
         {!isMobile && (
           <>
             {/* First testimonial card - floating to the left of hero */}
-            <div className="hidden md:block absolute left-0 top-24 z-10 w-full max-w-xs transform hover:-translate-y-1 transition-transform">
+            <div className="hidden md:block absolute left-0 top-24 z-10 transform hover:-translate-y-1 transition-transform">
               <TestimonialCard 
                 icon={<IconUsers className="text-primary" size={20} />}
                 text="Monthly donations increased 12% with donor automation"
@@ -23,7 +23,7 @@ const HeroSection = () => {
             </div>
             
             {/* Second testimonial card - floating to the right of hero */}
-            <div className="hidden md:block absolute right-0 top-24 z-10 w-full max-w-xs transform hover:-translate-y-1 transition-transform">
+            <div className="hidden md:block absolute right-0 top-24 z-10 transform hover:-translate-y-1 transition-transform">
               <TestimonialCard 
                 icon={<IconCreditCard className="text-primary" size={20} />}
                 text="Renewed 87% of lapsed donors this quarter"
@@ -74,7 +74,7 @@ const HeroSection = () => {
         {!isMobile && (
           <>
             {/* Third testimonial card - floating left under the buttons */}
-            <div className="hidden md:block absolute left-4 bottom-0 transform translate-y-1/2 w-full max-w-xs z-10 hover:-translate-y-6 transition-transform">
+            <div className="hidden md:block absolute left-4 bottom-0 transform translate-y-1/2 z-10 hover:-translate-y-6 transition-transform">
               <TestimonialCard 
                 icon={<IconReportMoney className="text-primary" size={20} />}
                 text="See your donor dashboard in minutes"
@@ -82,7 +82,7 @@ const HeroSection = () => {
             </div>
             
             {/* Fourth testimonial card - floating right under the buttons */}
-            <div className="hidden md:block absolute right-4 bottom-0 transform translate-y-1/2 w-full max-w-xs z-10 hover:-translate-y-6 transition-transform">
+            <div className="hidden md:block absolute right-4 bottom-0 transform translate-y-1/2 z-10 hover:-translate-y-6 transition-transform">
               <TestimonialCard 
                 icon={<IconCreditCard className="text-primary" size={20} />}
                 text="Automate donor follow-ups with precision"
