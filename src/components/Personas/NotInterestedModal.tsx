@@ -19,7 +19,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useForm } from "react-hook-form";
-import { IconInfoCircle } from "@tabler/icons-react";
+import { IconInfoCircle } from '@tabler/icons-react';
 import { declineFeature } from "@/services/waitlistService";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "@/hooks/use-toast";
@@ -54,7 +54,7 @@ const NotInterestedModal = ({ open, onOpenChange }: NotInterestedModalProps) => 
     setSubmitting(true);
     
     try {
-      // Use the new declineFeature function instead of directly inserting into not_interested
+      // Use the new declineFeature function
       await declineFeature("Personas", user.id, data.reason || "Not specified");
       
       // Save preference to localStorage for sidebar visibility

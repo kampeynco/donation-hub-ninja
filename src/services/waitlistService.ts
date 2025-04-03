@@ -4,8 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 // Check if a user is on a specific feature's waitlist and their status
 export const checkWaitlistStatus = async (featureName: string, userId: string) => {
   try {
-    // Use any to bypass TypeScript errors since waitlists table structure is updated
-    const { data, error } = await (supabase as any)
+    const { data, error } = await supabase
       .from("waitlists")
       .select("status, rejection_reason")
       .eq("user_id", userId)
@@ -27,8 +26,7 @@ export const checkWaitlistStatus = async (featureName: string, userId: string) =
 // Join a waitlist for a feature
 export const joinWaitlist = async (featureName: string, userId: string) => {
   try {
-    // Use any to bypass TypeScript errors since waitlists table structure is updated
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from("waitlists")
       .upsert({
         user_id: userId,
@@ -54,8 +52,7 @@ export const joinWaitlist = async (featureName: string, userId: string) => {
 // Decline a feature with a reason
 export const declineFeature = async (featureName: string, userId: string, reason: string) => {
   try {
-    // Use any to bypass TypeScript errors since waitlists table structure is updated
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from("waitlists")
       .upsert({
         user_id: userId,
@@ -82,8 +79,7 @@ export const declineFeature = async (featureName: string, userId: string, reason
 // Reset waitlist status (remove from waitlist)
 export const resetWaitlistStatus = async (featureName: string, userId: string) => {
   try {
-    // Use any to bypass TypeScript errors since waitlists table structure is updated
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from("waitlists")
       .upsert({
         user_id: userId,
