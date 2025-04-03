@@ -2,8 +2,14 @@
 import { Link } from "react-router-dom";
 import AccountTabs from "@/components/Account/AccountTabs";
 import { IconArrowLeft } from "@tabler/icons-react";
+import { useEffect } from "react";
 
 const Account = () => {
+  // Add console log to debug
+  useEffect(() => {
+    console.log("Account page mounted");
+  }, []);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center space-x-2 mb-2">

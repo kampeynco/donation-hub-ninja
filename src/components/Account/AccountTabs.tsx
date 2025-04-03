@@ -5,10 +5,16 @@ import NotificationsTab from "./NotificationsTab";
 import BillingTab from "./BillingTab";
 import FeaturesTab from "./FeaturesTab";
 import { useSearchParams } from "react-router-dom";
+import { useEffect } from "react";
 
 const AccountTabs = () => {
   const [searchParams] = useSearchParams();
   const defaultTab = searchParams.get("tab") || "profile";
+  
+  // Add console log to debug
+  useEffect(() => {
+    console.log("AccountTabs component mounted, default tab:", defaultTab);
+  }, [defaultTab]);
 
   return (
     <Tabs defaultValue={defaultTab} className="space-y-4">

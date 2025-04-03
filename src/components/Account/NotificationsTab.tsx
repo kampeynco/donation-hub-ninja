@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,7 @@ import NotificationSection from "./NotificationSection";
 import NotificationRow from "./NotificationRow";
 import NotificationsLoading from "./NotificationsLoading";
 import { useAuth } from "@/context/AuthContext";
-import { useNotificationSettings } from "@/hooks/useNotificationSettings"; // This import still works with .tsx extension
+import { useNotificationSettings } from "@/hooks/useNotificationSettings";
 
 const NotificationsTab: React.FC = () => {
   const { user } = useAuth();
@@ -18,6 +18,10 @@ const NotificationsTab: React.FC = () => {
     handleToggle, 
     saveSettings 
   } = useNotificationSettings(user?.id);
+
+  useEffect(() => {
+    console.log("NotificationsTab mounted, user:", user?.id ? `${user.id.substring(0, 8)}...` : "none");
+  }, [user]);
 
   return (
     <Card>

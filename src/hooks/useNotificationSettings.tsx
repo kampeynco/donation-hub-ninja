@@ -1,7 +1,7 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { IconCheck, IconAlertCircle } from "@tabler/icons-react";
 
 export interface NotificationSettings {
   marketing_web: boolean;
@@ -38,15 +38,20 @@ export const useNotificationSettings = (userId: string | undefined) => {
   const [hasPhoneNumber, setHasPhoneNumber] = useState(false);
 
   useEffect(() => {
+    console.log("useNotificationSettings hook initialized with userId:", userId);
     if (userId) {
       fetchSettings();
       checkPhoneNumber();
+    } else {
+      console.log("No userId provided to useNotificationSettings");
+      setInitialLoading(false);
     }
   }, [userId]);
 
   const fetchSettings = async () => {
     try {
       setInitialLoading(true);
+      console.log("Fetching notification settings for user:", userId);
       const { data, error } = await supabase
         .from('notification_settings')
         .select('*')
@@ -58,6 +63,7 @@ export const useNotificationSettings = (userId: string | undefined) => {
         return;
       }
       
+      console.log("Notification settings data:", data);
       if (data) {
         setSettings({
           marketing_web: data.marketing_web,
@@ -83,6 +89,7 @@ export const useNotificationSettings = (userId: string | undefined) => {
 
   const checkPhoneNumber = async () => {
     try {
+      console.log("Checking phone number for user:", userId);
       const { data, error } = await supabase
         .from('profiles')
         .select('mobile_phone')
@@ -94,6 +101,7 @@ export const useNotificationSettings = (userId: string | undefined) => {
         return;
       }
       
+      console.log("Profile data for phone check:", data);
       setHasPhoneNumber(!!data.mobile_phone);
     } catch (error) {
       console.error('Error checking phone number:', error);
@@ -120,6 +128,7 @@ export const useNotificationSettings = (userId: string | undefined) => {
     if (!userId) return;
     
     setLoading(true);
+    console.log("Saving notification settings for user:", userId);
     
     try {
       const { error } = await supabase
