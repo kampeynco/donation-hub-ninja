@@ -49,9 +49,7 @@ const Home = () => {
         
         <div className="container mx-auto px-4 py-20 md:py-32 flex flex-col items-center text-center">
           <h1 className="text-4xl md:text-6xl font-bold mb-6 max-w-4xl">Donor intent is hiding in plain sight. </h1>
-          <p className="text-xl md:text-2xl mb-10 max-w-2xl">
-            Engage the right donors at the right time. Donor Camp captures intent and connects it to the tools your team already uses.
-          </p>
+          <p className="text-xl md:text-2xl mb-10 max-w-2xl">Engage the right donors at the right time. Donor Camp captures intent and connects it to the tools your team already uses.</p>
           <Link to="/auth/signup">
             <Button size="lg" className="bg-white text-primary hover:bg-gray-100 font-semibold px-8">
               Get Started Free <IconArrowRight className="ml-2" />
