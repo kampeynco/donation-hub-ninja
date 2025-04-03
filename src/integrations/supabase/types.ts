@@ -575,7 +575,8 @@ export type Database = {
           created_at: string
           feature_name: Database["public"]["Enums"]["feature_name"]
           id: string
-          joined: boolean
+          rejection_reason: string | null
+          status: string | null
           updated_at: string
           user_id: string
         }
@@ -583,7 +584,8 @@ export type Database = {
           created_at?: string
           feature_name: Database["public"]["Enums"]["feature_name"]
           id?: string
-          joined?: boolean
+          rejection_reason?: string | null
+          status?: string | null
           updated_at?: string
           user_id: string
         }
@@ -591,7 +593,8 @@ export type Database = {
           created_at?: string
           feature_name?: Database["public"]["Enums"]["feature_name"]
           id?: string
-          joined?: boolean
+          rejection_reason?: string | null
+          status?: string | null
           updated_at?: string
           user_id?: string
         }

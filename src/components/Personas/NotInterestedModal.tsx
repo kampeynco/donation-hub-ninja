@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useForm } from "react-hook-form";
 import { IconInfoCircle } from "@tabler/icons-react";
-import { supabase } from "@/integrations/supabase/client";
+import { declineFeature } from "@/services/waitlistService";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "@/hooks/use-toast";
 
@@ -54,16 +54,8 @@ const NotInterestedModal = ({ open, onOpenChange }: NotInterestedModalProps) => 
     setSubmitting(true);
     
     try {
-      // Save to not_interested table using any to bypass type errors
-      const { error } = await (supabase as any).from("not_interested").upsert({
-        user_id: user.id,
-        feature_name: "Personas",
-        reason: data.reason || "Not specified",
-      }, {
-        onConflict: "user_id,feature_name"
-      });
-      
-      if (error) throw error;
+      // Use the new declineFeature function instead of directly inserting into not_interested
+      await declineFeature("Personas", user.id, data.reason || "Not specified");
       
       // Save preference to localStorage for sidebar visibility
       localStorage.setItem("hidePersonasSidebar", "true");

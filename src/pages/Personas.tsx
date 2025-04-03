@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { IconArrowRight, IconLock } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
@@ -8,9 +9,12 @@ import { Card, CardContent } from "@/components/ui/card";
 
 // Import the uploaded image from public/lovable-uploads/
 const personasImage = "/lovable-uploads/35af406b-6b5e-411d-98c7-b9d0642b92a0.png";
+
 const Personas = () => {
   const [modalOpen, setModalOpen] = useState(false);
-  return <div className="flex flex-col items-center justify-center min-h-[calc(100vh-120px)] mt-6">
+  
+  return (
+    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-120px)] mt-6">
       <div className="max-w-6xl w-full space-y-10 px-4 md:px-6">
         {/* Main section */}
         <div className="flex flex-col md:flex-row items-center gap-8">
@@ -71,6 +75,8 @@ const Personas = () => {
 
       {/* Modal for "Not Interested" feedback */}
       <NotInterestedModal open={modalOpen} onOpenChange={setModalOpen} />
-    </div>;
+    </div>
+  );
 };
+
 export default Personas;
