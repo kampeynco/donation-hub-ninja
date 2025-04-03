@@ -2,6 +2,19 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 
+interface TrueFocusProps {
+  sentence?: string;
+  manualMode?: boolean;
+  blurAmount?: number;
+  borderColor?: string;
+  glowColor?: string;
+  animationDuration?: number;
+  pauseBetweenAnimations?: number;
+  className?: string;
+  fontSize?: string;
+  fontWeight?: string;
+}
+
 function TrueFocus({
   sentence = "True Focus",
   manualMode = false,
@@ -10,7 +23,10 @@ function TrueFocus({
   glowColor = "rgba(0, 255, 0, 0.6)",
   animationDuration = 0.5,
   pauseBetweenAnimations = 1,
-}) {
+  className = "",
+  fontSize,
+  fontWeight,
+}: TrueFocusProps) {
   const words = sentence.split(" ");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [lastActiveIndex, setLastActiveIndex] = useState<number | null>(null);
@@ -58,7 +74,7 @@ function TrueFocus({
 
   return (
     <div
-      className="relative flex gap-4 justify-center items-center flex-wrap"
+      className={`relative inline-flex gap-1 items-center ${className}`}
       ref={containerRef}
     >
       {words.map((word, index) => {
@@ -67,7 +83,7 @@ function TrueFocus({
           <span
             key={index}
             ref={(el) => (wordRefs.current[index] = el)}
-            className="relative text-[3rem] font-black cursor-pointer"
+            className="relative cursor-pointer"
             style={{
               filter: manualMode
                 ? isActive
@@ -77,6 +93,8 @@ function TrueFocus({
                   ? `blur(0px)`
                   : `blur(${blurAmount}px)`,
               transition: `filter ${animationDuration}s ease`,
+              fontSize: fontSize,
+              fontWeight: fontWeight,
             }}
             onMouseEnter={() => handleMouseEnter(index)}
             onMouseLeave={handleMouseLeave}

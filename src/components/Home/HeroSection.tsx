@@ -37,7 +37,7 @@ const HeroSection = () => {
           {/* Main hero content */}
           <div className="text-center max-w-4xl mx-auto z-20 relative py-4 md:py-8">
             <h1 className="text-[4rem] font-bold mb-4 md:mb-6 leading-[1.125] text-gray-900">
-              Your<br />
+              Your{" "}
               <TrueFocus 
                 sentence="donor intent"
                 manualMode={true}
@@ -46,7 +46,10 @@ const HeroSection = () => {
                 glowColor="rgba(0, 122, 255, 0.6)"
                 animationDuration={0.5}
                 pauseBetweenAnimations={2}
-              /><br />
+                fontSize="inherit"
+                fontWeight="inherit"
+                className="inline-block"
+              />{" "}
               can be unclear.<br />
               We are here to<br />
               change that.
