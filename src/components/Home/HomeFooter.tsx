@@ -6,16 +6,16 @@ const DARK_LOGO_MARK = "https://igjnhwvtasegwyiwcdkr.supabase.co/storage/v1/obje
 
 const HomeFooter = () => {
   return (
-    <footer className="bg-gray-900 text-white py-8 md:py-12">
+    <footer className="bg-gray-900 text-white py-8 md:py-10 lg:py-12">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-center">
-          <Link to="/" className="flex items-center gap-2 mb-6 md:mb-0">
-            <div className="flex h-10 md:h-12 w-10 md:w-12 items-center justify-center rounded-full bg-white">
-              <img src={DARK_LOGO_MARK} alt="Donor Camp Logo" className="w-5 md:w-6 h-5 md:h-6" />
+          <Link to="/" className="flex items-center gap-2 mb-4 md:mb-0">
+            <div className="flex h-8 md:h-10 w-8 md:w-10 items-center justify-center rounded-full bg-white">
+              <img src={DARK_LOGO_MARK} alt="Donor Camp Logo" className="w-4 md:w-5 h-4 md:h-5" />
             </div>
-            <span className="text-lg md:text-xl font-semibold tracking-tight">Donor Camp</span>
+            <span className="text-base md:text-lg font-semibold tracking-tight">Donor Camp</span>
           </Link>
-          <div className="text-gray-400 text-sm">
+          <div className="text-gray-400 text-xs md:text-sm">
             © {new Date().getFullYear()} Donor Camp. All rights reserved.
           </div>
         </div>

@@ -2,9 +2,22 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { FeatureItem, INITIAL_FEATURES } from "@/types/features";
-import { useFeatureStatus } from "./useFeatureStatus";
-import { useFeatureVisibility } from "./useFeatureVisibility";
-import { useFeatureActions } from "./useFeatureActions";
+
+// Simple placeholder functions since we're not using these now
+const useFeatureStatus = (features: FeatureItem[]) => {
+  return { features, loading: false };
+};
+
+const useFeatureVisibility = (features: FeatureItem[]) => {
+  return { features };
+};
+
+const useFeatureActions = (features: FeatureItem[], setFeatures: any) => {
+  return {
+    handleToggleFeature: () => {},
+    handleToggleVisibility: () => {}
+  };
+};
 
 export type { FeatureItem } from "@/types/features";
 
