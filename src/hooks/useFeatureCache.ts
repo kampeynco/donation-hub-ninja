@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,7 +10,7 @@ interface FeatureCache {
 // Global cache shared across components
 let globalFeatureCache: FeatureCache = {};
 let lastFetchTimestamp = 0;
-const CACHE_TTL = 10 * 60 * 1000; // 10 minutes in milliseconds
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes in milliseconds (reduced from 10)
 
 // Standalone function to refresh the cache
 export async function refreshFeatureCache(userId: string | undefined) {
@@ -17,13 +18,14 @@ export async function refreshFeatureCache(userId: string | undefined) {
   
   const currentTime = Date.now();
   
-  // Skip fetching if cache is fresh
+  // Force refresh if requested explicitly, otherwise check cache TTL
   if (Object.keys(globalFeatureCache).length > 0 && 
       currentTime - lastFetchTimestamp < CACHE_TTL) {
     return;
   }
 
   try {
+    console.log(`Fetching features for user ${userId}`);
     const { data, error } = await supabase
       .from('features')
       .select('*')
@@ -32,7 +34,10 @@ export async function refreshFeatureCache(userId: string | undefined) {
     
     if (error) {
       console.error('Error fetching feature flags:', error);
-    } else if (data) {
+      return;
+    } 
+    
+    if (data) {
       // Extract feature flags from data
       const newCache: FeatureCache = {};
       Object.entries(data).forEach(([key, value]) => {
@@ -43,9 +48,13 @@ export async function refreshFeatureCache(userId: string | undefined) {
         }
       });
       
+      console.log('Updated feature cache:', newCache);
+      
       // Update global cache and timestamp
       globalFeatureCache = newCache;
       lastFetchTimestamp = currentTime;
+    } else {
+      console.warn('No feature data found for user', userId);
     }
   } catch (error) {
     console.error('Unexpected error fetching features:', error);
@@ -66,7 +75,7 @@ export function useFeatureCache() {
 
     setIsLoading(true);
     await refreshFeatureCache(user.id);
-    setFeatureCache(globalFeatureCache);
+    setFeatureCache({...globalFeatureCache}); // Create a new object reference to trigger state update
     setIsLoading(false);
   }, [user]);
 
@@ -86,9 +95,10 @@ export function useFeatureCache() {
           table: 'features',
           filter: `user_id=eq.${user.id}`
         },
-        () => {
+        (payload) => {
           // Invalidate cache when changes occur
-          lastFetchTimestamp = 0;
+          console.log('Feature change detected:', payload);
+          lastFetchTimestamp = 0; // Force refresh
           updateFeatureCache();
         }
       )
@@ -102,7 +112,11 @@ export function useFeatureCache() {
   return {
     featureCache,
     isLoading,
-    hasFeature: (featureId: string) => featureCache[featureId] || false,
-    refreshCache: () => updateFeatureCache()
+    hasFeature: useCallback((featureId: string) => {
+      const hasAccess = featureCache[featureId] || false;
+      console.log(`Feature check for ${featureId}:`, hasAccess);
+      return hasAccess;
+    }, [featureCache]),
+    refreshCache: updateFeatureCache
   };
 }

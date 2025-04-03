@@ -26,6 +26,7 @@ const Layout = ({ children }: LayoutProps) => {
     // Skip transition on initial render
     if (initialRenderRef.current) {
       initialRenderRef.current = false;
+      setDisplayedChildren(children);
       return;
     }
     
@@ -54,12 +55,12 @@ const Layout = ({ children }: LayoutProps) => {
     return () => { isMounted = false; };
   }, [children, displayedChildren]);
 
-  // Prefetch feature status when component mounts
+  // Prefetch feature status when component mounts or location changes
   useEffect(() => {
     if (user?.id) {
       refreshFeatureCache(user.id);
     }
-  }, [user?.id]);
+  }, [user?.id, location.pathname]);
 
   return (
     <TooltipProvider>

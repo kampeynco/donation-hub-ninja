@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
@@ -15,6 +15,11 @@ const UniverseProtectedRoute: React.FC<UniverseProtectedRouteProps> = ({
 }) => {
   const { user } = useAuth();
   const { isVisible, isLoading } = useUniverseVisibility();
+  
+  // Debug log for troubleshooting
+  useEffect(() => {
+    console.log("UniverseProtectedRoute:", { isVisible, isLoading });
+  }, [isVisible, isLoading]);
 
   if (!user) {
     return <Navigate to="/auth/signin" replace />;

@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
@@ -17,6 +17,11 @@ const FeatureProtectedRoute: React.FC<FeatureProtectedRouteProps> = ({
 }) => {
   const { user } = useAuth();
   const { isVisible, isLoading } = useFeatureVisibility(featureId);
+  
+  // Debug log for troubleshooting
+  useEffect(() => {
+    console.log(`FeatureProtectedRoute for ${featureId}:`, { isVisible, isLoading });
+  }, [featureId, isVisible, isLoading]);
 
   if (!user) {
     return <Navigate to="/auth/signin" replace />;
