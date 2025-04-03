@@ -1,59 +1,54 @@
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/lib/supabaseClient';
+import { Database } from '@/types/supabase';
 
-import { useState, useEffect } from "react";
-import { useAuth } from "@/context/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
-import { checkWaitlistStatus, WaitlistStatus, FeatureName } from "@/services/waitlistService";
-import { toast } from "sonner";
-import { FeatureItem, RealtimePayload } from "@/types/features";
+// Define types for the data you're fetching
+interface Feature {
+  id: number;
+  name: string;
+  description: string;
+  waitlist_status: string | null;
+}
 
-export const useFeatureStatus = (features: FeatureItem[]) => {
+interface RealtimePayload {
+  type: 'INSERT' | 'UPDATE' | 'DELETE';
+  table: string;
+  schema: string;
+  record: Database['public']['Tables']['waitlists']['Row'];
+  old_record: Database['public']['Tables']['waitlists']['Row'] | null;
+  errors: string[] | null;
+  new: Database['public']['Tables']['waitlists']['Row'];
+}
+
+export function useFeatureStatus(initialFeatures: Feature[]) {
   const { user } = useAuth();
-  const [updatedFeatures, setUpdatedFeatures] = useState<FeatureItem[]>(features);
-  const [loading, setLoading] = useState(true);
+  const [updatedFeatures, setUpdatedFeatures] = useState<Feature[]>(initialFeatures);
 
-  // Load initial status of features
   useEffect(() => {
-    const loadFeatureStatuses = async () => {
-      if (!user) return;
-      
-      try {
-        setLoading(true);
-        
-        // Load waitlist statuses for each feature
-        const featuresWithStatus = [...features];
-        for (let i = 0; i < featuresWithStatus.length; i++) {
-          const feature = featuresWithStatus[i];
-          const status = await checkWaitlistStatus(feature.name, user.id);
-          
-          featuresWithStatus[i] = {
-            ...feature,
-            status: status?.status || null,
-            enabled: status?.status === "approved"
-          };
-        }
-        
-        setUpdatedFeatures(featuresWithStatus);
-      } catch (error) {
-        console.error("Error loading feature statuses:", error);
-      } finally {
-        setLoading(false);
+    let channelSubscription: (() => void) | null = null;
+
+    if (user?.id) {
+      channelSubscription = initChannelSubscription();
+    }
+
+    return () => {
+      if (channelSubscription) {
+        channelSubscription();
       }
     };
+  }, [user?.id, updatedFeatures]);
 
-    loadFeatureStatuses();
-  }, [user, features]);
-
-  // Subscribe to waitlist status changes
-  useEffect(() => {
-    if (!user) return;
+  // Initialize the subscription to the channel
+  const initChannelSubscription = () => {
+    if (!user?.id) return;
 
     // Fixed: Correcting Supabase channel subscription syntax
     const channel = supabase
       .channel('waitlist-changes')
-      .on(
-        'postgres_changes', 
+      .on('postgres_changes', 
         { 
-          event: '*',
+          event: 'INSERT', 
           schema: 'public',
           table: 'waitlists',
           filter: `user_id=eq.${user.id}`
@@ -61,31 +56,24 @@ export const useFeatureStatus = (features: FeatureItem[]) => {
         (payload: RealtimePayload) => {
           // Update the local state when waitlist status changes
           const updatedFeaturesState = updatedFeatures.map(feature => {
-            if (feature.name.toLowerCase() === payload.new.feature_name.toLowerCase()) {
+            if (feature.id === payload.new.feature_id) {
               return {
                 ...feature,
-                status: payload.new.status,
-                enabled: payload.new.status === "approved"
+                waitlist_status: payload.new.status
               };
             }
             return feature;
           });
-          setUpdatedFeatures(updatedFeaturesState);
           
-          // Show toast notification for status changes
-          if (payload.new.status === "approved") {
-            toast.success(`${payload.new.feature_name} has been enabled for your account!`);
-          } else if (payload.new.status === "rejected") {
-            toast.error(`Your request for ${payload.new.feature_name} was declined.`);
-          }
+          setUpdatedFeatures(updatedFeaturesState);
         }
       )
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      channel.unsubscribe();
     };
-  }, [user, updatedFeatures]);
+  };
 
-  return { features: updatedFeatures, loading };
-};
+  return updatedFeatures;
+}
