@@ -27,12 +27,12 @@ const IntegrationCard: React.FC<IntegrationCardProps> = ({
       <CardContent className="p-6 flex-grow">
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center space-x-4">
-            <div className="flex h-[2.25rem] w-[2.25rem] items-center justify-center">
+            <div className="flex h-[2.5rem] w-[2.5rem] items-center justify-center">
               {logoUrl ? (
                 <img 
                   src={logoUrl} 
                   alt={title}
-                  className="h-[2.25rem] w-auto object-contain"
+                  className="h-[2.5rem] w-auto object-contain"
                 />
               ) : (
                 icon

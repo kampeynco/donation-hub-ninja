@@ -10,8 +10,8 @@ const HomeFooter = () => {
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-center">
           <Link to="/" className="flex items-center gap-2 mb-4 md:mb-0">
-            <div className="flex h-[2.25rem] w-[2.25rem] items-center justify-center rounded-full bg-white">
-              <img src={DARK_LOGO_MARK} alt="Donor Camp Logo" className="w-[1.125rem] h-[1.125rem]" />
+            <div className="flex h-[2.5rem] w-[2.5rem] items-center justify-center rounded-full bg-white">
+              <img src={DARK_LOGO_MARK} alt="Donor Camp Logo" className="w-[1.75rem] h-[1.75rem]" />
             </div>
             <span className="text-base md:text-lg font-semibold tracking-tight">Donor Camp</span>
           </Link>
