@@ -23,7 +23,9 @@ const NotificationRow = ({ notification, onMarkAsRead, onDelete }: NotificationR
 
   return (
     <TableRow 
-      className={!notification.is_read ? 'bg-blue-50 dark:bg-blue-900/10' : undefined}
+      className={!notification.is_read 
+        ? 'bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30' 
+        : 'hover:bg-gray-100 dark:hover:bg-gray-800/70'}
       onClick={() => !notification.is_read && onMarkAsRead(notification.id)}
     >
       <TableCell>
@@ -39,7 +41,7 @@ const NotificationRow = ({ notification, onMarkAsRead, onDelete }: NotificationR
           )}
         </div>
       </TableCell>
-      <TableCell>
+      <TableCell className="text-gray-600 dark:text-gray-400">
         {format(new Date(notification.date), 'MMM d, yyyy h:mm a')}
       </TableCell>
       <TableCell>
@@ -49,7 +51,7 @@ const NotificationRow = ({ notification, onMarkAsRead, onDelete }: NotificationR
           onClick={handleDelete}
           aria-label="Delete notification"
         >
-          <IconTrash size={16} className="text-gray-500 hover:text-red-500" />
+          <IconTrash size={16} className="text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400" />
           <span className="sr-only">Delete</span>
         </Button>
       </TableCell>

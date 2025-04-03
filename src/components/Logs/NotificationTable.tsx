@@ -1,9 +1,11 @@
+
 import React from 'react';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Notification } from '@/components/Notifications/NotificationBell';
 import NotificationRow from './NotificationRow';
 import EmptyState from './EmptyState';
 import LoadingRows from './LoadingRows';
+
 interface NotificationTableProps {
   notifications: Notification[];
   loading: boolean;
@@ -11,6 +13,7 @@ interface NotificationTableProps {
   onMarkAsRead: (id: string) => void;
   onDelete: (id: string) => void;
 }
+
 const NotificationTable = ({
   notifications,
   loading,
@@ -18,7 +21,8 @@ const NotificationTable = ({
   onMarkAsRead,
   onDelete
 }: NotificationTableProps) => {
-  return <div className="rounded-md border bg-white">
+  return (
+    <div className="rounded-md border bg-background dark:bg-gray-800">
       <Table>
         <TableHeader>
           <TableRow>
@@ -29,9 +33,26 @@ const NotificationTable = ({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {loading ? <LoadingRows /> : error ? <EmptyState message="Error loading notifications. Please try refreshing the page." isError /> : notifications.length === 0 ? <EmptyState message="No notifications found" /> : notifications.map(notification => <NotificationRow key={notification.id} notification={notification} onMarkAsRead={onMarkAsRead} onDelete={onDelete} />)}
+          {loading ? (
+            <LoadingRows />
+          ) : error ? (
+            <EmptyState message="Error loading notifications. Please try refreshing the page." isError />
+          ) : notifications.length === 0 ? (
+            <EmptyState message="No notifications found" />
+          ) : (
+            notifications.map(notification => (
+              <NotificationRow 
+                key={notification.id} 
+                notification={notification} 
+                onMarkAsRead={onMarkAsRead} 
+                onDelete={onDelete} 
+              />
+            ))
+          )}
         </TableBody>
       </Table>
-    </div>;
+    </div>
+  );
 };
+
 export default NotificationTable;
