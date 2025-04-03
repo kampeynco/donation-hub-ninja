@@ -1,6 +1,8 @@
+
 import React from "react";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import IntegrationsTab from "@/components/Account/IntegrationsTab";
+
 const Connections = () => {
   return <div className="space-y-6">
       <div>
@@ -10,15 +12,8 @@ const Connections = () => {
         </p>
       </div>
 
-      <Card>
-        <CardHeader className="pb-3">
-          
-          
-        </CardHeader>
-        <div className="px-6 pb-6">
-          <IntegrationsTab />
-        </div>
-      </Card>
+      <IntegrationsTab />
     </div>;
 };
+
 export default Connections;
