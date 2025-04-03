@@ -85,7 +85,7 @@ export function useFeatureStatus(initialFeatures: Feature[]) {
           table: 'waitlists',
           filter: `user_id=eq.${user.id}`
         },
-        (payload) => {
+        (payload: WaitlistRealtimePayload) => {
           if (!isMounted) return;
           
           console.log('Realtime waitlist update received:', payload);
