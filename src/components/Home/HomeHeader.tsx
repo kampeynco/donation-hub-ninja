@@ -9,8 +9,8 @@ const HomeHeader = () => {
   return (
     <div className="bg-primary text-primary-foreground container mx-auto px-4 py-4 md:py-6 flex justify-between items-center">
       <Link to="/" className="flex items-center gap-2">
-        <div className="flex h-9 md:h-10 w-9 md:w-10 items-center justify-center rounded-full bg-white">
-          <img src={DARK_LOGO_MARK} alt="Donor Camp Logo" className="w-4 md:w-5 h-4 md:h-5" />
+        <div className="flex h-[2.25rem] w-[2.25rem] items-center justify-center rounded-full bg-white">
+          <img src={DARK_LOGO_MARK} alt="Donor Camp Logo" className="w-[1.125rem] h-[1.125rem]" />
         </div>
         <span className="text-base md:text-lg font-semibold tracking-tight">Donor Camp</span>
       </Link>

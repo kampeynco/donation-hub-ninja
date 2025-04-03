@@ -11,8 +11,8 @@ interface SidebarLogoProps {
 const SidebarLogo = ({ collapsed }: SidebarLogoProps) => {
   return (
     <div className="p-4 flex items-center">
-      <div className="bg-donor-blue text-white p-2 rounded-full w-12 h-12 flex items-center justify-center shrink-0">
-        <img src={LIGHT_LOGO_MARK} alt="Donor Camp Logo" className="w-6 h-6" />
+      <div className="bg-donor-blue text-white p-2 rounded-full w-[2.25rem] h-[2.25rem] flex items-center justify-center shrink-0">
+        <img src={LIGHT_LOGO_MARK} alt="Donor Camp Logo" className="w-[1.125rem] h-[1.125rem]" />
       </div>
       {!collapsed && <span className="ml-3 font-bold text-lg">Donor Camp</span>}
     </div>

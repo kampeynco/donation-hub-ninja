@@ -31,7 +31,7 @@ const SidebarProfile = ({ collapsed }: SidebarProfileProps) => {
       <TooltipTrigger asChild>
         <div className={`flex ${collapsed ? "justify-center" : "items-center justify-between"}`}>
           <div className="flex items-center">
-            <Avatar className="h-9 w-9 border-2 border-gray-200">
+            <Avatar className="h-[2.25rem] w-[2.25rem] border-2 border-gray-200">
               <AvatarFallback className="bg-donor-blue text-white">
                 {getInitials()}
               </AvatarFallback>
