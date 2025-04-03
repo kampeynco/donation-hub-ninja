@@ -134,7 +134,7 @@ const Logs = () => {
                 )}
               </TabsTrigger>
               <TabsTrigger value="user" className="relative">
-                User
+                Account
                 {getUnreadCount('user') > 0 && (
                   <Badge variant="destructive" className="ml-2 text-xs">
                     {getUnreadCount('user')}

@@ -53,7 +53,7 @@ const SidebarItem = ({
                 </Button>
                 
                 {!collapsed && badge && (
-                  <div className="absolute top-1 right-2">
+                  <div className="absolute top-1/2 -translate-y-1/2 right-2">
                     <BadgeCustom 
                       variant={badge.variant as any}
                       className={`flex items-center gap-1 ${isActive ? "bg-white/20 text-white border-white/30 dark:bg-white/20 dark:text-white dark:border-white/30" : ""}`}
