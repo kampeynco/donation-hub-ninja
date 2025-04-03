@@ -25,18 +25,10 @@ const NotificationTabs = ({ activeTab, unreadCounts }: NotificationTabsProps) =>
         )}
       </TabsTrigger>
       <TabsTrigger value="donor" className="relative">
-        Donations
+        Donors
         {unreadCounts.donor > 0 && (
           <Badge variant="destructive" className="ml-2 text-xs">
             {unreadCounts.donor}
-          </Badge>
-        )}
-      </TabsTrigger>
-      <TabsTrigger value="system" className="relative">
-        System
-        {unreadCounts.system > 0 && (
-          <Badge variant="destructive" className="ml-2 text-xs">
-            {unreadCounts.system}
           </Badge>
         )}
       </TabsTrigger>
@@ -45,6 +37,14 @@ const NotificationTabs = ({ activeTab, unreadCounts }: NotificationTabsProps) =>
         {unreadCounts.user > 0 && (
           <Badge variant="destructive" className="ml-2 text-xs">
             {unreadCounts.user}
+          </Badge>
+        )}
+      </TabsTrigger>
+      <TabsTrigger value="system" className="relative">
+        System
+        {unreadCounts.system > 0 && (
+          <Badge variant="destructive" className="ml-2 text-xs">
+            {unreadCounts.system}
           </Badge>
         )}
       </TabsTrigger>
