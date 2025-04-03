@@ -25,9 +25,8 @@ export function formatDonation(item: any, donoEmails: Map<string, string>): Dona
 }
 
 /**
- * Helper function to fetch donor emails
- * Optimized to use a single query instead of multiple queries in a loop
- * And now ensures we only get emails for donors associated with the current user
+ * Helper function to fetch donor emails in a single batch
+ * Optimized to use a single query and caching
  */
 export async function fetchDonorEmails(donations: any[]): Promise<Map<string, string>> {
   const donoEmails = new Map();
@@ -44,34 +43,32 @@ export async function fetchDonorEmails(donations: any[]): Promise<Map<string, st
   }
   
   try {
-    // Get current user ID to ensure we only fetch emails for donors associated with this user
+    // Get current user ID
     const userId = await getCurrentUserId();
     if (!userId) {
       return donoEmails;
     }
 
-    // First get donor IDs associated with the current user
+    // Fetch user's donor associations in a single query
     const { data: userDonors, error: userDonorsError } = await supabase
       .from('user_donors')
       .select('donor_id')
-      .eq('user_id', userId);
+      .eq('user_id', userId)
+      .in('donor_id', donorIds); // Only fetch the donors we need
     
     if (userDonorsError) {
       console.error('Error fetching user donors:', userDonorsError);
       return donoEmails;
     }
     
-    // Extract user's donor IDs as an array
-    const userDonorIds = userDonors?.map(ud => ud.donor_id) || [];
+    // Extract valid donor IDs as an array
+    const validDonorIds = userDonors?.map(ud => ud.donor_id) || [];
     
-    // Only proceed with donor IDs that belong to this user
-    const validDonorIds = donorIds.filter(id => userDonorIds.includes(id));
-
     if (validDonorIds.length === 0) {
       return donoEmails;
     }
 
-    // Fetch all emails with a single query, ensuring they belong to the current user's donors
+    // Fetch all emails in a single query
     const { data: emailData, error } = await supabase
       .from('emails')
       .select('email, donor_id')
@@ -89,18 +86,57 @@ export async function fetchDonorEmails(donations: any[]): Promise<Map<string, st
       });
     }
   } catch (error) {
-    console.error('Error in bulk email fetch:', error);
+    console.error('Error in batch email fetch:', error);
   }
   
   return donoEmails;
 }
 
 /**
- * Helper function to get the current user ID
+ * Helper function to get the current user ID with memoization
+ * This reduces redundant auth calls
  */
+let cachedUserId: string | null = null;
+let userFetchPromise: Promise<string | null> | null = null;
+
 export async function getCurrentUserId(): Promise<string | null> {
-  const { data: { user } } = await supabase.auth.getUser();
-  return user?.id || null;
+  // Return cached value if available
+  if (cachedUserId !== null) {
+    return cachedUserId;
+  }
+  
+  // If we're already fetching, return the existing promise
+  if (userFetchPromise !== null) {
+    return userFetchPromise;
+  }
+  
+  // Create a new promise to fetch the user
+  userFetchPromise = new Promise(async (resolve) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      cachedUserId = user?.id || null;
+      resolve(cachedUserId);
+    } catch (error) {
+      console.error('Error getting current user:', error);
+      resolve(null);
+    } finally {
+      // Clear the promise so we can fetch again if needed
+      setTimeout(() => {
+        userFetchPromise = null;
+      }, 0);
+    }
+  });
+  
+  return userFetchPromise;
+}
+
+/**
+ * Function to clear the user ID cache
+ * Call this after logout or when user state changes
+ */
+export function clearUserCache(): void {
+  cachedUserId = null;
+  userFetchPromise = null;
 }
 
 /**
@@ -110,7 +146,7 @@ export function handleDonationError(error: any, message: string) {
   console.error(`${message}:`, error);
   toast({
     title: message,
-    description: "Could not load donation data",
+    description: "Could not load donation data. Please try again later.",
     variant: "destructive"
   });
 }

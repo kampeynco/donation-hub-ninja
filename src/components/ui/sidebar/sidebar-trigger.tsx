@@ -2,7 +2,7 @@
 import * as React from "react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { PanelLeft } from "lucide-react"
+import { IconPanelLeft } from "@tabler/icons-react"
 import { useSidebar } from "./sidebar-context"
 
 const SidebarTrigger = React.forwardRef<
@@ -24,7 +24,7 @@ const SidebarTrigger = React.forwardRef<
       }}
       {...props}
     >
-      <PanelLeft />
+      <IconPanelLeft size={18} />
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   )
