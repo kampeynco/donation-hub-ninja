@@ -186,7 +186,7 @@ const ProfileForm = ({
               value={email}
               onChange={() => {}}
               disabled 
-              className="bg-gray-100"
+              className="bg-gray-100 dark:bg-gray-800 dark:text-gray-300"
             />
             <p className="text-xs text-muted-foreground mt-1">Email cannot be changed</p>
           </div>

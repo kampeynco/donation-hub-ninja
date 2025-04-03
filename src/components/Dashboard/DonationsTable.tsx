@@ -28,8 +28,8 @@ const DonationsTable = ({ donations }: DonationsTableProps) => {
   );
 
   return (
-    <div className="bg-white rounded-lg shadow">
-      <div className="p-4 flex justify-between items-center border-b">
+    <div className="bg-white dark:bg-gray-900 rounded-lg shadow">
+      <div className="p-4 flex justify-between items-center border-b dark:border-gray-800">
         <TableSearch 
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}

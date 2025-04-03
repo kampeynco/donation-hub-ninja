@@ -19,7 +19,7 @@ const DonationsTableContent = ({ donations }: DonationsTableContentProps) => {
   // Function to render donation type badge
   const renderDonationTypeBadge = (donation: Donation) => {
     if (!donation.recurringPeriod || donation.recurringPeriod === 'once') {
-      return <Badge variant="outline" className="bg-gray-100 whitespace-nowrap">One-time</Badge>;
+      return <Badge variant="outline" className="bg-gray-100 dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">One-time</Badge>;
     }
 
     // Recurring donation badge for Monthly or Weekly
@@ -43,7 +43,7 @@ const DonationsTableContent = ({ donations }: DonationsTableContentProps) => {
       // Check for Monthly period
       if (donation.recurringPeriod.toLowerCase() === 'monthly') {
         return (
-          <Badge variant="outline" className="bg-gray-100 ml-2 whitespace-nowrap">
+          <Badge variant="outline" className="bg-gray-100 dark:bg-gray-800 dark:border-gray-700 ml-2 whitespace-nowrap">
             {donation.recurringDuration} {donation.recurringDuration === 1 ? 'Month' : 'Months'}
           </Badge>
         );
@@ -51,7 +51,7 @@ const DonationsTableContent = ({ donations }: DonationsTableContentProps) => {
       // Check for Weekly period
       else if (donation.recurringPeriod.toLowerCase() === 'weekly') {
         return (
-          <Badge variant="outline" className="bg-gray-100 ml-2 whitespace-nowrap">
+          <Badge variant="outline" className="bg-gray-100 dark:bg-gray-800 dark:border-gray-700 ml-2 whitespace-nowrap">
             {donation.recurringDuration} {donation.recurringDuration === 1 ? 'Week' : 'Weeks'}
           </Badge>
         );
@@ -59,13 +59,13 @@ const DonationsTableContent = ({ donations }: DonationsTableContentProps) => {
     }
 
     // Default badge for other recurring cases
-    return <Badge variant="outline" className="bg-gray-100 ml-2 whitespace-nowrap">Recurring</Badge>;
+    return <Badge variant="outline" className="bg-gray-100 dark:bg-gray-800 dark:border-gray-700 ml-2 whitespace-nowrap">Recurring</Badge>;
   };
 
   return (
     <div className="overflow-x-auto">
       <Table>
-        <TableHeader className="bg-gray-50 text-xs uppercase tracking-wider text-gray-500">
+        <TableHeader className="bg-gray-50 dark:bg-gray-900 text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
           <TableRow>
             <TableHead className="px-6 py-3 text-left font-medium cursor-pointer">
               DATE
@@ -77,25 +77,25 @@ const DonationsTableContent = ({ donations }: DonationsTableContentProps) => {
             <TableHead className="px-6 py-3 text-right font-medium">AMOUNT</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody className="divide-y divide-gray-200 text-sm">
+        <TableBody className="divide-y divide-gray-200 dark:divide-gray-800 text-sm">
           {donations.length > 0 ? (
             donations.map((donation) => (
-              <TableRow key={donation.id} className="hover:bg-gray-50">
-                <TableCell className="px-6 py-4 text-gray-600">{donation.date}</TableCell>
-                <TableCell className="px-6 py-4">{donation.name || "Anonymous"}</TableCell>
-                <TableCell className="px-6 py-4 text-blue-500">{donation.email || "---"}</TableCell>
+              <TableRow key={donation.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                <TableCell className="px-6 py-4 text-gray-600 dark:text-gray-400">{donation.date}</TableCell>
+                <TableCell className="px-6 py-4 dark:text-gray-300">{donation.name || "Anonymous"}</TableCell>
+                <TableCell className="px-6 py-4 text-blue-500 dark:text-blue-400">{donation.email || "---"}</TableCell>
                 <TableCell className="px-6 py-4">
                   <div className="flex items-center flex-nowrap">
                     {renderDonationTypeBadge(donation)}
                     {renderDurationBadge(donation)}
                   </div>
                 </TableCell>
-                <TableCell className="px-6 py-4 text-right font-medium">${donation.amount.toFixed(2)}</TableCell>
+                <TableCell className="px-6 py-4 text-right font-medium dark:text-gray-300">${donation.amount.toFixed(2)}</TableCell>
               </TableRow>
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={5} className="px-6 py-8 text-center text-gray-500">
+              <TableCell colSpan={5} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
                 No donations found
               </TableCell>
             </TableRow>
