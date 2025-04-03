@@ -36,10 +36,10 @@ const HeroSection = () => {
           {/* Main hero content */}
           <div className="text-center max-w-4xl mx-auto z-20 relative py-4 md:py-8">
             <h1 className="text-[4rem] font-bold mb-4 md:mb-6 leading-[1.125]">
-              Donor intent<br />
+              Your donors intent<br />
               can be unclear.<br />
-              We help you<br />
-              to uncover it.
+              We are here to<br />
+              change that.
             </h1>
             <p className="text-[1.25rem] font-[300] mb-6 md:mb-8 max-w-2xl mx-auto px-4 leading-[1.5]">
               Engage the right donors at the right time. Donor Camp captures intent and connects it to the tools your team already uses.
