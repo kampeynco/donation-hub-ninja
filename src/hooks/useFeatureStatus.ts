@@ -4,6 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 import { WaitlistStatus } from '@/services/waitlistService';
+import { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 
 // Define types for the data you're fetching
 export interface Feature {
@@ -13,20 +14,13 @@ export interface Feature {
   waitlist_status: WaitlistStatus;
 }
 
-interface RealtimePayload {
-  type: 'INSERT' | 'UPDATE' | 'DELETE';
-  table: string;
-  schema: string;
-  record: Database['public']['Tables']['waitlists']['Row'];
-  old_record: Database['public']['Tables']['waitlists']['Row'] | null;
-  errors: string[] | null;
-  new: {
-    feature_name: string;
-    status: WaitlistStatus;
-    user_id: string;
-    [key: string]: any;
-  };
-}
+// Define the payload type for the real-time subscription
+type WaitlistRealtimePayload = RealtimePostgresChangesPayload<{
+  feature_name: string;
+  status: WaitlistStatus;
+  user_id: string;
+  [key: string]: any;
+}>;
 
 export function useFeatureStatus(initialFeatures: Feature[]) {
   const { user } = useAuth();
@@ -80,18 +74,18 @@ export function useFeatureStatus(initialFeatures: Feature[]) {
 
     fetchWaitlistStatus();
 
-    // Set up realtime subscription
+    // Set up realtime subscription using the correct channel API syntax
     const channel = supabase
       .channel('waitlist-changes')
       .on(
-        'postgres_changes',
-        { 
+        'postgres_changes', 
+        {
           event: '*', // Listen to all events (INSERT, UPDATE, DELETE)
           schema: 'public',
           table: 'waitlists',
           filter: `user_id=eq.${user.id}`
         },
-        (payload: RealtimePayload) => {
+        (payload) => {
           if (!isMounted) return;
           
           console.log('Realtime waitlist update received:', payload);
@@ -111,13 +105,11 @@ export function useFeatureStatus(initialFeatures: Feature[]) {
           );
         }
       )
-      .subscribe((status) => {
-        console.log('Supabase channel status:', status);
-      });
+      .subscribe();
 
     return () => {
       isMounted = false;
-      channel.unsubscribe();
+      supabase.removeChannel(channel);
     };
   }, [user?.id, initialFeatures]);
 
