@@ -1,15 +1,17 @@
+
 import React, { useState } from "react";
 import { IconArrowRight, IconCreditCard } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import NotInterestedModal from "@/components/Personas/NotInterestedModal";
+import { Card, CardContent } from "@/components/ui/card";
 
 // Import the uploaded image from public/lovable-uploads/
 const personasImage = "/lovable-uploads/35af406b-6b5e-411d-98c7-b9d0642b92a0.png";
 const Personas = () => {
   const [modalOpen, setModalOpen] = useState(false);
   return <div className="flex flex-col items-center justify-center min-h-[calc(100vh-120px)] mt-6">
-      <div className="max-w-6xl w-full space-y-10">
+      <div className="max-w-6xl w-full space-y-10 px-4 md:px-6">
         {/* Main section */}
         <div className="flex flex-col md:flex-row items-center gap-8">
           <div className="max-w-xl">
@@ -37,51 +39,43 @@ const Personas = () => {
 
         <Separator className="my-10" />
 
-        {/* Feature columns - added vertical separators between columns */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="p-6">
-            <div className="w-12 h-12 flex items-center justify-center rounded-full bg-blue-100 mb-4">
-              <IconArrowRight className="h-6 w-6 text-blue-600" />
-            </div>
-            <h3 className="text-xl font-semibold mb-3">Enrich events with warehouse data</h3>
-            <p className="text-gray-600 dark:text-gray-300">
-              Easily link data from the warehouse to any event before it's sent downstream.
-            </p>
-          </div>
+        {/* Feature columns - improved layout with proper spacing */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:divide-x divide-gray-200 dark:divide-gray-700">
+          <Card className="border-0 shadow-none bg-transparent">
+            <CardContent className="p-6">
+              <div className="w-12 h-12 flex items-center justify-center rounded-full bg-blue-100 mb-4">
+                <IconArrowRight className="h-6 w-6 text-blue-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-3">Enrich events with warehouse data</h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                Easily link data from the warehouse to any event before it's sent downstream.
+              </p>
+            </CardContent>
+          </Card>
           
-          {/* Vertical separator for desktop */}
-          <div className="hidden md:block w-px bg-gray-200 dark:bg-gray-700 absolute left-1/3 h-48 my-6 transform translate-x-4" />
+          <Card className="border-0 shadow-none bg-transparent md:pl-8">
+            <CardContent className="p-6">
+              <div className="w-12 h-12 flex items-center justify-center rounded-full bg-green-100 mb-4">
+                <IconArrowRight className="h-6 w-6 text-green-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-3">Visualize unified donor profiles</h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                Visually explore user profiles in one place to understand donor behavior and traits.
+              </p>
+            </CardContent>
+          </Card>
           
-          <div className="p-6 relative">
-            <div className="w-12 h-12 flex items-center justify-center rounded-full bg-green-100 mb-4">
-              <IconArrowRight className="h-6 w-6 text-green-600" />
-            </div>
-            <h3 className="text-xl font-semibold mb-3">Visualize unified donor profiles</h3>
-            <p className="text-gray-600 dark:text-gray-300">
-              Visually explore user profiles in one place to understand donor behavior and traits.
-            </p>
-          </div>
-          
-          {/* Vertical separator for desktop */}
-          <div className="hidden md:block w-px bg-gray-200 dark:bg-gray-700 absolute left-2/3 h-48 my-6 transform translate-x-4" />
-          
-          <div className="p-6">
-            <div className="w-12 h-12 flex items-center justify-center rounded-full bg-purple-100 mb-4">
-              <IconArrowRight className="h-6 w-6 text-purple-600" />
-            </div>
-            <h3 className="text-xl font-semibold mb-3">Sync profiles to your warehouse</h3>
-            <p className="text-gray-600 dark:text-gray-300">
-              Defines relationships between any entity data set in the warehouse and the Segment Profiles you send with Profiles Sync.
-            </p>
-          </div>
-          
-          {/* Mobile horizontal separators */}
-          <div className="md:hidden w-full">
-            <Separator className="my-4" />
-          </div>
-          <div className="md:hidden w-full">
-            <Separator className="my-4" />
-          </div>
+          <Card className="border-0 shadow-none bg-transparent md:pl-8">
+            <CardContent className="p-6">
+              <div className="w-12 h-12 flex items-center justify-center rounded-full bg-purple-100 mb-4">
+                <IconArrowRight className="h-6 w-6 text-purple-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-3">Sync profiles to your warehouse</h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                Defines relationships between any entity data set in the warehouse and the Segment Profiles you send with Profiles Sync.
+              </p>
+            </CardContent>
+          </Card>
         </div>
       </div>
 
