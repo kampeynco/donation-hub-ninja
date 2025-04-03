@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -7,20 +6,17 @@ import { IconArrowRight, IconCreditCard, IconUsers, IconReportMoney } from "@tab
 
 // Logo mark image from assets bucket
 const DARK_LOGO_MARK = "https://igjnhwvtasegwyiwcdkr.supabase.co/storage/v1/object/public/assets//updated_dc_logomark_dark.png";
-
 const Home = () => {
   const {
     user,
     loading
   } = useAuth();
   const navigate = useNavigate();
-
   useEffect(() => {
     if (!loading && user) {
       navigate("/dashboard");
     }
   }, [user, loading, navigate]);
-
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -28,7 +24,6 @@ const Home = () => {
         </div>
       </div>;
   }
-
   return <div className="min-h-screen bg-white">
       <header className="bg-primary text-white">
         <div className="container mx-auto px-4 py-6 flex justify-between items-center">
@@ -53,9 +48,7 @@ const Home = () => {
         </div>
         
         <div className="container mx-auto px-4 py-20 md:py-32 flex flex-col items-center text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 max-w-4xl">
-            Donor intent is hiding in plain sight. Donor Camp reveals it—and automates your next move.
-          </h1>
+          <h1 className="text-4xl md:text-6xl font-bold mb-6 max-w-4xl">Donor intent is hiding in plain sight. </h1>
           <p className="text-xl md:text-2xl mb-10 max-w-2xl">
             Engage the right donors at the right time. Donor Camp captures intent and connects it to the tools your team already uses.
           </p>
@@ -140,5 +133,4 @@ const Home = () => {
       </footer>
     </div>;
 };
-
 export default Home;
