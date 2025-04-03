@@ -22,9 +22,12 @@ const DashboardSidebar = () => {
       // Check localStorage first for not interested status
       const hidePersonas = localStorage.getItem("hidePersonasSidebar") === "true";
       
+      // Create a new array instead of modifying the existing one
+      let updatedItems = [...sidebarItems];
+      
       // If the user is not interested, apply that preference
       if (hidePersonas) {
-        const updatedItems = items.map(item => ({
+        updatedItems = updatedItems.map(item => ({
           ...item,
           hidden: item.name === "Personas" ? true : item.hidden
         }));
@@ -36,10 +39,9 @@ const DashboardSidebar = () => {
       // Otherwise check waitlist status if user is logged in
       if (user) {
         try {
-          const waitlistStatus = await checkWaitlistStatus("Personas", user.id);
-          
-          // Keep Personas visible always unless explicitly hidden by not interested
-          const updatedItems = items.map(item => ({
+          // No need to check waitlist status to determine visibility
+          // We'll always show Personas unless explicitly hidden by "not interested"
+          updatedItems = updatedItems.map(item => ({
             ...item,
             hidden: item.name === "Personas" ? false : item.hidden
           }));
