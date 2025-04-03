@@ -33,7 +33,7 @@ const Home = () => {
         <div className="container mx-auto px-4 py-6 flex justify-between items-center">
           <Link to="/" className="flex items-center gap-2">
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white">
-              <img src={DARK_LOGO_MARK} alt="Donor Camp Logo" className="w-4 h-4" />
+              <img src={DARK_LOGO_MARK} alt="Donor Camp Logo" className="w-5 h-5" />
             </div>
             <span className="text-xl font-semibold tracking-tight">Donor Camp</span>
           </Link>
