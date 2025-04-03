@@ -14,13 +14,13 @@ import { toast } from "sonner";
 import { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 
 // Type interface for the waitlist table payload
-type WaitlistPayload = {
+interface WaitlistPayload {
   feature_name: string;
   status: WaitlistStatus;
   user_id: string;
   rejection_reason?: string | null;
   [key: string]: any;
-};
+}
 
 export const useFeatures = () => {
   const { user } = useAuth();
@@ -98,6 +98,7 @@ export const useFeatures = () => {
           
           console.log('Realtime waitlist update received:', payload);
           
+          // Check if payload.new exists and has necessary properties
           if (payload.new && 'feature_name' in payload.new && 'status' in payload.new) {
             setFeatures(prevFeatures => 
               prevFeatures.map(feature => {

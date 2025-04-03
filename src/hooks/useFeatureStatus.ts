@@ -90,19 +90,22 @@ export function useFeatureStatus(initialFeatures: Feature[]) {
           
           console.log('Realtime waitlist update received:', payload);
           
-          // Update the local state when waitlist status changes
-          setUpdatedFeatures(prevFeatures => 
-            prevFeatures.map(feature => {
-              // Match the feature name with payload data
-              if (feature.name === payload.new.feature_name) {
-                return {
-                  ...feature,
-                  waitlist_status: payload.new.status
-                };
-              }
-              return feature;
-            })
-          );
+          // Check if payload.new exists and has feature_name and status properties
+          if (payload.new && 'feature_name' in payload.new && 'status' in payload.new) {
+            // Update the local state when waitlist status changes
+            setUpdatedFeatures(prevFeatures => 
+              prevFeatures.map(feature => {
+                // Match the feature name with payload data
+                if (feature.name === payload.new.feature_name) {
+                  return {
+                    ...feature,
+                    waitlist_status: payload.new.status
+                  };
+                }
+                return feature;
+              })
+            );
+          }
         }
       )
       .subscribe();

@@ -4,7 +4,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { FeatureStatusBadge } from "./FeatureStatusBadge";
-import { FeatureItem as FeatureItemType } from "@/hooks/useFeatures";
+import { FeatureItem as FeatureItemType } from "@/types/features";
 
 interface FeatureItemProps {
   feature: FeatureItemType;
