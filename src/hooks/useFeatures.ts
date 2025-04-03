@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { FeatureItem } from "@/types/features";
@@ -118,8 +117,8 @@ export const useFeatures = () => {
       const updatedFeatures = [...features];
       updatedFeatures[featureIndex] = {
         ...feature,
-        enabled: newEnabledState,
-        hidden: !newEnabledState // hide if disabled
+        enabled: newEnabledState
+        // Keep it visible in the features tab regardless of enabled state
       };
       
       setFeatures(updatedFeatures);
