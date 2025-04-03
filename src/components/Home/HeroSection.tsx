@@ -41,7 +41,7 @@ const HeroSection = () => {
               Donor Camp makes it<br />
               plain for you to see.
             </h1>
-            <p className="text-[1.25rem] font-normal mb-6 md:mb-8 max-w-2xl mx-auto px-4 leading-[1.5]">
+            <p className="text-[1.25rem] font-[400] mb-6 md:mb-8 max-w-2xl mx-auto px-4 leading-[1.5]">
               Engage the right donors at the right time. Donor Camp captures intent and connects it to the tools your team already uses.
             </p>
             
