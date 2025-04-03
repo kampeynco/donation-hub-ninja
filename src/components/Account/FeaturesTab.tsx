@@ -28,6 +28,23 @@ interface FeatureItem {
   hidden: boolean;
 }
 
+// Define the type for the realtime payload
+interface RealtimePayload {
+  schema: string;
+  table: string;
+  commit_timestamp: string;
+  eventType: string;
+  new: {
+    feature_name: string;
+    status: WaitlistStatus;
+    [key: string]: any;
+  };
+  old: {
+    [key: string]: any;
+  };
+  errors: any;
+}
+
 const FeaturesTab = () => {
   const { user } = useAuth();
   const [features, setFeatures] = useState<FeatureItem[]>([
@@ -86,7 +103,7 @@ const FeaturesTab = () => {
             table: 'waitlists',
             filter: `user_id=eq.${user.id}`
           }, 
-          (payload) => {
+          (payload: RealtimePayload) => {
             // Update the local state when waitlist status changes
             const updatedFeatures = features.map(feature => {
               if (feature.name.toLowerCase() === payload.new.feature_name.toLowerCase()) {

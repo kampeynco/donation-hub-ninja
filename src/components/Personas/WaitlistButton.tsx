@@ -60,7 +60,7 @@ const WaitlistButton = () => {
     setLoading(true);
     try {
       await joinWaitlist('Personas', user.id);
-      setWaitlistStatus({ status: 'joined', rejection_reason: null });
+      setWaitlistStatus({ status: 'joined' as WaitlistStatus, rejection_reason: null });
       toast({
         title: 'Joined waitlist',
         description: 'You\'ve been added to the Personas waitlist.',
