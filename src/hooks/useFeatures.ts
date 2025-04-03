@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { FeatureItem } from "@/types/features";
@@ -27,7 +28,7 @@ export const useFeatures = () => {
         .from('features')
         .select('*')
         .eq('user_id', user.id)
-        .maybeSingle(); // Use maybeSingle instead of limit(1)
+        .maybeSingle();
       
       if (error) {
         console.error('Error fetching features:', error);
@@ -76,6 +77,14 @@ export const useFeatures = () => {
       const feature = features[featureIndex];
       const newEnabledState = !feature.enabled;
       
+      // Optimistically update the UI
+      const updatedFeatures = [...features];
+      updatedFeatures[featureIndex] = {
+        ...feature,
+        enabled: newEnabledState
+      };
+      setFeatures(updatedFeatures);
+      
       // Update the database
       const { error } = await supabase
         .from('features')
@@ -85,23 +94,20 @@ export const useFeatures = () => {
       if (error) {
         console.error(`Error updating feature ${featureId}:`, error);
         toast.error("There was an error updating the feature status.");
+        
+        // Revert to previous state on error
+        const revertedFeatures = [...features];
+        setFeatures(revertedFeatures);
         return;
       }
-      
-      // Update the local state
-      const updatedFeatures = [...features];
-      updatedFeatures[featureIndex] = {
-        ...feature,
-        enabled: newEnabledState
-        // Keep it visible in the features tab regardless of enabled state
-      };
-      
-      setFeatures(updatedFeatures);
       
       toast.success(`${feature.name} has been ${newEnabledState ? 'enabled' : 'disabled'}.`);
     } catch (error) {
       console.error(`Error toggling feature ${featureId}:`, error);
       toast.error("There was an error updating the feature status.");
+      
+      // Revert changes on error
+      fetchFeatures();
     } finally {
       setIsProcessing(false);
     }

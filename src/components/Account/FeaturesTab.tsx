@@ -27,7 +27,7 @@ const FeaturesTab = () => {
             Enable or disable features for your account.
           </p>
 
-          {loading ? (
+          {loading && features.length === 0 ? (
             <FeaturesLoading />
           ) : features.length === 0 ? (
             <div className="p-4 border rounded-md bg-gray-50 dark:bg-gray-900 text-center">
@@ -39,7 +39,8 @@ const FeaturesTab = () => {
                 <FeatureItem 
                   key={feature.id} 
                   feature={feature} 
-                  onToggleFeature={handleToggleFeature} 
+                  onToggleFeature={handleToggleFeature}
+                  isLoading={loading}
                 />
               ))}
             </div>

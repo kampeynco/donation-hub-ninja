@@ -10,11 +10,13 @@ import { IconStarFilled } from "@tabler/icons-react";
 interface FeatureItemProps {
   feature: FeatureItemType;
   onToggleFeature: (featureId: string) => void;
+  isLoading?: boolean;
 }
 
 export const FeatureItem: React.FC<FeatureItemProps> = ({ 
   feature, 
-  onToggleFeature 
+  onToggleFeature,
+  isLoading = false
 }) => {
   const handleToggleFeature = () => {
     onToggleFeature(feature.id);
@@ -37,6 +39,7 @@ export const FeatureItem: React.FC<FeatureItemProps> = ({
             checked={feature.enabled}
             onCheckedChange={handleToggleFeature}
             aria-label={`Toggle ${feature.name}`}
+            disabled={isLoading}
           />
         </div>
       </div>
