@@ -11,12 +11,25 @@ import { useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { useFeatureCache } from "@/hooks/useFeatureCache";
 
+// Key for localStorage
+const SIDEBAR_STATE_KEY = "donorcamp:sidebar:collapsed";
+
 const DashboardSidebar = () => {
-  const [collapsed, setCollapsed] = useState(false);
+  // Initialize state from localStorage, defaulting to expanded (false) if no value exists
+  const [collapsed, setCollapsed] = useState(() => {
+    const savedState = localStorage.getItem(SIDEBAR_STATE_KEY);
+    return savedState ? JSON.parse(savedState) : false;
+  });
+  
   const [items, setItems] = useState(sidebarItems);
   const location = useLocation();
   const { user } = useAuth();
   const { hasFeature, isLoading, featureCache } = useFeatureCache();
+
+  // Update localStorage when collapsed state changes
+  useEffect(() => {
+    localStorage.setItem(SIDEBAR_STATE_KEY, JSON.stringify(collapsed));
+  }, [collapsed]);
 
   // Update sidebar items based on feature flags
   useEffect(() => {
