@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Database } from '@/integrations/supabase/types';
 import { WaitlistStatus } from '@/services/waitlistService';
 import { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 

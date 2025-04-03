@@ -357,30 +357,6 @@ export type Database = {
           },
         ]
       }
-      not_interested: {
-        Row: {
-          created_at: string
-          feature_name: Database["public"]["Enums"]["feature_name"]
-          id: string
-          reason: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          feature_name: Database["public"]["Enums"]["feature_name"]
-          id?: string
-          reason: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          feature_name?: Database["public"]["Enums"]["feature_name"]
-          id?: string
-          reason?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       notification_settings: {
         Row: {
           created_at: string
