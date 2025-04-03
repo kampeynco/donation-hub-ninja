@@ -1,6 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 // Define feature names and their corresponding waitlist statuses
 export type FeatureName = "Personas";
@@ -84,11 +84,7 @@ export const joinWaitlist = async (
     return true;
   } catch (error) {
     console.error("Error joining waitlist:", error);
-    toast({
-      title: "Error joining waitlist",
-      description: error instanceof Error ? error.message : "An unknown error occurred",
-      variant: "destructive"
-    });
+    toast.error("Error joining waitlist: " + (error instanceof Error ? error.message : "An unknown error occurred"));
     return false;
   }
 };
@@ -117,11 +113,7 @@ export const resetWaitlistStatus = async (
     return true;
   } catch (error) {
     console.error("Error resetting waitlist status:", error);
-    toast({
-      title: "Error resetting feature",
-      description: error instanceof Error ? error.message : "An unknown error occurred",
-      variant: "destructive"
-    });
+    toast.error("Error resetting feature: " + (error instanceof Error ? error.message : "An unknown error occurred"));
     return false;
   }
 };

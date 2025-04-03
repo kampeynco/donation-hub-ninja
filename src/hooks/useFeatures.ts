@@ -1,73 +1,222 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { FeatureItem, INITIAL_FEATURES } from "@/types/features";
-import { useFeatureStatus } from "./useFeatureStatus";
-import { useFeatureVisibility } from "./useFeatureVisibility";
-import { useFeatureActions } from "./useFeatureActions";
-import { WaitlistStatus } from "@/services/waitlistService";
+import { INITIAL_FEATURES, FeatureItem } from "@/types/features";
+import { supabase } from "@/integrations/supabase/client";
+import { 
+  joinWaitlist, 
+  resetWaitlistStatus,
+  setFeatureVisibilityPreference,
+  getFeatureVisibilityPreference,
+  WaitlistStatus
+} from "@/services/waitlistService";
 import { toast } from "sonner";
+import { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 
-export type { FeatureItem } from "@/types/features";
+// Type interface for the waitlist table payload
+type WaitlistPayload = {
+  feature_name: string;
+  status: WaitlistStatus;
+  user_id: string;
+  rejection_reason?: string | null;
+  [key: string]: any;
+};
 
 export const useFeatures = () => {
   const { user } = useAuth();
   const [features, setFeatures] = useState<FeatureItem[]>(INITIAL_FEATURES);
   const [loading, setLoading] = useState(true);
-  
-  // Get feature statuses from waitlist
-  const featuresForStatus = INITIAL_FEATURES.map(feature => ({
-    id: feature.id,
-    name: feature.name,
-    description: feature.description,
-    waitlist_status: feature.status
-  }));
-  
-  const { features: updatedFeaturesWithStatus, isLoading: statusLoading } = useFeatureStatus(featuresForStatus);
-  
-  // Apply feature statuses to our features
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  // Fetch waitlist statuses and apply visibility preferences
   useEffect(() => {
-    if (updatedFeaturesWithStatus.length > 0) {
-      setFeatures(prevFeatures => 
-        prevFeatures.map(feature => {
-          const statusFeature = updatedFeaturesWithStatus.find(f => f.name === feature.name);
-          if (statusFeature) {
+    if (!user?.id) {
+      setLoading(false);
+      return;
+    }
+
+    let isMounted = true;
+    setLoading(true);
+
+    const fetchFeatureStatus = async () => {
+      try {
+        // Get waitlist statuses
+        const { data: waitlistData, error } = await supabase
+          .from('waitlists')
+          .select('*')
+          .eq('user_id', user.id);
+        
+        if (error) {
+          console.error('Error fetching waitlist status:', error);
+          return;
+        }
+        
+        // Apply waitlist statuses and visibility preferences to features
+        if (isMounted) {
+          const updatedFeatures = INITIAL_FEATURES.map(feature => {
+            // Find matching waitlist entry
+            const waitlistEntry = waitlistData?.find(entry => entry.feature_name === feature.name);
+            
+            // Get visibility preference
+            const hidden = getFeatureVisibilityPreference(feature.name);
+            
+            // Update feature with waitlist status and visibility
             return {
               ...feature,
-              status: statusFeature.waitlist_status
+              status: waitlistEntry?.status || null,
+              enabled: waitlistEntry?.status === "approved",
+              hidden
             };
-          }
-          return feature;
-        })
-      );
-    }
-  }, [updatedFeaturesWithStatus]);
-  
-  // Apply visibility preferences
-  const { features: featuresWithVisibility } = useFeatureVisibility(features);
-  
-  // Get feature action handlers
-  const { handleToggleFeature, handleToggleVisibility, isProcessing } = useFeatureActions(
-    featuresWithVisibility, 
-    setFeatures
-  );
-  
-  // Update combined state
-  useEffect(() => {
-    if (featuresWithVisibility.length > 0) {
-      setFeatures(featuresWithVisibility);
-    }
-  }, [featuresWithVisibility]);
+          });
+          
+          setFeatures(updatedFeatures);
+        }
+      } catch (err) {
+        console.error('Unexpected error fetching feature status:', err);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
 
-  // Set loading state based on all loading states
-  useEffect(() => {
-    setLoading(statusLoading || isProcessing);
-  }, [statusLoading, isProcessing]);
+    fetchFeatureStatus();
+
+    // Set up realtime subscription
+    const channel = supabase
+      .channel('waitlist-changes')
+      .on(
+        'postgres_changes', 
+        {
+          event: '*',
+          schema: 'public',
+          table: 'waitlists',
+          filter: `user_id=eq.${user.id}`
+        },
+        (payload: RealtimePostgresChangesPayload<WaitlistPayload>) => {
+          if (!isMounted) return;
+          
+          console.log('Realtime waitlist update received:', payload);
+          
+          if (payload.new && 'feature_name' in payload.new && 'status' in payload.new) {
+            setFeatures(prevFeatures => 
+              prevFeatures.map(feature => {
+                if (feature.name === payload.new.feature_name) {
+                  return {
+                    ...feature,
+                    status: payload.new.status,
+                    enabled: payload.new.status === "approved"
+                  };
+                }
+                return feature;
+              })
+            );
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      isMounted = false;
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id]);
+
+  // Toggle feature (join/leave waitlist)
+  const handleToggleFeature = useCallback(async (featureId: string) => {
+    if (!user || isProcessing) return;
+    
+    const featureIndex = features.findIndex(f => f.id === featureId);
+    if (featureIndex === -1) return;
+    
+    const feature = features[featureIndex];
+    
+    try {
+      setIsProcessing(true);
+      
+      // Show immediate feedback with optimistic UI update
+      const updatedFeatures = [...features];
+      
+      if (feature.status === "joined" || feature.status === "approved") {
+        // Optimistic UI update
+        updatedFeatures[featureIndex] = {
+          ...feature,
+          status: null,
+          enabled: false
+        };
+        setFeatures(updatedFeatures);
+        
+        // If already on waitlist or approved, remove from waitlist
+        await resetWaitlistStatus(feature.name, user.id);
+        toast.info(`${feature.name} has been disabled.`);
+      } else {
+        // Optimistic UI update
+        updatedFeatures[featureIndex] = {
+          ...feature,
+          status: "joined",
+          enabled: false
+        };
+        setFeatures(updatedFeatures);
+        
+        // Join waitlist for the feature
+        await joinWaitlist(feature.name, user.id);
+        toast.success(`You've been added to the waitlist for ${feature.name}.`);
+      }
+    } catch (error) {
+      console.error(`Error updating feature ${featureId}:`, error);
+      toast.error("There was an error updating the feature status.");
+      
+      // Revert optimistic update in case of error
+      const { data } = await supabase
+        .from('waitlists')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('feature_name', feature.name)
+        .single();
+        
+      // Restore the correct state
+      const updatedFeatures = [...features];
+      updatedFeatures[featureIndex] = {
+        ...feature,
+        status: data ? data.status : null,
+        enabled: (data && data.status === "approved")
+      };
+      setFeatures(updatedFeatures);
+    } finally {
+      setIsProcessing(false);
+    }
+  }, [features, isProcessing, user]);
+
+  // Toggle feature visibility in sidebar
+  const handleToggleVisibility = useCallback((featureId: string) => {
+    if (!user) return;
+    
+    const featureIndex = features.findIndex(f => f.id === featureId);
+    if (featureIndex === -1) return;
+    
+    const feature = features[featureIndex];
+    const newHiddenState = !feature.hidden;
+    
+    // Update UI visibility preference in localStorage
+    setFeatureVisibilityPreference(feature.name, newHiddenState);
+    
+    // Update local state
+    const updatedFeatures = [...features];
+    updatedFeatures[featureIndex] = {
+      ...feature,
+      hidden: newHiddenState
+    };
+    setFeatures(updatedFeatures);
+    
+    toast.info(`${feature.name} is now ${newHiddenState ? 'hidden from' : 'visible in'} your sidebar.`);
+  }, [features, user]);
 
   return {
     features,
-    loading,
+    loading: loading || isProcessing,
     handleToggleFeature,
     handleToggleVisibility
   };
 };
+
+export type { FeatureItem };

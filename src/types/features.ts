@@ -1,5 +1,5 @@
 
-import { FeatureName, WaitlistStatus } from "@/services/waitlistService";
+import { WaitlistStatus, FeatureName } from "@/services/waitlistService";
 
 export interface FeatureItem {
   id: string;
@@ -9,22 +9,6 @@ export interface FeatureItem {
   status: WaitlistStatus;
   beta: boolean;
   hidden: boolean;
-}
-
-export interface RealtimePayload {
-  schema: string;
-  table: string;
-  commit_timestamp: string;
-  eventType: string;
-  new: {
-    feature_name: string;
-    status: WaitlistStatus;
-    [key: string]: any;
-  };
-  old: {
-    [key: string]: any;
-  };
-  errors: any;
 }
 
 export const INITIAL_FEATURES: FeatureItem[] = [

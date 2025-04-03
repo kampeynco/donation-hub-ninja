@@ -4,7 +4,7 @@ import {
   IconActivity,
   IconCurrentLocation,
   IconAdjustments,
-  IconSparkles,
+  IconStarFilled,
   IconPlugConnected
 } from "@tabler/icons-react";
 
@@ -42,7 +42,7 @@ const sidebarItems: SidebarItemType[] = [
     badge: {
       text: "Beta",
       variant: "beta",
-      icon: IconSparkles
+      icon: IconStarFilled
     },
     // Initial state is visible, will be updated by DashboardSidebar
     hidden: false

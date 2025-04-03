@@ -4,11 +4,10 @@ import { Button } from '@/components/ui/button';
 import { 
   checkWaitlistStatus, 
   joinWaitlist, 
-  WaitlistStatus,
-  WaitlistEntry
+  WaitlistStatus 
 } from '@/services/waitlistService';
 import { useAuth } from '@/context/AuthContext';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { IconCheck, IconX } from '@tabler/icons-react';
 
 type WaitlistStatusState = {
@@ -70,16 +69,9 @@ const WaitlistButton = () => {
         status: status.status,
         rejection_reason: status.rejection_reason || null
       } : null);
-      toast({
-        title: 'Joined waitlist',
-        description: 'You\'ve been added to the Personas waitlist.',
-      });
+      toast.success('You\'ve been added to the Personas waitlist.');
     } catch (error: any) {
-      toast({
-        title: 'Error joining waitlist',
-        description: error.message || 'An unexpected error occurred.',
-        variant: 'destructive',
-      });
+      toast.error('Error joining waitlist: ' + (error.message || 'An unexpected error occurred.'));
     } finally {
       setLoading(false);
     }
