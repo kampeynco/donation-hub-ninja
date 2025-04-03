@@ -47,9 +47,11 @@ export const useFeatureStatus = (features: FeatureItem[]) => {
   useEffect(() => {
     if (!user) return;
 
+    // Fix: Update Supabase channel subscription syntax
     const channel = supabase
       .channel('waitlist-changes')
-      .on('postgres_changes', 
+      .on(
+        'postgres_changes', 
         {
           event: '*',
           schema: 'public',
