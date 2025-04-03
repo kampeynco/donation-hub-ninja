@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { IconCreditCard, IconUsers, IconReportMoney } from "@tabler/icons-react";
 import TestimonialCard from "./TestimonialCard";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { TrueFocus } from "@/components/ui/true-focus";
 
 const HeroSection = () => {
   const isMobile = useIsMobile();
@@ -36,7 +37,16 @@ const HeroSection = () => {
           {/* Main hero content */}
           <div className="text-center max-w-4xl mx-auto z-20 relative py-4 md:py-8">
             <h1 className="text-[4rem] font-bold mb-4 md:mb-6 leading-[1.125] text-gray-900">
-              Your donors intent<br />
+              Your<br />
+              <TrueFocus 
+                sentence="donor intent"
+                manualMode={true}
+                blurAmount={3}
+                borderColor="#007AFF"
+                glowColor="rgba(0, 122, 255, 0.6)"
+                animationDuration={0.5}
+                pauseBetweenAnimations={2}
+              /><br />
               can be unclear.<br />
               We are here to<br />
               change that.
