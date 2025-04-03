@@ -1,9 +1,11 @@
+
 import React from "react";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import IntegrationsTab from "@/components/Account/IntegrationsTab";
+
 const Connections = () => {
-  return <div className="space-y-6">
+  return (
+    <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Connections</h1>
         <p className="text-muted-foreground mt-2">
@@ -18,18 +20,12 @@ const Connections = () => {
             Connect your Donor Camp account with third-party services
           </CardDescription>
         </CardHeader>
-        <Tabs defaultValue="integrations" className="px-6 pb-6">
-          
-          <TabsContent value="integrations">
-            <IntegrationsTab />
-          </TabsContent>
-          <TabsContent value="webhooks">
-            <div className="mt-4">
-              <iframe src="/account?tab=webhooks" title="Webhooks" className="w-full h-[600px] border-0" />
-            </div>
-          </TabsContent>
-        </Tabs>
+        <div className="px-6 pb-6">
+          <IntegrationsTab />
+        </div>
       </Card>
-    </div>;
+    </div>
+  );
 };
+
 export default Connections;

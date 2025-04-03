@@ -1,122 +1,204 @@
 
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 
-// Define a type for valid feature names based on the database schema
+// Define feature names and their corresponding waitlist statuses
 export type FeatureName = "Personas";
-
-// Define the waitlist status type to match our database enum
 export type WaitlistStatus = "joined" | "approved" | "rejected" | "declined" | null;
 
-// Check if a user is on a specific feature's waitlist and their status
-export const checkWaitlistStatus = async (featureName: FeatureName, userId: string) => {
+// Define the waitlist entry interface
+export interface WaitlistEntry {
+  id: string;
+  user_id: string;
+  feature_name: FeatureName;
+  status: WaitlistStatus;
+  created_at: string;
+  updated_at: string;
+  rejection_reason?: string;
+}
+
+// Check waitlist status for a feature
+export const checkWaitlistStatus = async (
+  featureName: FeatureName,
+  userId: string
+): Promise<WaitlistEntry | null> => {
   try {
     const { data, error } = await supabase
       .from("waitlists")
-      .select("status, rejection_reason")
+      .select("*")
       .eq("user_id", userId)
       .eq("feature_name", featureName)
       .single();
-    
-    if (error && error.code !== "PGRST116") { // PGRST116 is "no rows returned"
-      console.error("Error checking waitlist status:", error);
+
+    if (error) {
+      if (error.code !== "PGRST116") { // Don't log "no rows returned" errors
+        console.error("Error checking waitlist status:", error);
+      }
       return null;
     }
-    
-    return data || null;
+
+    return data as WaitlistEntry;
   } catch (error) {
     console.error("Unexpected error checking waitlist status:", error);
     return null;
   }
 };
 
-// Join a waitlist for a feature
-export const joinWaitlist = async (featureName: FeatureName, userId: string) => {
+// Join waitlist for a feature
+export const joinWaitlist = async (
+  featureName: FeatureName,
+  userId: string
+): Promise<boolean> => {
   try {
+    // Check if already on waitlist
+    const existingEntry = await checkWaitlistStatus(featureName, userId);
+    
+    if (existingEntry) {
+      // Update existing entry to "joined" status
+      const { error } = await supabase
+        .from("waitlists")
+        .update({
+          status: "joined",
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", existingEntry.id);
+      
+      if (error) {
+        throw error;
+      }
+    } else {
+      // Create new waitlist entry
+      const { error } = await supabase
+        .from("waitlists")
+        .insert({
+          user_id: userId,
+          feature_name: featureName,
+          status: "joined"
+        });
+      
+      if (error) {
+        throw error;
+      }
+    }
+    
+    return true;
+  } catch (error) {
+    console.error("Error joining waitlist:", error);
+    toast({
+      title: "Error joining waitlist",
+      description: error instanceof Error ? error.message : "An unknown error occurred",
+      variant: "destructive"
+    });
+    return false;
+  }
+};
+
+// Reset waitlist status for a feature
+export const resetWaitlistStatus = async (
+  featureName: FeatureName,
+  userId: string
+): Promise<boolean> => {
+  try {
+    const existingEntry = await checkWaitlistStatus(featureName, userId);
+    
+    if (!existingEntry) {
+      return true; // Nothing to reset
+    }
+    
     const { error } = await supabase
       .from("waitlists")
-      .upsert({
-        user_id: userId,
-        feature_name: featureName,
-        status: "joined",
-        updated_at: new Date().toISOString()
-      }, {
-        onConflict: "user_id,feature_name"
-      });
+      .delete()
+      .eq("id", existingEntry.id);
     
     if (error) {
-      console.error("Error joining waitlist:", error);
       throw error;
     }
     
     return true;
   } catch (error) {
-    console.error("Unexpected error joining waitlist:", error);
-    throw error;
+    console.error("Error resetting waitlist status:", error);
+    toast({
+      title: "Error resetting feature",
+      description: error instanceof Error ? error.message : "An unknown error occurred",
+      variant: "destructive"
+    });
+    return false;
   }
 };
 
-// Decline a feature with a reason
-export const declineFeature = async (featureName: FeatureName, userId: string, reason: string) => {
+// Decline a feature
+export const declineFeature = async (
+  featureName: FeatureName,
+  userId: string,
+  reason: string
+): Promise<boolean> => {
   try {
-    const { error } = await supabase
-      .from("waitlists")
-      .upsert({
-        user_id: userId,
-        feature_name: featureName,
-        status: "declined",
-        rejection_reason: reason,
-        updated_at: new Date().toISOString()
-      }, {
-        onConflict: "user_id,feature_name"
-      });
+    // Check if already on waitlist
+    const existingEntry = await checkWaitlistStatus(featureName, userId);
     
-    if (error) {
-      console.error("Error declining feature:", error);
-      throw error;
+    if (existingEntry) {
+      // Update existing entry to "declined" status
+      const { error } = await supabase
+        .from("waitlists")
+        .update({
+          status: "declined",
+          rejection_reason: reason,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", existingEntry.id);
+      
+      if (error) {
+        throw error;
+      }
+    } else {
+      // Create new waitlist entry with "declined" status
+      const { error } = await supabase
+        .from("waitlists")
+        .insert({
+          user_id: userId,
+          feature_name: featureName,
+          status: "declined",
+          rejection_reason: reason
+        });
+      
+      if (error) {
+        throw error;
+      }
     }
     
     return true;
   } catch (error) {
-    console.error("Unexpected error declining feature:", error);
-    throw error;
+    console.error("Error declining feature:", error);
+    return false;
   }
 };
 
-// Reset waitlist status (remove from waitlist)
-export const resetWaitlistStatus = async (featureName: FeatureName, userId: string) => {
-  try {
-    const { error } = await supabase
-      .from("waitlists")
-      .upsert({
-        user_id: userId,
-        feature_name: featureName,
-        status: null,
-        rejection_reason: null,
-        updated_at: new Date().toISOString()
-      }, {
-        onConflict: "user_id,feature_name"
-      });
-    
-    if (error) {
-      console.error("Error resetting waitlist status:", error);
-      throw error;
-    }
-    
-    return true;
-  } catch (error) {
-    console.error("Unexpected error resetting waitlist status:", error);
-    throw error;
-  }
-};
+// Get and set feature visibility preferences in local storage
+const VISIBILITY_PREFERENCE_KEY = "donorcamp_feature_visibility";
 
-// Get the visibility preference for a feature from localStorage
+// Get feature visibility preference
 export const getFeatureVisibilityPreference = (featureName: FeatureName): boolean => {
-  const key = `hide${featureName}Sidebar`;
-  return localStorage.getItem(key) === "true";
+  try {
+    const preferences = localStorage.getItem(VISIBILITY_PREFERENCE_KEY);
+    if (!preferences) return false;
+    
+    const parsedPreferences = JSON.parse(preferences);
+    return parsedPreferences[featureName] || false;
+  } catch (error) {
+    console.error("Error getting feature visibility preference:", error);
+    return false;
+  }
 };
 
-// Set the visibility preference for a feature in localStorage
+// Set feature visibility preference
 export const setFeatureVisibilityPreference = (featureName: FeatureName, hidden: boolean): void => {
-  const key = `hide${featureName}Sidebar`;
-  localStorage.setItem(key, hidden.toString());
+  try {
+    const preferences = localStorage.getItem(VISIBILITY_PREFERENCE_KEY);
+    const parsedPreferences = preferences ? JSON.parse(preferences) : {};
+    
+    parsedPreferences[featureName] = hidden;
+    localStorage.setItem(VISIBILITY_PREFERENCE_KEY, JSON.stringify(parsedPreferences));
+  } catch (error) {
+    console.error("Error setting feature visibility preference:", error);
+  }
 };

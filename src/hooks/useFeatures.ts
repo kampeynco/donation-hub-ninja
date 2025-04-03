@@ -90,7 +90,7 @@ export const useFeatures = () => {
     // Set up realtime subscription for waitlist changes
     if (user) {
       const channel = supabase
-        .channel('public:waitlists')
+        .channel('waitlist-changes')
         .on('postgres_changes', 
           {
             event: '*',

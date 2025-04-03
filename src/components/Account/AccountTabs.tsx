@@ -1,8 +1,6 @@
 
-// Import the existing component code and add in our new FeaturesTab import
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProfileTab from "./ProfileTab";
-import WebhooksTab from "./WebhooksTab";
 import NotificationsTab from "./NotificationsTab";
 import BillingTab from "./BillingTab";
 import FeaturesTab from "./FeaturesTab";
@@ -14,10 +12,9 @@ const AccountTabs = () => {
 
   return (
     <Tabs defaultValue={defaultTab} className="space-y-4">
-      <TabsList className="grid grid-cols-5 w-full md:w-auto">
+      <TabsList className="grid grid-cols-4 w-full md:w-auto">
         <TabsTrigger value="profile">Profile</TabsTrigger>
         <TabsTrigger value="notifications">Notifications</TabsTrigger>
-        <TabsTrigger value="webhooks">Webhooks</TabsTrigger>
         <TabsTrigger value="features">Features</TabsTrigger>
         <TabsTrigger value="billing">Billing</TabsTrigger>
       </TabsList>
@@ -28,10 +25,6 @@ const AccountTabs = () => {
 
       <TabsContent value="notifications">
         <NotificationsTab />
-      </TabsContent>
-
-      <TabsContent value="webhooks">
-        <WebhooksTab />
       </TabsContent>
       
       <TabsContent value="features">
