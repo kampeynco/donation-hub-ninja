@@ -4,7 +4,7 @@ import StatCard from "@/components/Dashboard/StatCard";
 import DonationsTable from "@/components/Dashboard/DonationsTable";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { fetchRecentDonations, fetchDonationStats } from "@/services/donations";
-import { IconActivity, IconUsers, IconDollarSign } from "@tabler/icons-react";
+import { IconActivity, IconUsers, IconCurrencyDollar } from "@tabler/icons-react";
 
 const Dashboard = () => {
   const {
@@ -54,7 +54,7 @@ const Dashboard = () => {
             value={`$${stats.allTime.total.toLocaleString()}`} 
             subtitle={`ACROSS ALL DONATIONS`} 
             className="bg-gray-700 shadow-sm hover:shadow-md transition-shadow text-white"
-            icon={<IconDollarSign className="h-6 w-6" />}
+            icon={<IconCurrencyDollar className="h-6 w-6" />}
           />
         </div>
       </div>
