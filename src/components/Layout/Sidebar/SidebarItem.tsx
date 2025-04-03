@@ -44,7 +44,7 @@ const SidebarItem = ({
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  className={`${collapsed ? "justify-center w-full" : "w-full flex items-center justify-start"} h-9 ${
+                  className={`${collapsed ? "justify-center w-[45px]" : "w-[225px] flex items-center justify-start"} h-9 ${
                     isActive ? "bg-donor-blue text-white hover:bg-donor-blue hover:text-white" : ""
                   }`}
                 >

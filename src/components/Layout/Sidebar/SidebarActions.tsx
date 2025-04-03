@@ -22,7 +22,7 @@ const SidebarActions = ({ collapsed, toggleSidebar }: SidebarActionsProps) => {
             <Button 
               variant="ghost" 
               size="sm" 
-              className={`${collapsed ? "justify-center w-full" : "w-full flex items-center justify-start"} h-9`}
+              className={`${collapsed ? "justify-center w-[45px]" : "w-[225px] flex items-center justify-start"} h-9`}
               onClick={toggleSidebar}
             >
               <IconChevronLeft className={`h-5 w-5 transition-transform ${collapsed ? "rotate-180" : ""}`} />
@@ -44,7 +44,7 @@ const SidebarActions = ({ collapsed, toggleSidebar }: SidebarActionsProps) => {
             <Button
               variant="ghost"
               size="sm"
-              className={`${collapsed ? "justify-center w-full" : "w-full flex items-center justify-start"} h-9`}
+              className={`${collapsed ? "justify-center w-[45px]" : "w-[225px] flex items-center justify-start"} h-9`}
               onClick={toggleTheme}
             >
               {theme === "light" ? (
