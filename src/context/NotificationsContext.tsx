@@ -34,7 +34,6 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
     loading,
     error,
     isInitialized,
-    setIsInitialized,
     filterByAction,
     markAsRead,
     markAllAsRead,
