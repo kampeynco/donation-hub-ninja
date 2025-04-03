@@ -17,6 +17,8 @@ export const FeatureItem: React.FC<FeatureItemProps> = ({
   onToggleFeature, 
   onToggleVisibility 
 }) => {
+  const isEnabled = feature.status === "approved" || feature.status === "joined";
+  
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
@@ -24,7 +26,7 @@ export const FeatureItem: React.FC<FeatureItemProps> = ({
         <div className="flex items-center gap-3">
           <FeatureStatusBadge status={feature.status} beta={feature.beta} />
           <Switch
-            checked={feature.status === "joined" || feature.status === "approved"}
+            checked={isEnabled}
             onCheckedChange={() => onToggleFeature(feature.id)}
             disabled={feature.status === "rejected"}
           />

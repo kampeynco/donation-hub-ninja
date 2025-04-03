@@ -6,7 +6,7 @@ import { Database } from '@/integrations/supabase/types';
 
 // Define types for the data you're fetching
 interface Feature {
-  id: number;
+  id: number | string;
   name: string;
   description: string;
   waitlist_status: string | null;
@@ -38,16 +38,17 @@ export function useFeatureStatus(initialFeatures: Feature[]) {
         channelSubscription();
       }
     };
-  }, [user?.id, updatedFeatures]);
+  }, [user?.id, initialFeatures]);
 
   // Initialize the subscription to the channel
   const initChannelSubscription = () => {
-    if (!user?.id) return;
+    if (!user?.id) return null;
 
-    // Fixed: Correcting Supabase channel subscription syntax
+    // Fixed: Correctly using Supabase channel subscription syntax
     const channel = supabase
       .channel('waitlist-changes')
-      .on('postgres_changes', 
+      .on(
+        'postgres_changes', 
         { 
           event: 'INSERT', 
           schema: 'public',
@@ -57,7 +58,8 @@ export function useFeatureStatus(initialFeatures: Feature[]) {
         (payload: RealtimePayload) => {
           // Update the local state when waitlist status changes
           const updatedFeaturesState = updatedFeatures.map(feature => {
-            if (feature.id === payload.new.feature_id) {
+            // Match the feature name instead of non-existent feature_id
+            if (feature.name === payload.new.feature_name) {
               return {
                 ...feature,
                 waitlist_status: payload.new.status

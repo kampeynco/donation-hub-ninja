@@ -2,22 +2,9 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { FeatureItem, INITIAL_FEATURES } from "@/types/features";
-
-// Simple placeholder functions since we're not using these now
-const useFeatureStatus = (features: FeatureItem[]) => {
-  return { features, loading: false };
-};
-
-const useFeatureVisibility = (features: FeatureItem[]) => {
-  return { features };
-};
-
-const useFeatureActions = (features: FeatureItem[], setFeatures: any) => {
-  return {
-    handleToggleFeature: () => {},
-    handleToggleVisibility: () => {}
-  };
-};
+import { useFeatureStatus } from "./useFeatureStatus";
+import { useFeatureVisibility } from "./useFeatureVisibility";
+import { useFeatureActions } from "./useFeatureActions";
 
 export type { FeatureItem } from "@/types/features";
 
@@ -25,14 +12,39 @@ export const useFeatures = () => {
   const { user } = useAuth();
   const [features, setFeatures] = useState<FeatureItem[]>(INITIAL_FEATURES);
   
-  // Get feature statuses from waitlist
-  const { features: featuresWithStatus, loading } = useFeatureStatus(features);
+  // Get feature statuses from waitlist - convert INITIAL_FEATURES to the expected format
+  const featuresForStatus = INITIAL_FEATURES.map(feature => ({
+    id: feature.id,
+    name: feature.name,
+    description: feature.description,
+    waitlist_status: feature.status
+  }));
+  
+  const updatedFeaturesWithStatus = useFeatureStatus(featuresForStatus);
+  
+  // Apply feature statuses to our features
+  useEffect(() => {
+    if (updatedFeaturesWithStatus.length > 0) {
+      const updatedFeatures = features.map(feature => {
+        const statusFeature = updatedFeaturesWithStatus.find(f => f.name === feature.name);
+        if (statusFeature) {
+          return {
+            ...feature,
+            status: statusFeature.waitlist_status
+          };
+        }
+        return feature;
+      });
+      
+      setFeatures(updatedFeatures);
+    }
+  }, [updatedFeaturesWithStatus]);
   
   // Apply visibility preferences
-  const { features: featuresWithVisibility } = useFeatureVisibility(featuresWithStatus);
+  const { features: featuresWithVisibility } = useFeatureVisibility(features);
   
   // Get feature action handlers
-  const { handleToggleFeature, handleToggleVisibility } = useFeatureActions(
+  const { handleToggleFeature, handleToggleVisibility, isProcessing } = useFeatureActions(
     featuresWithVisibility, 
     setFeatures
   );
@@ -46,7 +58,7 @@ export const useFeatures = () => {
 
   return {
     features,
-    loading,
+    loading: isProcessing,
     handleToggleFeature,
     handleToggleVisibility
   };
