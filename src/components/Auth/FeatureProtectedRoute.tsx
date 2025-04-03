@@ -57,7 +57,8 @@ const FeatureProtectedRoute: React.FC<FeatureProtectedRouteProps> = ({
     );
   }
 
-  if (!isVisible) {
+  // Only redirect if we're sure the feature is not available (not loading and not visible)
+  if (!isLoading && !isVisible) {
     console.log(`[FeatureProtectedRoute(${featureId})] Feature not enabled, redirecting to account`);
     toast.error(`You don't have access to this feature. Enable it in your account settings.`);
     return <Navigate to="/account?tab=features" replace />;

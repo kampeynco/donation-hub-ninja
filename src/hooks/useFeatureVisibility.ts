@@ -4,7 +4,14 @@ import { useFeatureCache } from "./useFeatureCache";
 
 export function useFeatureVisibility(featureId: string) {
   const { hasFeature, isLoading, refreshCache, featureCache } = useFeatureCache();
-  const [isVisible, setIsVisible] = useState(false);
+  // Initialize with the current cache state instead of false
+  const [isVisible, setIsVisible] = useState(() => {
+    // Get initial state from cache if available
+    if (featureCache && featureId in featureCache) {
+      return featureCache[featureId] || false;
+    }
+    return false;
+  });
 
   // Force an immediate check when the feature or loading state changes
   const checkVisibility = useCallback(() => {

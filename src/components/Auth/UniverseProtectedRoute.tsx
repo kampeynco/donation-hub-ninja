@@ -55,7 +55,8 @@ const UniverseProtectedRoute: React.FC<UniverseProtectedRouteProps> = ({
     );
   }
 
-  if (!isVisible) {
+  // Only redirect if we're sure the feature is not available (not loading and not visible)
+  if (!isLoading && !isVisible) {
     console.log(`[UniverseProtectedRoute] Feature not enabled, redirecting to account`);
     toast.error(`You don't have access to the Universe feature. Enable it in your account settings.`);
     return <Navigate to="/account?tab=features" replace />;
