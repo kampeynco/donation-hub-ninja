@@ -4,6 +4,8 @@ import { NavLink } from "react-router-dom";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { BadgeCustom } from "@/components/ui/badge-custom";
+import { Badge } from "@/components/ui/badge";
+import { useNotificationsContext } from "@/context/NotificationsContext";
 
 interface SidebarItemProps {
   name: string;
@@ -14,9 +16,20 @@ interface SidebarItemProps {
     text: string;
     variant: string;
   };
+  showNotificationBadge?: boolean;
 }
 
-const SidebarItem = ({ name, path, icon: Icon, collapsed, badge }: SidebarItemProps) => {
+const SidebarItem = ({ 
+  name, 
+  path, 
+  icon: Icon, 
+  collapsed, 
+  badge, 
+  showNotificationBadge 
+}: SidebarItemProps) => {
+  const { notifications } = useNotificationsContext();
+  const unreadCount = notifications.filter(n => !n.is_read).length;
+
   return (
     <div className="px-3 py-2">
       <Tooltip delayDuration={0}>
@@ -48,6 +61,19 @@ const SidebarItem = ({ name, path, icon: Icon, collapsed, badge }: SidebarItemPr
                     </BadgeCustom>
                   </div>
                 )}
+
+                {showNotificationBadge && unreadCount > 0 && (
+                  <div className={`absolute ${collapsed ? 'top-0 right-0' : 'top-0 right-8'}`}>
+                    <Badge 
+                      variant="destructive"
+                      className={`flex items-center justify-center ${
+                        isActive ? "bg-white text-donor-blue" : ""
+                      }`}
+                    >
+                      {unreadCount}
+                    </Badge>
+                  </div>
+                )}
               </div>
             )}
           </NavLink>
@@ -58,6 +84,9 @@ const SidebarItem = ({ name, path, icon: Icon, collapsed, badge }: SidebarItemPr
               {name}
               {badge && (
                 <BadgeCustom variant={badge.variant as any} className="ml-1">{badge.text}</BadgeCustom>
+              )}
+              {showNotificationBadge && unreadCount > 0 && (
+                <Badge variant="destructive">{unreadCount}</Badge>
               )}
             </div>
           </TooltipContent>

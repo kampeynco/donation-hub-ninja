@@ -14,6 +14,7 @@ export interface SidebarItemType {
     text: string;
     variant: string;
   };
+  showNotificationBadge?: boolean;
   hidden?: boolean;
 }
 
@@ -32,6 +33,7 @@ const sidebarItems: SidebarItemType[] = [
     name: "Logs",
     path: "/logs",
     icon: IconArrowsRightLeft,
+    showNotificationBadge: true
   },
   {
     name: "Personas",

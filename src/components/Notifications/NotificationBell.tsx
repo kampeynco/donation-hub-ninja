@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { IconBell } from '@tabler/icons-react';
 import { 
   Popover,
@@ -7,16 +7,8 @@ import {
   PopoverTrigger
 } from '@/components/ui/popover';
 import { Badge } from '@/components/ui/badge';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/context/AuthContext';
-import { useToast } from '@/hooks/use-toast';
+import { useNotificationsContext } from '@/context/NotificationsContext';
 import NotificationsList from './NotificationsList';
-import { 
-  fetchRecentNotifications, 
-  markNotificationAsRead, 
-  markAllNotificationsAsRead,
-  deleteNotification
-} from '@/services/notifications';
 
 export interface Notification {
   id: string;
@@ -28,96 +20,10 @@ export interface Notification {
 }
 
 const NotificationBell = () => {
-  const { user } = useAuth();
-  const { toast } = useToast();
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { notifications, markAsRead, markAllAsRead, deleteNotification } = useNotificationsContext();
   const [open, setOpen] = useState(false);
 
   const unreadCount = notifications.filter(n => !n.is_read).length;
-
-  useEffect(() => {
-    if (!user) return;
-
-    const loadNotifications = async () => {
-      try {
-        setLoading(true);
-        const data = await fetchRecentNotifications(10);
-        setNotifications(data);
-      } catch (error) {
-        console.error('Error fetching notifications:', error);
-        toast({
-          title: 'Error',
-          description: 'Failed to fetch notifications',
-          variant: 'destructive'
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadNotifications();
-
-    // Set up real-time subscription
-    const channel = supabase
-      .channel('notification-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'notifications'
-        },
-        (payload) => {
-          setNotifications(prev => [payload.new as Notification, ...prev].slice(0, 10));
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'DELETE',
-          schema: 'public',
-          table: 'notifications'
-        },
-        (payload) => {
-          setNotifications(prev => prev.filter(n => n.id !== payload.old.id));
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [user, toast]);
-
-  const handleMarkAsRead = async (id: string) => {
-    const success = await markNotificationAsRead(id);
-    if (success) {
-      setNotifications(prev => 
-        prev.map(n => n.id === id ? { ...n, is_read: true } : n)
-      );
-    }
-  };
-
-  const handleMarkAllAsRead = async () => {
-    const success = await markAllNotificationsAsRead();
-    if (success) {
-      setNotifications(prev => 
-        prev.map(n => ({ ...n, is_read: true }))
-      );
-    }
-  };
-
-  const handleDeleteNotification = async (id: string) => {
-    const success = await deleteNotification(id);
-    if (success) {
-      setNotifications(prev => prev.filter(n => n.id !== id));
-      toast({
-        title: 'Success',
-        description: 'Notification deleted',
-      });
-    }
-  };
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -133,11 +39,11 @@ const NotificationBell = () => {
       </PopoverTrigger>
       <PopoverContent className="w-80 p-0 rounded-lg" align="end">
         <NotificationsList
-          notifications={notifications}
-          loading={loading}
-          markAsRead={handleMarkAsRead}
-          markAllAsRead={handleMarkAllAsRead}
-          deleteNotification={handleDeleteNotification}
+          notifications={notifications.slice(0, 10)} // Only show the most recent 10
+          loading={false}
+          markAsRead={markAsRead}
+          markAllAsRead={markAllAsRead}
+          deleteNotification={deleteNotification}
           onClose={() => setOpen(false)}
         />
       </PopoverContent>

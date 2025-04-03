@@ -50,6 +50,7 @@ const DashboardSidebar = () => {
                 icon={item.icon}
                 collapsed={collapsed}
                 badge={item.badge}
+                showNotificationBadge={item.showNotificationBadge}
               />
             ))}
           </nav>
