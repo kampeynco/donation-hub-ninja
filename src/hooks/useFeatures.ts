@@ -36,7 +36,9 @@ export const useFeatures = () => {
         return;
       }
       
-      if (!data || data.length === 0) {
+      let featureData = data;
+      
+      if (!featureData || featureData.length === 0) {
         // No features found, create a new row
         const { error: insertError } = await supabase
           .from('features')
@@ -62,7 +64,7 @@ export const useFeatures = () => {
           return;
         }
         
-        data = newData;
+        featureData = newData;
       }
       
       // Convert the database feature flags to FeatureItem[]
@@ -71,9 +73,9 @@ export const useFeatures = () => {
           id: "personas",
           name: "Personas",
           description: "Access donor personas and analytics",
-          enabled: data[0].personas,
+          enabled: featureData[0].personas,
           beta: true,
-          hidden: !data[0].personas // hide if not enabled
+          hidden: !featureData[0].personas // hide if not enabled
         }
       ];
       
