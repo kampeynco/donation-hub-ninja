@@ -13,6 +13,7 @@ interface TrueFocusProps {
   className?: string;
   fontSize?: string;
   fontWeight?: string;
+  treatAsOneUnit?: boolean; // New prop to treat all words as a single unit
 }
 
 function TrueFocus({
@@ -26,6 +27,7 @@ function TrueFocus({
   className = "",
   fontSize,
   fontWeight,
+  treatAsOneUnit = false, // Default to false for backward compatibility
 }: TrueFocusProps) {
   const words = sentence.split(" ");
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -46,18 +48,50 @@ function TrueFocus({
 
   useEffect(() => {
     if (currentIndex === null || currentIndex === -1) return;
-    if (!wordRefs.current[currentIndex] || !containerRef.current) return;
+    if (!containerRef.current) return;
 
-    const parentRect = containerRef.current.getBoundingClientRect();
-    const activeRect = wordRefs.current[currentIndex]!.getBoundingClientRect();
+    if (treatAsOneUnit) {
+      // When treating as one unit, calculate bounding box for all words
+      const parentRect = containerRef.current.getBoundingClientRect();
+      
+      // Initialize with extreme values to find min/max
+      let minX = Infinity;
+      let minY = Infinity;
+      let maxX = -Infinity;
+      let maxY = -Infinity;
+      
+      // Calculate combined bounding box of all word elements
+      wordRefs.current.forEach(wordRef => {
+        if (wordRef) {
+          const rect = wordRef.getBoundingClientRect();
+          minX = Math.min(minX, rect.left);
+          minY = Math.min(minY, rect.top);
+          maxX = Math.max(maxX, rect.right);
+          maxY = Math.max(maxY, rect.bottom);
+        }
+      });
+      
+      // Set the focus rectangle to cover all words
+      setFocusRect({
+        x: minX - parentRect.left,
+        y: minY - parentRect.top,
+        width: maxX - minX,
+        height: maxY - minY,
+      });
+    } else {
+      // Original behavior for individual words
+      if (!wordRefs.current[currentIndex]) return;
+      const parentRect = containerRef.current.getBoundingClientRect();
+      const activeRect = wordRefs.current[currentIndex]!.getBoundingClientRect();
 
-    setFocusRect({
-      x: activeRect.left - parentRect.left,
-      y: activeRect.top - parentRect.top,
-      width: activeRect.width,
-      height: activeRect.height,
-    });
-  }, [currentIndex, words.length]);
+      setFocusRect({
+        x: activeRect.left - parentRect.left,
+        y: activeRect.top - parentRect.top,
+        width: activeRect.width,
+        height: activeRect.height,
+      });
+    }
+  }, [currentIndex, words.length, treatAsOneUnit]);
 
   const handleMouseEnter = (index: number) => {
     if (manualMode) {
@@ -76,9 +110,11 @@ function TrueFocus({
     <div
       className={`relative inline-flex gap-1 items-center ${className}`}
       ref={containerRef}
+      onMouseEnter={treatAsOneUnit && manualMode ? () => setCurrentIndex(0) : undefined}
+      onMouseLeave={treatAsOneUnit && manualMode ? handleMouseLeave : undefined}
     >
       {words.map((word, index) => {
-        const isActive = index === currentIndex;
+        const isActive = treatAsOneUnit ? currentIndex !== null : index === currentIndex;
         return (
           <span
             key={index}
@@ -96,8 +132,8 @@ function TrueFocus({
               fontSize: fontSize,
               fontWeight: fontWeight,
             }}
-            onMouseEnter={() => handleMouseEnter(index)}
-            onMouseLeave={handleMouseLeave}
+            onMouseEnter={!treatAsOneUnit ? () => handleMouseEnter(index) : undefined}
+            onMouseLeave={!treatAsOneUnit ? handleMouseLeave : undefined}
           >
             {word}
           </span>

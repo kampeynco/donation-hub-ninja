@@ -49,6 +49,7 @@ const HeroSection = () => {
                 fontSize="inherit"
                 fontWeight="inherit"
                 className="inline-block"
+                treatAsOneUnit={true}
               /><br />
               can be unclear.<br />
               We are here to<br />
