@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { IconArrowRight, IconLock } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
@@ -6,14 +5,10 @@ import { Separator } from "@/components/ui/separator";
 import NotInterestedModal from "@/components/Personas/NotInterestedModal";
 import WaitlistButton from "@/components/Personas/WaitlistButton";
 import { Card, CardContent } from "@/components/ui/card";
-
 const universeImage = "/lovable-uploads/35af406b-6b5e-411d-98c7-b9d0642b92a0.png";
-
 const Universe = () => {
   const [modalOpen, setModalOpen] = useState(false);
-  
-  return (
-    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-120px)] mt-6">
+  return <div className="flex flex-col items-center justify-center min-h-[calc(100vh-120px)] mt-6">
       <div className="max-w-6xl w-full space-y-10 px-4 md:px-6">
         {/* Main section */}
         <div className="flex flex-col md:flex-row items-center gap-8">
@@ -23,13 +18,7 @@ const Universe = () => {
               <span className="text-sm font-medium">Paid Plans</span>
             </div>
             <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-6">Get started with Universe today</h1>
-            <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
-              The Universe feature offers a real-time overview of donor activity across the entire platform, 
-              ensuring you stay informed about your shared supporters. When a donor makes a contribution to any user 
-              on the app, all other users who have that donor associated with their account will receive an immediate 
-              notification detailing the donation date, time, amount, and general information about the recipient user, 
-              fostering a collaborative awareness of donor engagement and impact.
-            </p>
+            <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">The Universe feature offers a real-time overview of donor activity across the entire platform, ensuring you stay informed about your shared supporters. </p>
             <div className="flex items-center gap-4">
               <WaitlistButton />
               <Button variant="link" onClick={() => setModalOpen(true)} className="text-donor-blue flex items-center">
@@ -80,8 +69,6 @@ const Universe = () => {
 
       {/* Modal for "Not Interested" feedback */}
       <NotInterestedModal open={modalOpen} onOpenChange={setModalOpen} />
-    </div>
-  );
+    </div>;
 };
-
 export default Universe;
