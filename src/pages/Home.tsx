@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -33,8 +32,8 @@ const Home = () => {
       <header className="bg-white">
         <div className="container mx-auto px-4 py-6 flex justify-between items-center">
           <Link to="/" className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10">
-              <img src={DARK_LOGO_MARK} alt="Donor Camp Logo" className="w-5 h-5" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+              <img src={DARK_LOGO_MARK} alt="Donor Camp Logo" className="w-6 h-6" />
             </div>
             <span className="text-xl font-semibold tracking-tight">Donor Camp</span>
           </Link>
@@ -54,7 +53,6 @@ const Home = () => {
         
         <div className="container mx-auto px-4 py-20 md:py-32 max-w-7xl">
           <div className="relative">
-            {/* Testimonial cards positioned absolutely */}
             <div className="hidden md:block absolute -left-4 top-1/4 transform -translate-y-1/2 max-w-xs">
               <div className="bg-white rounded-lg shadow-md p-4 border border-gray-100">
                 <div className="flex items-center gap-3">
@@ -77,7 +75,6 @@ const Home = () => {
               </div>
             </div>
             
-            {/* Main hero content with updated line breaks */}
             <div className="text-center max-w-4xl mx-auto z-10 relative">
               <h1 className="text-4xl md:text-6xl font-bold mb-6">
                 Donor intent is hiding<br />
@@ -102,7 +99,6 @@ const Home = () => {
               </div>
             </div>
             
-            {/* Bottom testimonial card */}
             <div className="hidden md:block absolute bottom-0 right-1/4 transform translate-y-1/2 max-w-xs">
               <div className="bg-white rounded-lg shadow-md p-4 border border-gray-100">
                 <div className="flex items-center gap-3">
@@ -177,8 +173,8 @@ const Home = () => {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <Link to="/" className="flex items-center gap-2 mb-6 md:mb-0">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white">
-                <img src={DARK_LOGO_MARK} alt="Donor Camp Logo" className="w-4 h-4" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white">
+                <img src={DARK_LOGO_MARK} alt="Donor Camp Logo" className="w-6 h-6" />
               </div>
               <span className="text-xl font-semibold tracking-tight">Donor Camp</span>
             </Link>

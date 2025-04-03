@@ -47,16 +47,17 @@ export const useFeatureStatus = (features: FeatureItem[]) => {
   useEffect(() => {
     if (!user) return;
 
-    // Fix: Use the correct Supabase channel subscription syntax
+    // Fix: Using the correct Supabase channel subscription syntax
     const channel = supabase
       .channel('waitlist-changes')
-      .on('postgres_changes', 
+      .on(
+        'postgres_changes', 
         {
           event: '*',
           schema: 'public',
           table: 'waitlists',
           filter: `user_id=eq.${user.id}`
-        }, 
+        },
         (payload: RealtimePayload) => {
           // Update the local state when waitlist status changes
           const updatedFeaturesState = updatedFeatures.map(feature => {
