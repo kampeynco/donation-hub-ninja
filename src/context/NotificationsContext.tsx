@@ -50,7 +50,7 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [user, isInitialized, loadNotifications]);
 
   // Set up real-time subscriptions
-  useNotificationsRealtime(user?.id, isInitialized, updateNotifications);
+  useNotificationsRealtime(user?.id, updateNotifications, isInitialized);
 
   return (
     <NotificationsContext.Provider
