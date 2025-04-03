@@ -1,8 +1,9 @@
+
 import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
-import { IconArrowRight, IconCreditCard, IconUsers, IconReportMoney, IconTent } from "@tabler/icons-react";
+import { IconArrowRight, IconCreditCard, IconUsers, IconReportMoney } from "@tabler/icons-react";
 
 // Logo mark image from assets bucket
 const DARK_LOGO_MARK = "https://igjnhwvtasegwyiwcdkr.supabase.co/storage/v1/object/public/assets//updated_dc_logomark_dark.png";
@@ -53,7 +54,7 @@ const Home = () => {
         
         <div className="container mx-auto px-4 py-20 md:py-32 flex flex-col items-center text-center">
           <h1 className="text-4xl md:text-6xl font-bold mb-6 max-w-4xl">
-            Manage your donors and track donations with ease
+            Donor intent is hiding in plain sight. Donor Camp reveals it—and automates your next move.
           </h1>
           <p className="text-xl md:text-2xl mb-10 max-w-2xl">
             Donor Camp helps you track donations, manage donor relationships, and grow your fundraising efforts.

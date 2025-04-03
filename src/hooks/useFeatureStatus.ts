@@ -50,7 +50,8 @@ export const useFeatureStatus = (features: FeatureItem[]) => {
     // Fixed: Update Supabase channel subscription syntax
     const channel = supabase
       .channel('waitlist-changes')
-      .on('postgres_changes', {
+      .on('postgres_changes', 
+        {
           event: '*',
           schema: 'public',
           table: 'waitlists',
