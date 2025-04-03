@@ -1,78 +1,20 @@
 
 import { useState } from 'react';
 import { 
-  createNotification,
   markNotificationAsRead,
   markAllNotificationsAsRead,
   fetchRecentNotifications,
-  deleteNotification
+  deleteNotification,
+  createDonationNotification,
+  createRecurringDonationNotification
 } from '@/services/notifications';
 import { Notification } from '@/components/Notifications/NotificationBell';
-import { toast } from '@/hooks/use-toast';
 
+/**
+ * Hook for working with notifications
+ */
 export function useNotifications() {
   const [isLoading, setIsLoading] = useState(false);
-
-  /**
-   * Create a notification for a new donation
-   */
-  const createDonationNotification = async (
-    donorName: string, 
-    amount: number, 
-    donorId: string | null = null
-  ) => {
-    setIsLoading(true);
-    try {
-      const formattedAmount = amount.toFixed(2);
-      const message = `${donorName} donated $${formattedAmount}`;
-      return await createNotification({
-        message,
-        action: 'donor',
-        donorId
-      });
-    } catch (error) {
-      console.error('Error creating donation notification:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to create notification',
-        variant: 'destructive'
-      });
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  /**
-   * Create a notification for a recurring donation
-   */
-  const createRecurringDonationNotification = async (
-    donorName: string, 
-    amount: number, 
-    period: string, 
-    donorId: string | null = null
-  ) => {
-    setIsLoading(true);
-    try {
-      const formattedAmount = amount.toFixed(2);
-      const message = `${donorName} set up a ${period} donation of $${formattedAmount}`;
-      return await createNotification({
-        message,
-        action: 'donor',
-        donorId
-      });
-    } catch (error) {
-      console.error('Error creating recurring donation notification:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to create notification',
-        variant: 'destructive'
-      });
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   /**
    * Mark a notification as read
