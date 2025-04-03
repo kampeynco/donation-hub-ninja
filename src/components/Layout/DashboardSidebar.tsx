@@ -17,6 +17,11 @@ const DashboardSidebar = () => {
   const location = useLocation();
   const { user } = useAuth();
 
+  // Log the current location
+  useEffect(() => {
+    console.log("DashboardSidebar: Current location path:", location.pathname);
+  }, [location.pathname]);
+
   // Fetch feature flags from database
   const fetchFeatures = useCallback(async () => {
     if (!user) return;

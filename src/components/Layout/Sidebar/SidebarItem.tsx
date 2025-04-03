@@ -1,6 +1,6 @@
 
-import React from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import React, { useCallback } from "react";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { BadgeCustom } from "@/components/ui/badge-custom";
@@ -29,6 +29,7 @@ const SidebarItem = ({
   showNotificationBadge 
 }: SidebarItemProps) => {
   const location = useLocation();
+  const navigate = useNavigate();
   
   // Safely get notifications context
   let unreadCount = 0;
@@ -46,6 +47,17 @@ const SidebarItem = ({
   const isActive = location.pathname === path || 
     (path !== '/' && location.pathname.startsWith(path + '/'));
 
+  // Handle manual click for refresh logic
+  const handleClick = useCallback((e: React.MouseEvent) => {
+    // If already on the same path, we want to force a re-render of the route
+    if (isActive) {
+      e.preventDefault();
+      console.log("Reloading current route:", path);
+      // Simply re-navigate to the same route to trigger a refresh
+      navigate(path, { replace: true });
+    }
+  }, [isActive, navigate, path]);
+
   return (
     <Tooltip delayDuration={0}>
       <TooltipTrigger asChild>
@@ -53,6 +65,7 @@ const SidebarItem = ({
           to={path}
           className="block"
           end={path === '/' || path === '/dashboard'} // Only use end for home and dashboard
+          onClick={handleClick}
         >
           {({ isActive: navLinkActive }) => (
             <div className="relative">
