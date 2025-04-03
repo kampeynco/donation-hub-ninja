@@ -2,7 +2,7 @@
 import React from "react";
 
 // Logo mark image from assets bucket
-const LIGHT_LOGO_MARK = "https://igjnhwvtasegwyiwcdkr.supabase.co/storage/v1/object/public/assets//updated_dc_logomark_light.png";
+const LIGHT_LOGO_MARK = "https://igjnhwvtasegwyiwcdkr.supabase.co/storage/v1/object/public/assets/images/updated_dc_logomark_light.png";
 
 interface SidebarLogoProps {
   collapsed: boolean;

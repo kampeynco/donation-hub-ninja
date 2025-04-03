@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
  * If the image doesn't exist, a default icon will be used
  */
 export const getActBlueLogo = (): string => {
-  return "https://igjnhwvtasegwyiwcdkr.supabase.co/storage/v1/object/public/assets//updated_actblue_icon.png";
+  return "https://igjnhwvtasegwyiwcdkr.supabase.co/storage/v1/object/public/assets/images/updated_actblue_icon.png";
 };
 
 /**
@@ -17,7 +17,7 @@ export const checkActBlueLogoExists = async (): Promise<boolean> => {
   try {
     const { data, error } = await supabase.storage
       .from("assets")
-      .list("", {
+      .list("images", {
         search: "updated_actblue_icon.png"
       });
 

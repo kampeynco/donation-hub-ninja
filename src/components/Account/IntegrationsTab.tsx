@@ -22,7 +22,7 @@ const IntegrationsTab = () => {
   const [actBlueWebhookUrl, setActBlueWebhookUrl] = useState<string>("");
   const [configModalOpen, setConfigModalOpen] = useState(false);
   const [instructionsModalOpen, setInstructionsModalOpen] = useState(false);
-  const [actBlueLogoUrl, setActBlueLogoUrl] = useState<string>("https://igjnhwvtasegwyiwcdkr.supabase.co/storage/v1/object/public/assets//updated_actblue_icon.png");
+  const [actBlueLogoUrl, setActBlueLogoUrl] = useState<string>("https://igjnhwvtasegwyiwcdkr.supabase.co/storage/v1/object/public/assets/images/updated_actblue_icon.png");
 
   useEffect(() => {
     const loadWebhookCredentials = async () => {
