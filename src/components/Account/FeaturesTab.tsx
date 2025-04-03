@@ -1,12 +1,17 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useFeatures } from "@/hooks/useFeatures";
 import { FeatureItem } from "./FeatureItem";
 import { FeaturesLoading } from "./FeaturesLoading";
 
 const FeaturesTab = () => {
-  const { features, loading, handleToggleFeature, handleToggleVisibility } = useFeatures();
+  const { features, loading, handleToggleFeature, handleToggleVisibility, refetchFeatures } = useFeatures();
+
+  // Refetch features when component mounts
+  useEffect(() => {
+    refetchFeatures();
+  }, [refetchFeatures]);
 
   return (
     <Card>

@@ -38,8 +38,13 @@ export const useFeatureActions = (features: FeatureItem[], setFeatures: React.Di
         setFeatures(updatedFeatures);
         
         // If already on waitlist or approved, remove from waitlist
-        await resetWaitlistStatus(feature.name, user.id);
-        toast.info(`${feature.name} has been disabled.`);
+        const success = await resetWaitlistStatus(feature.name, user.id);
+        
+        if (success) {
+          toast.info(`${feature.name} has been disabled.`);
+        } else {
+          throw new Error("Failed to reset waitlist status");
+        }
       } else {
         // Optimistic UI update
         updatedFeatures[featureIndex] = {
@@ -50,8 +55,13 @@ export const useFeatureActions = (features: FeatureItem[], setFeatures: React.Di
         setFeatures(updatedFeatures);
         
         // Join waitlist for the feature
-        await joinWaitlist(feature.name, user.id);
-        toast.success(`You've been added to the waitlist for ${feature.name}.`);
+        const success = await joinWaitlist(feature.name, user.id);
+        
+        if (success) {
+          toast.success(`You've been added to the waitlist for ${feature.name}.`);
+        } else {
+          throw new Error("Failed to join waitlist");
+        }
       }
     } catch (error) {
       console.error(`Error updating feature ${featureId}:`, error);

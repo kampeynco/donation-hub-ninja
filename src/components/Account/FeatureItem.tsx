@@ -5,6 +5,8 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { FeatureStatusBadge } from "./FeatureStatusBadge";
 import { FeatureItem as FeatureItemType } from "@/types/features";
+import { BadgeCustom } from "@/components/ui/badge-custom";
+import { IconStarFilled } from "@tabler/icons-react";
 
 interface FeatureItemProps {
   feature: FeatureItemType;
@@ -31,9 +33,17 @@ export const FeatureItem: React.FC<FeatureItemProps> = ({
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <span className="font-medium">{feature.name}</span>
+        <div className="flex items-center gap-2">
+          <span className="font-medium">{feature.name}</span>
+          {feature.beta && (
+            <BadgeCustom variant="beta" className="flex items-center">
+              <IconStarFilled size={10} className="mr-1" />
+              Beta
+            </BadgeCustom>
+          )}
+        </div>
         <div className="flex items-center gap-3">
-          <FeatureStatusBadge status={feature.status} beta={feature.beta} />
+          <FeatureStatusBadge status={feature.status} />
           <Switch
             checked={isEnabled}
             onCheckedChange={handleToggleFeature}

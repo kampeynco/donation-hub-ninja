@@ -1,14 +1,12 @@
 
 import React from "react";
-import { IconStarFilled } from "@tabler/icons-react";
 import { WaitlistStatus } from "@/services/waitlistService";
 
 interface FeatureStatusBadgeProps {
   status: WaitlistStatus;
-  beta?: boolean;
 }
 
-export const FeatureStatusBadge: React.FC<FeatureStatusBadgeProps> = ({ status, beta }) => {
+export const FeatureStatusBadge: React.FC<FeatureStatusBadgeProps> = ({ status }) => {
   const getStatusText = (status: WaitlistStatus) => {
     if (status === "approved") return "Enabled";
     if (status === "joined") return "On waitlist";
@@ -26,16 +24,8 @@ export const FeatureStatusBadge: React.FC<FeatureStatusBadgeProps> = ({ status, 
   };
 
   return (
-    <div className="flex items-center gap-2">
-      {beta && (
-        <span className="bg-donor-blue bg-opacity-10 text-donor-blue text-xs px-2 py-0.5 rounded-full flex items-center">
-          <IconStarFilled size={10} className="mr-1" />
-          Beta
-        </span>
-      )}
-      <span className={`text-sm ${getStatusColor(status)}`}>
-        {getStatusText(status)}
-      </span>
-    </div>
+    <span className={`text-sm ${getStatusColor(status)}`}>
+      {getStatusText(status)}
+    </span>
   );
 };
