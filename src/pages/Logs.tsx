@@ -30,6 +30,11 @@ const Logs = () => {
     setActiveTab(value);
   };
 
+  const handleDeleteNotification = async (id: string) => {
+    console.log(`Logs page: Deleting notification with ID: ${id}`);
+    await deleteNotification(id);
+  };
+
   const filteredNotifications = filterByAction(activeTab === 'all' ? 'all' : activeTab);
   const hasUnread = getUnreadCount() > 0;
   
@@ -70,7 +75,7 @@ const Logs = () => {
               loading={loading}
               error={error}
               onMarkAsRead={markAsRead}
-              onDelete={deleteNotification}
+              onDelete={handleDeleteNotification}
             />
           </Tabs>
         </CardContent>

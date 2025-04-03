@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { format } from 'date-fns';
-import { IconX } from '@tabler/icons-react';
+import { IconTrash } from '@tabler/icons-react';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,11 @@ interface NotificationRowProps {
 }
 
 const NotificationRow = ({ notification, onMarkAsRead, onDelete }: NotificationRowProps) => {
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onDelete(notification.id);
+  };
+
   return (
     <TableRow 
       className={!notification.is_read ? 'bg-blue-50 dark:bg-blue-900/10' : undefined}
@@ -40,12 +45,10 @@ const NotificationRow = ({ notification, onMarkAsRead, onDelete }: NotificationR
         <Button
           variant="ghost" 
           size="icon"
-          onClick={(e) => {
-            e.stopPropagation();
-            onDelete(notification.id);
-          }}
+          onClick={handleDelete}
+          aria-label="Delete notification"
         >
-          <IconX size={16} />
+          <IconTrash size={16} className="text-gray-500 hover:text-red-500" />
           <span className="sr-only">Delete</span>
         </Button>
       </TableCell>

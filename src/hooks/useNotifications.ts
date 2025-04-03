@@ -109,8 +109,16 @@ export function useNotifications() {
    */
   const deleteNotificationById = async (id: string) => {
     setIsLoading(true);
+    console.log(`useNotifications: Deleting notification with ID: ${id}`);
     try {
-      return await deleteNotification(id);
+      const success = await deleteNotification(id);
+      if (success) {
+        console.log(`useNotifications: Successfully deleted notification with ID: ${id}`);
+        return true;
+      } else {
+        console.error(`useNotifications: Failed to delete notification with ID: ${id}`);
+        return false;
+      }
     } catch (error) {
       console.error('Error deleting notification:', error);
       return false;

@@ -112,10 +112,14 @@ export async function markAllNotificationsAsRead(): Promise<boolean> {
  */
 export async function deleteNotification(id: string): Promise<boolean> {
   try {
-    const { error } = await supabase
+    // Add debug logging
+    console.log(`Attempting to delete notification with ID: ${id}`);
+    
+    const { error, count } = await supabase
       .from('notifications')
       .delete()
-      .eq('id', id);
+      .eq('id', id)
+      .select('count');
       
     if (error) {
       console.error('Error deleting notification:', error);
@@ -126,6 +130,9 @@ export async function deleteNotification(id: string): Promise<boolean> {
       });
       return false;
     }
+    
+    // Log successful deletion
+    console.log(`Successfully deleted notification. Affected rows: ${count}`);
     
     return true;
   } catch (error) {
