@@ -57,9 +57,7 @@ const Personas = () => {
                 <IconArrowRight className="h-6 w-6 text-green-600" />
               </div>
               <h3 className="text-xl font-semibold mb-3">Visualize unified donor profiles</h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                Visually explore user profiles in one place to understand donor behavior and traits.
-              </p>
+              <p className="text-gray-600 dark:text-gray-300">Visually explore donor profiles in one place to understand donor behavior and traits.</p>
             </CardContent>
           </Card>
           
