@@ -49,7 +49,7 @@ const HeroSection = () => {
                 fontSize="inherit"
                 fontWeight="inherit"
                 className="inline-block"
-              />{" "}
+              /><br />
               can be unclear.<br />
               We are here to<br />
               change that.
