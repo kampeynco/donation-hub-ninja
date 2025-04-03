@@ -78,7 +78,7 @@ const WaitlistButton = () => {
     return (
       <Button variant="outline" className="mr-4 border-green-500 text-green-600 hover:bg-green-50 hover:text-green-600" disabled>
         <IconCheck className="mr-1 h-4 w-4" />
-        Joined
+        Added to Waitlist
       </Button>
     );
   }
