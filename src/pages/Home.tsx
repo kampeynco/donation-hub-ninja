@@ -20,7 +20,7 @@ const Home = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Loading...</h1>
         </div>
@@ -29,7 +29,7 @@ const Home = () => {
   }
 
   return (
-    <div className="min-h-screen bg-donor-gray">
+    <div className="min-h-screen bg-white">
       <HomeHeader />
       <HeroSection />
       <FeaturesSection />
