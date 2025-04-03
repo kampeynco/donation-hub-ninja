@@ -43,7 +43,7 @@ const Logs = () => {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
-            <span>Notifications</span>
+            
             
           </CardTitle>
         </CardHeader>
