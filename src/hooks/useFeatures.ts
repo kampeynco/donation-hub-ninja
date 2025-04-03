@@ -5,6 +5,7 @@ import { FeatureItem, INITIAL_FEATURES } from "@/types/features";
 import { useFeatureStatus } from "./useFeatureStatus";
 import { useFeatureVisibility } from "./useFeatureVisibility";
 import { useFeatureActions } from "./useFeatureActions";
+import { WaitlistStatus } from "@/services/waitlistService";
 
 export type { FeatureItem } from "@/types/features";
 
@@ -30,7 +31,7 @@ export const useFeatures = () => {
         if (statusFeature) {
           return {
             ...feature,
-            status: statusFeature.waitlist_status
+            status: statusFeature.waitlist_status as WaitlistStatus
           };
         }
         return feature;
