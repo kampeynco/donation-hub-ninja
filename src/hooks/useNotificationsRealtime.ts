@@ -6,8 +6,8 @@ import { toast } from '@/hooks/use-toast';
 
 export function useNotificationsRealtime(
   userId?: string,
-  isInitialized: boolean = false,
-  updateNotifications: (updater: (prev: Notification[]) => Notification[]) => void
+  updateNotifications: (updater: (prev: Notification[]) => Notification[]) => void,
+  isInitialized: boolean = false
 ) {
   // Subscribe to real-time notifications
   useEffect(() => {

@@ -1,7 +1,7 @@
 
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
-import { IconPanelLeft } from "@tabler/icons-react"
+import { IconLayoutSidebar } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
@@ -26,7 +26,7 @@ export const SidebarTrigger = React.forwardRef<
       }}
       {...props}
     >
-      <IconPanelLeft className="h-4 w-4" />
+      <IconLayoutSidebar className="h-4 w-4" />
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   )
