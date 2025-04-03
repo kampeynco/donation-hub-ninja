@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { INITIAL_FEATURES, FeatureItem } from "@/types/features";
 import { supabase } from "@/integrations/supabase/client";
-import { WaitlistStatus } from "@/services/waitlistService";
+import { WaitlistStatus, getFeatureVisibilityPreference } from "@/services/waitlistService";
 import { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 import { useFeatureActions } from "./useFeatureActions";
 
