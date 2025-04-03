@@ -46,6 +46,7 @@ const SidebarItem = ({
         <NavLink
           to={path}
           className="block"
+          end
         >
           {({ isActive }) => (
             <div className="relative">
