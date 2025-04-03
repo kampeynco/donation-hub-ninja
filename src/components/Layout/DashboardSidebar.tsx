@@ -41,7 +41,7 @@ const DashboardSidebar = () => {
         
         {/* Navigation */}
         <div className="px-3 py-2 flex-1">
-          <nav className="space-y-1">
+          <nav className="space-y-2">
             {items.filter(item => !item.hidden).map((item) => (
               <SidebarItem 
                 key={item.path}
@@ -57,7 +57,7 @@ const DashboardSidebar = () => {
         </div>
 
         {/* Bottom section with collapse, theme toggle */}
-        <div className="mt-auto">
+        <div className="mt-auto space-y-2 px-3 py-2">
           <SidebarActions 
             collapsed={collapsed} 
             toggleSidebar={toggleSidebar}
