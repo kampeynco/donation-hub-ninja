@@ -14,7 +14,7 @@ const FeatureProtectedRoute: React.FC<FeatureProtectedRouteProps> = ({
   children, 
   featureId 
 }) => {
-  const { user, isLoaded } = useAuth();
+  const { user } = useAuth();
   const [hasAccess, setHasAccess] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -47,12 +47,14 @@ const FeatureProtectedRoute: React.FC<FeatureProtectedRouteProps> = ({
       }
     };
 
-    if (isLoaded) {
+    if (user) {
       checkFeatureAccess();
+    } else {
+      setIsLoading(false);
     }
-  }, [user, isLoaded, featureId]);
+  }, [user, featureId]);
 
-  if (!isLoaded || isLoading) {
+  if (isLoading) {
     return <div>Loading...</div>;
   }
 
