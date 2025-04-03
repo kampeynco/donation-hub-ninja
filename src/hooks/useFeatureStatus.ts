@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { WaitlistStatus } from '@/services/waitlistService';
-import { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 
 // Define types for the data you're fetching
 export interface Feature {
@@ -13,19 +12,12 @@ export interface Feature {
   waitlist_status: WaitlistStatus;
 }
 
-// Define the payload type for the real-time subscription
-type WaitlistRealtimePayload = RealtimePostgresChangesPayload<{
-  feature_name: string;
-  status: WaitlistStatus;
-  user_id: string;
-  [key: string]: any;
-}>;
-
 export function useFeatureStatus(initialFeatures: Feature[]) {
   const { user } = useAuth();
   const [updatedFeatures, setUpdatedFeatures] = useState<Feature[]>(initialFeatures);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Fetch current waitlist statuses
   useEffect(() => {
     if (!user?.id) {
       setIsLoading(false);
@@ -35,7 +27,6 @@ export function useFeatureStatus(initialFeatures: Feature[]) {
     let isMounted = true;
     setIsLoading(true);
 
-    // Fetch current waitlist statuses for this user
     const fetchWaitlistStatus = async () => {
       try {
         const { data, error } = await supabase
@@ -73,18 +64,28 @@ export function useFeatureStatus(initialFeatures: Feature[]) {
 
     fetchWaitlistStatus();
 
-    // Set up realtime subscription using the correct channel API syntax
+    return () => {
+      isMounted = false;
+    };
+  }, [user?.id, initialFeatures]);
+
+  // Set up realtime subscription
+  useEffect(() => {
+    if (!user?.id) return;
+
+    let isMounted = true;
+
     const channel = supabase
       .channel('waitlist-changes')
       .on(
         'postgres_changes', 
         {
-          event: '*', // Listen to all events (INSERT, UPDATE, DELETE)
+          event: '*',
           schema: 'public',
           table: 'waitlists',
           filter: `user_id=eq.${user.id}`
         },
-        (payload: WaitlistRealtimePayload) => {
+        (payload) => {
           if (!isMounted) return;
           
           console.log('Realtime waitlist update received:', payload);

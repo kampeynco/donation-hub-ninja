@@ -4,17 +4,8 @@ import { useAuth } from "@/context/AuthContext";
 import { INITIAL_FEATURES, FeatureItem } from "@/types/features";
 import { supabase } from "@/integrations/supabase/client";
 import { WaitlistStatus, getFeatureVisibilityPreference } from "@/services/waitlistService";
-import { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 import { useFeatureActions } from "./useFeatureActions";
-
-// Type interface for the waitlist table payload
-interface WaitlistPayload {
-  feature_name: string;
-  status: WaitlistStatus;
-  user_id: string;
-  rejection_reason?: string | null;
-  [key: string]: any;
-}
+import { useFeatureRealtime } from "./useFeatureRealtime";
 
 export const useFeatures = () => {
   const { user } = useAuth();
@@ -22,6 +13,9 @@ export const useFeatures = () => {
   const [loading, setLoading] = useState(true);
   
   const { handleToggleFeature, handleToggleVisibility, isProcessing } = useFeatureActions(features, setFeatures);
+  
+  // Use the new realtime hook
+  useFeatureRealtime(user?.id, features, setFeatures);
 
   // Fetch waitlist statuses and apply visibility preferences
   useEffect(() => {
@@ -77,46 +71,8 @@ export const useFeatures = () => {
 
     fetchFeatureStatus();
 
-    // Set up realtime subscription
-    const channel = supabase
-      .channel('waitlist-changes')
-      .on(
-        'postgres_changes', 
-        {
-          event: '*',
-          schema: 'public',
-          table: 'waitlists',
-          filter: `user_id=eq.${user.id}`
-        },
-        (payload: RealtimePostgresChangesPayload<WaitlistPayload>) => {
-          if (!isMounted) return;
-          
-          console.log('Realtime waitlist update received:', payload);
-          
-          // Check if payload.new exists and has necessary properties
-          const newData = payload.new as { feature_name?: string; status?: WaitlistStatus } | null;
-          
-          if (newData && typeof newData.feature_name === 'string' && newData.status !== undefined) {
-            setFeatures(prevFeatures => 
-              prevFeatures.map(feature => {
-                if (feature.name === newData.feature_name) {
-                  return {
-                    ...feature,
-                    status: newData.status,
-                    enabled: newData.status === "approved"
-                  };
-                }
-                return feature;
-              })
-            );
-          }
-        }
-      )
-      .subscribe();
-
     return () => {
       isMounted = false;
-      supabase.removeChannel(channel);
     };
   }, [user?.id]);
 
