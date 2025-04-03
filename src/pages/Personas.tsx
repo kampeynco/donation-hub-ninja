@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { IconArrowRight, IconCreditCard } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
@@ -7,12 +6,9 @@ import NotInterestedModal from "@/components/Personas/NotInterestedModal";
 
 // Import the uploaded image from public/lovable-uploads/
 const personasImage = "/lovable-uploads/35af406b-6b5e-411d-98c7-b9d0642b92a0.png";
-
 const Personas = () => {
   const [modalOpen, setModalOpen] = useState(false);
-
-  return (
-    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-120px)] mt-6">
+  return <div className="flex flex-col items-center justify-center min-h-[calc(100vh-120px)] mt-6">
       <div className="max-w-6xl w-full space-y-10">
         {/* Main section */}
         <div className="flex flex-col md:flex-row items-center gap-8">
@@ -21,7 +17,7 @@ const Personas = () => {
               <IconCreditCard className="h-4 w-4 mr-2" />
               <span className="text-sm font-medium">Paid Plans</span>
             </div>
-            <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-6">Get started with Donor Personas today</h1>
+            <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-6">Get started with Personas today</h1>
             <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
               Donor Personas is the only solution designed to help campaigns build and share real-time profiles
               at scale and enable marketers with self-service access a complete view of the donor
@@ -35,11 +31,7 @@ const Personas = () => {
             </div>
           </div>
           <div className="flex-1 hidden md:block">
-            <img 
-              src={personasImage} 
-              alt="Donor Personas visualization" 
-              className="max-w-full rounded-lg shadow-lg" 
-            />
+            <img src={personasImage} alt="Donor Personas visualization" className="max-w-full rounded-lg shadow-lg" />
           </div>
         </div>
 
@@ -94,12 +86,7 @@ const Personas = () => {
       </div>
 
       {/* Modal for "Not Interested" feedback */}
-      <NotInterestedModal 
-        open={modalOpen} 
-        onOpenChange={setModalOpen} 
-      />
-    </div>
-  );
+      <NotInterestedModal open={modalOpen} onOpenChange={setModalOpen} />
+    </div>;
 };
-
 export default Personas;
