@@ -44,7 +44,7 @@ const SidebarItem = ({
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  className={`${collapsed ? "justify-center w-[45px]" : "w-[225px] flex items-center justify-start"} h-9 ${
+                  className={`${collapsed ? "justify-center w-full" : "w-full flex items-center justify-start"} ${
                     isActive ? "bg-donor-blue text-white hover:bg-donor-blue hover:text-white" : ""
                   }`}
                 >
@@ -65,7 +65,7 @@ const SidebarItem = ({
                 )}
 
                 {showNotificationBadge && unreadCount > 0 && (
-                  <div className={`absolute ${collapsed ? 'top-1/2 -translate-y-1/2 right-0' : 'top-1/2 -translate-y-1/2 right-2'}`}>
+                  <div className={`absolute ${collapsed ? 'top-1/2 -translate-y-1/2 right-0' : 'top-1/2 -translate-y-1/2 right-8'}`}>
                     <Badge 
                       variant="destructive"
                       className={`flex items-center justify-center ${
