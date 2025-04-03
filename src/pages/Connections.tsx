@@ -1,12 +1,9 @@
-
 import React from "react";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import IntegrationsTab from "@/components/Account/IntegrationsTab";
-
 const Connections = () => {
-  return (
-    <div className="space-y-6">
+  return <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Connections</h1>
         <p className="text-muted-foreground mt-2">
@@ -22,26 +19,17 @@ const Connections = () => {
           </CardDescription>
         </CardHeader>
         <Tabs defaultValue="integrations" className="px-6 pb-6">
-          <TabsList className="mb-6">
-            <TabsTrigger value="integrations">Integrations</TabsTrigger>
-            <TabsTrigger value="webhooks">Webhooks</TabsTrigger>
-          </TabsList>
+          
           <TabsContent value="integrations">
             <IntegrationsTab />
           </TabsContent>
           <TabsContent value="webhooks">
             <div className="mt-4">
-              <iframe 
-                src="/account?tab=webhooks" 
-                title="Webhooks" 
-                className="w-full h-[600px] border-0"
-              />
+              <iframe src="/account?tab=webhooks" title="Webhooks" className="w-full h-[600px] border-0" />
             </div>
           </TabsContent>
         </Tabs>
       </Card>
-    </div>
-  );
+    </div>;
 };
-
 export default Connections;
