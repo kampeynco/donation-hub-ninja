@@ -67,9 +67,7 @@ const Personas = () => {
                 <IconArrowRight className="h-6 w-6 text-purple-600" />
               </div>
               <h3 className="text-xl font-semibold mb-3">Sync donors to your camp</h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                Defines relationships between any entity data set in the warehouse and the Segment Profiles you send with Profiles Sync.
-              </p>
+              <p className="text-gray-600 dark:text-gray-300">Defines relationships between any donor data set in your camp and the donor profiles.</p>
             </CardContent>
           </Card>
         </div>
