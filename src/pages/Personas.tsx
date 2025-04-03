@@ -4,6 +4,7 @@ import { IconArrowRight, IconLock } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import NotInterestedModal from "@/components/Personas/NotInterestedModal";
+import WaitlistButton from "@/components/Personas/WaitlistButton";
 import { Card, CardContent } from "@/components/ui/card";
 
 // Import the uploaded image from public/lovable-uploads/
@@ -26,7 +27,7 @@ const Personas = () => {
               in the warehouse.
             </p>
             <div className="flex items-center gap-4">
-              {/* Hide Request demo button */}
+              <WaitlistButton />
               <Button variant="link" onClick={() => setModalOpen(true)} className="text-donor-blue flex items-center">
                 Not interested <IconArrowRight className="ml-1 h-4 w-4" />
               </Button>

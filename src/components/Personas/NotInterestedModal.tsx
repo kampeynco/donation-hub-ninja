@@ -20,6 +20,9 @@ import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useForm } from "react-hook-form";
 import { IconInfoCircle } from "@tabler/icons-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/context/AuthContext";
+import { toast } from "@/hooks/use-toast";
 
 interface NotInterestedModalProps {
   open: boolean;
@@ -36,21 +39,58 @@ const reasons = [
 
 const NotInterestedModal = ({ open, onOpenChange }: NotInterestedModalProps) => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [submitting, setSubmitting] = useState(false);
+  
   const form = useForm({
     defaultValues: {
       reason: "",
     },
   });
 
-  const onSubmit = (data: { reason: string }) => {
-    // Save preference to localStorage
-    localStorage.setItem("hidePersonasSidebar", "true");
+  const onSubmit = async (data: { reason: string }) => {
+    if (!user) return;
     
-    // Close modal
-    onOpenChange(false);
+    setSubmitting(true);
     
-    // Navigate to dashboard
-    navigate("/dashboard");
+    try {
+      // Save to not_interested table
+      const { error } = await supabase
+        .from("not_interested")
+        .upsert({
+          user_id: user.id,
+          feature_name: "Personas",
+          reason: data.reason || "Not specified",
+        }, {
+          onConflict: "user_id,feature_name"
+        });
+      
+      if (error) throw error;
+      
+      // Save preference to localStorage for sidebar visibility
+      localStorage.setItem("hidePersonasSidebar", "true");
+      
+      // Close modal
+      onOpenChange(false);
+      
+      // Navigate to dashboard
+      navigate("/dashboard");
+      
+      // Show success toast
+      toast({
+        title: "Feedback saved",
+        description: "Thank you for your feedback."
+      });
+    } catch (error: any) {
+      console.error("Error saving feedback:", error);
+      toast({
+        title: "Error saving feedback",
+        description: error.message || "An unexpected error occurred.",
+        variant: "destructive"
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -103,10 +143,12 @@ const NotInterestedModal = ({ open, onOpenChange }: NotInterestedModalProps) => 
             </div>
             
             <DialogFooter>
-              <Button variant="outline" type="button" onClick={() => onOpenChange(false)}>
+              <Button variant="outline" type="button" onClick={() => onOpenChange(false)} disabled={submitting}>
                 Cancel
               </Button>
-              <Button type="submit">Submit</Button>
+              <Button type="submit" disabled={submitting}>
+                {submitting ? "Submitting..." : "Submit"}
+              </Button>
             </DialogFooter>
           </form>
         </Form>

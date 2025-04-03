@@ -357,6 +357,30 @@ export type Database = {
           },
         ]
       }
+      not_interested: {
+        Row: {
+          created_at: string
+          feature_name: Database["public"]["Enums"]["feature_name"]
+          id: string
+          reason: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          feature_name: Database["public"]["Enums"]["feature_name"]
+          id?: string
+          reason: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          feature_name?: Database["public"]["Enums"]["feature_name"]
+          id?: string
+          reason?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       notification_settings: {
         Row: {
           created_at: string
@@ -546,6 +570,33 @@ export type Database = {
           },
         ]
       }
+      waitlists: {
+        Row: {
+          created_at: string
+          feature_name: Database["public"]["Enums"]["feature_name"]
+          id: string
+          joined: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          feature_name: Database["public"]["Enums"]["feature_name"]
+          id?: string
+          joined?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          feature_name?: Database["public"]["Enums"]["feature_name"]
+          id?: string
+          joined?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       webhooks: {
         Row: {
           actblue_webhook_url: string | null
@@ -604,6 +655,7 @@ export type Database = {
       }
     }
     Enums: {
+      feature_name: "Personas"
       location_type: "main" | "work"
       notification_action: "user" | "system" | "donor"
       recurring_period: "once" | "weekly" | "monthly"

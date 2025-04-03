@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Separator } from "@/components/ui/separator";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,23 +6,53 @@ import SidebarLogo from "./Sidebar/SidebarLogo";
 import SidebarProfile from "./Sidebar/SidebarProfile";
 import SidebarActions from "./Sidebar/SidebarActions";
 import sidebarItems from "./Sidebar/sidebarItems";
+import { useLocation } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
+import { checkWaitlistStatus } from "@/services/waitlistService";
 
 const DashboardSidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [items, setItems] = useState(sidebarItems);
+  const location = useLocation();
+  const { user } = useAuth();
 
-  // Re-evaluate sidebar items when component mounts or route changes
+  // Re-evaluate sidebar items when component mounts, route changes, or user changes
   useEffect(() => {
-    // Force re-evaluation of the items to check localStorage
-    const updatedItems = sidebarItems.map(item => ({
-      ...item,
-      hidden: item.name === "Personas" ? 
-        localStorage.getItem("hidePersonasSidebar") === "true" : 
-        item.hidden
-    }));
+    const updateSidebarItems = async () => {
+      // Check localStorage first for not interested status
+      const hidePersonas = localStorage.getItem("hidePersonasSidebar") === "true";
+      
+      // If the user is not interested, apply that preference
+      if (hidePersonas) {
+        const updatedItems = items.map(item => ({
+          ...item,
+          hidden: item.name === "Personas" ? true : item.hidden
+        }));
+        
+        setItems(updatedItems);
+        return;
+      }
+      
+      // Otherwise check waitlist status if user is logged in
+      if (user) {
+        try {
+          const waitlistStatus = await checkWaitlistStatus("Personas", user.id);
+          
+          // Keep Personas visible always unless explicitly hidden by not interested
+          const updatedItems = items.map(item => ({
+            ...item,
+            hidden: item.name === "Personas" ? false : item.hidden
+          }));
+          
+          setItems(updatedItems);
+        } catch (error) {
+          console.error("Error checking waitlist status:", error);
+        }
+      }
+    };
     
-    setItems(updatedItems);
-  }, []);
+    updateSidebarItems();
+  }, [location.pathname, user]);
 
   const toggleSidebar = () => setCollapsed(!collapsed);
 
