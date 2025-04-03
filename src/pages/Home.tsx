@@ -54,8 +54,8 @@ const Home = () => {
         
         <div className="container mx-auto px-4 py-20 md:py-32 max-w-7xl">
           <div className="relative">
-            {/* First testimonial card - adjusted position to avoid overlap */}
-            <div className="hidden md:block absolute -left-4 top-0 transform -translate-y-full max-w-xs">
+            {/* First testimonial card - floating to the left of hero */}
+            <div className="hidden md:block absolute left-0 top-24 max-w-xs">
               <div className="bg-white rounded-lg shadow-md p-4 border border-gray-100">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
@@ -66,8 +66,8 @@ const Home = () => {
               </div>
             </div>
             
-            {/* Second testimonial card - adjusted position to avoid overlap */}
-            <div className="hidden md:block absolute -right-4 top-0 transform -translate-y-full max-w-xs">
+            {/* Second testimonial card - floating to the right of hero */}
+            <div className="hidden md:block absolute right-0 top-24 max-w-xs">
               <div className="bg-white rounded-lg shadow-md p-4 border border-gray-100">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
@@ -78,16 +78,14 @@ const Home = () => {
               </div>
             </div>
             
-            {/* Main hero content - increased z-index to ensure it's on top */}
+            {/* Main hero content */}
             <div className="text-center max-w-4xl mx-auto z-20 relative py-10">
               <h1 className="text-4xl md:text-6xl font-bold mb-6">
                 Donor intent is hiding<br />
-                in plain sight.
+                in plain sight.<br />
+                Donor Camp reveals it<br />
+                so you can act on it.
               </h1>
-              <h2 className="text-4xl md:text-6xl font-bold mb-8">
-                Donor Camp reveals it,<br />
-                <span className="bg-primary/10 px-2 py-1 rounded">and automates your next move</span>.
-              </h2>
               <p className="text-xl md:text-2xl mb-10 max-w-2xl mx-auto">
                 Engage the right donors at the right time. Donor Camp captures intent and connects it to the tools your team already uses.
               </p>
@@ -103,14 +101,26 @@ const Home = () => {
               </div>
             </div>
             
-            {/* Bottom testimonial card - adjusted position to avoid overlap */}
-            <div className="hidden md:block absolute bottom-0 right-1/4 transform translate-y-1/2 max-w-xs z-10">
+            {/* Third testimonial card - floating left under the buttons */}
+            <div className="hidden md:block absolute left-4 bottom-0 transform translate-y-1/2 max-w-xs z-10">
               <div className="bg-white rounded-lg shadow-md p-4 border border-gray-100">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                     <IconReportMoney className="text-primary" size={20} />
                   </div>
                   <p className="text-sm font-medium">See your donor dashboard in minutes</p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Fourth testimonial card - floating right under the buttons */}
+            <div className="hidden md:block absolute right-4 bottom-0 transform translate-y-1/2 max-w-xs z-10">
+              <div className="bg-white rounded-lg shadow-md p-4 border border-gray-100">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                    <IconCreditCard className="text-primary" size={20} />
+                  </div>
+                  <p className="text-sm font-medium">Automate donor follow-ups with precision</p>
                 </div>
               </div>
             </div>
