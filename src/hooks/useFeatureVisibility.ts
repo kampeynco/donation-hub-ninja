@@ -1,20 +1,44 @@
 
 import { useState, useEffect } from "react";
-import { FeatureItem } from "@/types/features";
-import { getFeatureVisibilityPreference } from "@/services/waitlistService";
+import { useAuth } from "@/context/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
-export const useFeatureVisibility = (features: FeatureItem[]) => {
-  const [featuresWithVisibility, setFeaturesWithVisibility] = useState<FeatureItem[]>(features);
+export function useFeatureVisibility(featureId: string) {
+  const { user } = useAuth();
+  const [isVisible, setIsVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Apply visibility preferences to features
-    const featuresWithPrefs = features.map(feature => ({
-      ...feature,
-      hidden: getFeatureVisibilityPreference(feature.name)
-    }));
-    
-    setFeaturesWithVisibility(featuresWithPrefs);
-  }, [features]);
+    async function checkFeatureVisibility() {
+      if (!user) {
+        setIsVisible(false);
+        setIsLoading(false);
+        return;
+      }
 
-  return { features: featuresWithVisibility };
-};
+      try {
+        const { data, error } = await supabase
+          .from('features')
+          .select(featureId)
+          .eq('user_id', user.id)
+          .single();
+
+        if (error) {
+          console.error("Error checking feature visibility:", error);
+          setIsVisible(false);
+        } else {
+          setIsVisible(!!data[featureId]);
+        }
+      } catch (error) {
+        console.error("Unexpected error:", error);
+        setIsVisible(false);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    checkFeatureVisibility();
+  }, [user, featureId]);
+
+  return { isVisible, isLoading };
+}

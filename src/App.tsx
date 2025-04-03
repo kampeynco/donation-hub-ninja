@@ -28,79 +28,77 @@ const App = () => (
       <TooltipProvider>
         <ThemeProvider>
           <AuthProvider>
-            <NotificationsProvider>
-              <Routes>
-                {/* Public routes */}
-                <Route path="/" element={<Home />} />
-                <Route path="/auth/signin" element={<SignIn />} />
-                <Route path="/login" element={<Navigate to="/auth/signin" replace />} />
-                <Route path="/auth/signup" element={<SignUp />} />
-                
-                {/* Protected routes */}
-                <Route 
-                  path="/dashboard" 
-                  element={
-                    <ProtectedRoute>
-                      <Layout>
-                        <Dashboard />
-                      </Layout>
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/account" 
-                  element={
-                    <ProtectedRoute>
-                      <Layout>
-                        <Account />
-                      </Layout>
-                    </ProtectedRoute>
-                  } 
-                />
-                
-                {/* Updated routes for navigation items */}
-                <Route 
-                  path="/logs" 
-                  element={
-                    <ProtectedRoute>
-                      <Layout>
-                        <Logs />
-                      </Layout>
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/personas" 
-                  element={
-                    <FeatureProtectedRoute featureId="personas">
-                      <Layout>
-                        <Personas />
-                      </Layout>
-                    </FeatureProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/connections" 
-                  element={
-                    <ProtectedRoute>
-                      <Layout>
-                        <Connections />
-                      </Layout>
-                    </ProtectedRoute>
-                  } 
-                />
-                
-                {/* Redirects for old routes */}
-                <Route path="/donors" element={<Navigate to="/logs" replace />} />
-                <Route path="/donations" element={<Navigate to="/personas" replace />} />
-                <Route path="/reports" element={<Navigate to="/account" replace />} />
-                
-                {/* 404 route */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-              <Toaster />
-              <Sonner />
-            </NotificationsProvider>
+            <Routes>
+              {/* Public routes */}
+              <Route path="/" element={<Home />} />
+              <Route path="/auth/signin" element={<SignIn />} />
+              <Route path="/login" element={<Navigate to="/auth/signin" replace />} />
+              <Route path="/auth/signup" element={<SignUp />} />
+              
+              {/* Protected routes */}
+              <Route 
+                path="/dashboard" 
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <Dashboard />
+                    </Layout>
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/account" 
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <Account />
+                    </Layout>
+                  </ProtectedRoute>
+                } 
+              />
+              
+              {/* Updated routes for navigation items */}
+              <Route 
+                path="/logs" 
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <Logs />
+                    </Layout>
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/personas" 
+                element={
+                  <FeatureProtectedRoute featureId="personas">
+                    <Layout>
+                      <Personas />
+                    </Layout>
+                  </FeatureProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/connections" 
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <Connections />
+                    </Layout>
+                  </ProtectedRoute>
+                } 
+              />
+              
+              {/* Redirects for old routes */}
+              <Route path="/donors" element={<Navigate to="/logs" replace />} />
+              <Route path="/donations" element={<Navigate to="/personas" replace />} />
+              <Route path="/reports" element={<Navigate to="/account" replace />} />
+              
+              {/* 404 route */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+            <Toaster />
+            <Sonner />
           </AuthProvider>
         </ThemeProvider>
       </TooltipProvider>

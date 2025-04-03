@@ -28,8 +28,14 @@ const SidebarItem = ({
   badge, 
   showNotificationBadge 
 }: SidebarItemProps) => {
-  const { notifications } = useNotificationsContext();
-  const unreadCount = notifications.filter(n => !n.is_read).length;
+  // Safely get notifications context
+  let unreadCount = 0;
+  try {
+    const { notifications } = useNotificationsContext();
+    unreadCount = notifications.filter(n => !n.is_read).length;
+  } catch (error) {
+    console.error("Notifications context not available:", error);
+  }
 
   return (
     <Tooltip delayDuration={0}>
