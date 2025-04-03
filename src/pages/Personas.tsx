@@ -47,9 +47,7 @@ const Personas = () => {
                 <IconArrowRight className="h-6 w-6 text-blue-600" />
               </div>
               <h3 className="text-xl font-semibold mb-3">Enrich donors from multiple sources</h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                Easily link data from the warehouse to any event before it's sent downstream.
-              </p>
+              <p className="text-gray-600 dark:text-gray-300">Easily connect donor data from your fundraising stack to establish a single source of truth.</p>
             </CardContent>
           </Card>
           
