@@ -35,7 +35,11 @@ const WaitlistButton = () => {
       try {
         const status = await checkWaitlistStatus('Personas', user.id);
         if (isMounted) {
-          setWaitlistStatus(status);
+          // Convert WaitlistEntry to WaitlistStatusState
+          setWaitlistStatus(status ? {
+            status: status.status,
+            rejection_reason: status.rejection_reason || null
+          } : null);
           setLoading(false);
         }
       } catch (error) {
@@ -61,7 +65,11 @@ const WaitlistButton = () => {
     try {
       await joinWaitlist('Personas', user.id);
       const status = await checkWaitlistStatus('Personas', user.id);
-      setWaitlistStatus(status);
+      // Convert WaitlistEntry to WaitlistStatusState
+      setWaitlistStatus(status ? {
+        status: status.status,
+        rejection_reason: status.rejection_reason || null
+      } : null);
       toast({
         title: 'Joined waitlist',
         description: 'You\'ve been added to the Personas waitlist.',

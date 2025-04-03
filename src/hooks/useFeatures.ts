@@ -6,7 +6,7 @@ import { useFeatureStatus } from "./useFeatureStatus";
 import { useFeatureVisibility } from "./useFeatureVisibility";
 import { useFeatureActions } from "./useFeatureActions";
 
-export { FeatureItem } from "@/types/features";
+export type { FeatureItem } from "@/types/features";
 
 export const useFeatures = () => {
   const { user } = useAuth();
