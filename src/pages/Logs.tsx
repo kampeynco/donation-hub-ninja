@@ -16,11 +16,13 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { useNotificationsContext } from '@/context/NotificationsContext';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const Logs = () => {
   const { 
     notifications, 
     loading, 
+    error,
     filterByAction, 
     markAsRead, 
     markAllAsRead, 
@@ -61,6 +63,28 @@ const Logs = () => {
 
   const filteredNotifications = getFilteredNotifications();
   const hasUnread = getUnreadCount() > 0;
+
+  const renderLoadingRows = () => {
+    return Array.from({ length: 5 }).map((_, index) => (
+      <TableRow key={`loading-${index}`}>
+        <TableCell>
+          <Skeleton className="h-8 w-8 rounded-full" />
+        </TableCell>
+        <TableCell>
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-[250px]" />
+            <Skeleton className="h-4 w-[200px]" />
+          </div>
+        </TableCell>
+        <TableCell>
+          <Skeleton className="h-4 w-[150px]" />
+        </TableCell>
+        <TableCell>
+          <Skeleton className="h-8 w-8 rounded-full" />
+        </TableCell>
+      </TableRow>
+    ));
+  };
 
   return (
     <div className="container mx-auto py-6 space-y-6">
@@ -120,27 +144,33 @@ const Logs = () => {
             </TabsList>
             
             <TabsContent value={activeTab} className="mt-0">
-              {loading ? (
-                <div className="flex justify-center items-center py-8">
-                  <p>Loading notifications...</p>
-                </div>
-              ) : filteredNotifications.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-10">
-                  <p className="text-gray-500">No notifications</p>
-                </div>
-              ) : (
-                <div className="rounded-md border">
-                  <Table>
-                    <TableHeader>
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-12"></TableHead>
+                      <TableHead>Message</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead className="w-12"></TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {loading ? (
+                      renderLoadingRows()
+                    ) : error ? (
                       <TableRow>
-                        <TableHead className="w-12"></TableHead>
-                        <TableHead>Message</TableHead>
-                        <TableHead>Date</TableHead>
-                        <TableHead className="w-12"></TableHead>
+                        <TableCell colSpan={4} className="text-center py-6 text-destructive">
+                          Error loading notifications. Please try refreshing the page.
+                        </TableCell>
                       </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredNotifications.map((notification) => (
+                    ) : filteredNotifications.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={4} className="text-center py-6 text-muted-foreground">
+                          No notifications found
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      filteredNotifications.map((notification) => (
                         <TableRow 
                           key={notification.id}
                           className={!notification.is_read ? 'bg-blue-50 dark:bg-blue-900/10' : undefined}
@@ -176,11 +206,11 @@ const Logs = () => {
                             </Button>
                           </TableCell>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              )}
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
             </TabsContent>
           </Tabs>
         </CardContent>

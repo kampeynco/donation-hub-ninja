@@ -8,6 +8,7 @@ import {
   deleteNotification
 } from '@/services/notifications';
 import { Notification } from '@/components/Notifications/NotificationBell';
+import { toast } from '@/hooks/use-toast';
 
 export function useNotifications() {
   const [isLoading, setIsLoading] = useState(false);
@@ -29,6 +30,14 @@ export function useNotifications() {
         action: 'donor',
         donorId
       });
+    } catch (error) {
+      console.error('Error creating donation notification:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to create notification',
+        variant: 'destructive'
+      });
+      return null;
     } finally {
       setIsLoading(false);
     }
@@ -52,6 +61,14 @@ export function useNotifications() {
         action: 'donor',
         donorId
       });
+    } catch (error) {
+      console.error('Error creating recurring donation notification:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to create notification',
+        variant: 'destructive'
+      });
+      return null;
     } finally {
       setIsLoading(false);
     }
@@ -64,6 +81,9 @@ export function useNotifications() {
     setIsLoading(true);
     try {
       return await markNotificationAsRead(id);
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+      return false;
     } finally {
       setIsLoading(false);
     }
@@ -76,6 +96,9 @@ export function useNotifications() {
     setIsLoading(true);
     try {
       return await markAllNotificationsAsRead();
+    } catch (error) {
+      console.error('Error marking all notifications as read:', error);
+      return false;
     } finally {
       setIsLoading(false);
     }
@@ -88,6 +111,9 @@ export function useNotifications() {
     setIsLoading(true);
     try {
       return await deleteNotification(id);
+    } catch (error) {
+      console.error('Error deleting notification:', error);
+      return false;
     } finally {
       setIsLoading(false);
     }
@@ -99,7 +125,12 @@ export function useNotifications() {
   const fetchNotifications = async (limit = 10): Promise<Notification[]> => {
     setIsLoading(true);
     try {
-      return await fetchRecentNotifications(limit);
+      const data = await fetchRecentNotifications(limit);
+      return data;
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+      // Return empty array instead of throwing to prevent UI from breaking
+      return [];
     } finally {
       setIsLoading(false);
     }

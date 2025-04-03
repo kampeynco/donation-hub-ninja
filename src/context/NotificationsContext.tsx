@@ -1,13 +1,14 @@
-
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { Notification } from '@/components/Notifications/NotificationBell';
 import { supabase } from '@/integrations/supabase/client';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useAuth } from './AuthContext';
+import { toast } from '@/hooks/use-toast';
 
 interface NotificationsContextType {
   notifications: Notification[];
   loading: boolean;
+  error: Error | null;
   filterByAction: (action: string) => Notification[];
   markAsRead: (id: string) => Promise<void>;
   markAllAsRead: () => Promise<void>;
@@ -27,25 +28,36 @@ export const useNotificationsContext = () => {
 export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
   const { user } = useAuth();
   const { markAsRead, markAllAsRead, deleteNotification, fetchNotifications } = useNotifications();
+
+  const loadNotifications = useCallback(async () => {
+    if (!user) return;
+    
+    try {
+      setLoading(true);
+      const data = await fetchNotifications(50);
+      setNotifications(data);
+      setError(null);
+    } catch (err) {
+      console.error('Error fetching notifications:', err);
+      setError(err instanceof Error ? err : new Error('Failed to fetch notifications'));
+      // Don't clear notifications array if there's an error - keep previous state
+    } finally {
+      setLoading(false);
+      setIsInitialized(true);
+    }
+  }, [user, fetchNotifications]);
 
   useEffect(() => {
     if (!user) return;
 
-    const loadNotifications = async () => {
-      try {
-        setLoading(true);
-        const data = await fetchNotifications(50); // Fetch more notifications for the logs page
-        setNotifications(data);
-      } catch (error) {
-        console.error('Error fetching notifications:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadNotifications();
+    // Only load if not initialized yet or explicitly triggered
+    if (!isInitialized) {
+      loadNotifications();
+    }
 
     // Set up real-time subscription
     const channel = supabase
@@ -85,35 +97,73 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
           );
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          console.log('Successfully subscribed to notifications channel');
+        } else if (status === 'CHANNEL_ERROR') {
+          console.error('Error subscribing to notifications channel');
+          toast({
+            title: 'Notification Error',
+            description: 'Unable to get real-time notifications. Please refresh the page.',
+            variant: 'destructive',
+          });
+        }
+      });
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, fetchNotifications]);
+  }, [user, isInitialized, loadNotifications]);
 
   const handleMarkAsRead = async (id: string) => {
-    const success = await markAsRead(id);
-    if (success) {
-      setNotifications(prev => 
-        prev.map(n => n.id === id ? { ...n, is_read: true } : n)
-      );
+    try {
+      const success = await markAsRead(id);
+      if (success) {
+        setNotifications(prev => 
+          prev.map(n => n.id === id ? { ...n, is_read: true } : n)
+        );
+      }
+    } catch (err) {
+      console.error('Error marking notification as read:', err);
+      toast({
+        title: 'Error',
+        description: 'Failed to mark notification as read',
+        variant: 'destructive',
+      });
     }
   };
 
   const handleMarkAllAsRead = async () => {
-    const success = await markAllAsRead();
-    if (success) {
-      setNotifications(prev => 
-        prev.map(n => ({ ...n, is_read: true }))
-      );
+    try {
+      const success = await markAllAsRead();
+      if (success) {
+        setNotifications(prev => 
+          prev.map(n => ({ ...n, is_read: true }))
+        );
+      }
+    } catch (err) {
+      console.error('Error marking all notifications as read:', err);
+      toast({
+        title: 'Error',
+        description: 'Failed to mark all notifications as read',
+        variant: 'destructive',
+      });
     }
   };
 
   const handleDeleteNotification = async (id: string) => {
-    const success = await deleteNotification(id);
-    if (success) {
-      setNotifications(prev => prev.filter(n => n.id !== id));
+    try {
+      const success = await deleteNotification(id);
+      if (success) {
+        setNotifications(prev => prev.filter(n => n.id !== id));
+      }
+    } catch (err) {
+      console.error('Error deleting notification:', err);
+      toast({
+        title: 'Error',
+        description: 'Failed to delete notification',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -129,6 +179,7 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
       value={{
         notifications,
         loading,
+        error,
         filterByAction,
         markAsRead: handleMarkAsRead,
         markAllAsRead: handleMarkAllAsRead,
