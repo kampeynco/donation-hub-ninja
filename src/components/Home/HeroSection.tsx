@@ -10,7 +10,7 @@ const HeroSection = () => {
 
   return (
     <div className="bg-primary text-primary-foreground">
-      <div className="container mx-auto px-4 flex items-center justify-center min-h-[85vh] max-w-7xl">
+      <div className="container mx-auto px-4 flex items-center justify-center h-[100vh] max-w-7xl">
         <div className="relative w-full">
           {/* Testimonial cards for desktop */}
           {!isMobile && (
