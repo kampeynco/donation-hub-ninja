@@ -108,7 +108,7 @@ function TrueFocus({
 
   return (
     <div
-      className={`relative inline-flex gap-1 items-center ${className}`}
+      className={`relative inline-flex gap-3 items-center ${className}`}
       ref={containerRef}
       onMouseEnter={treatAsOneUnit && manualMode ? () => setCurrentIndex(0) : undefined}
       onMouseLeave={treatAsOneUnit && manualMode ? handleMouseLeave : undefined}
