@@ -13,8 +13,9 @@ export const INITIAL_FEATURES: FeatureItem[] = [
     id: "personas",
     name: "Personas",
     description: "Access donor personas and analytics",
-    enabled: false,
+    enabled: true,
     beta: true,
     hidden: true
   }
 ];
+
