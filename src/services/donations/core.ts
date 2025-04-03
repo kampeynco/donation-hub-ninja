@@ -8,30 +8,18 @@ import {
   handleDonationError 
 } from "./helpers";
 
-// Cache donations to reduce duplicate fetches
-let donationsCache: { data: Donation[]; timestamp: number } | null = null;
-const CACHE_LIFETIME = 5 * 60 * 1000; // 5 minutes
-
 /**
- * Main function to fetch recent donations with caching
+ * Main function to fetch recent donations
  */
 export async function fetchRecentDonations(limit = 30): Promise<Donation[]> {
   try {
-    // Check cache validity
-    const now = Date.now();
-    if (donationsCache && (now - donationsCache.timestamp < CACHE_LIFETIME)) {
-      console.log('Using cached donations data');
-      return donationsCache.data;
-    }
-    
-    // Get current user ID
     const userId = await getCurrentUserId();
     if (!userId) {
       console.log('No user logged in, returning empty donations array');
       return [];
     }
 
-    // Fetch donor IDs associated with the current user in a single optimized query
+    // First get donor IDs associated with the current user
     const { data: userDonors, error: userDonorsError } = await supabase
       .from('user_donors')
       .select('donor_id')
@@ -46,12 +34,10 @@ export async function fetchRecentDonations(limit = 30): Promise<Donation[]> {
     
     if (donorIds.length === 0) {
       console.log('No donors associated with this user');
-      // Update cache with empty array
-      donationsCache = { data: [], timestamp: now };
       return [];
     }
     
-    // Fetch donations with donor information in a single query
+    // Query donations using the extracted donor IDs array and include recurring info
     const { data, error } = await supabase
       .from('donations')
       .select(`
@@ -75,29 +61,13 @@ export async function fetchRecentDonations(limit = 30): Promise<Donation[]> {
       throw error;
     }
     
-    // Fetch emails for donors in a single batch operation
+    // Fetch emails for donors
     const donoEmails = await fetchDonorEmails(data || []);
     
-    // Format donations
-    const formattedDonations = (data || []).map((item: any) => 
-      formatDonation(item, donoEmails)
-    );
-    
-    // Update cache
-    donationsCache = { data: formattedDonations, timestamp: now };
-    
-    return formattedDonations;
+    // Format donation data
+    return (data || []).map((item: any) => formatDonation(item, donoEmails));
   } catch (error) {
     handleDonationError(error, "Error fetching donations");
     return [];
   }
-}
-
-/**
- * Function to clear the donations cache
- * Call this when you need to force a fresh fetch
- */
-export function clearDonationsCache(): void {
-  donationsCache = null;
-  console.log('Donations cache cleared');
 }

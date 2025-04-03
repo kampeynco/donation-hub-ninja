@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { IconArrowDown } from "@tabler/icons-react";
-import EmptyDonationsState from "./EmptyDonationsState";
 
 interface DonationsTableContentProps {
   donations: Donation[];
@@ -63,10 +62,6 @@ const DonationsTableContent = ({ donations }: DonationsTableContentProps) => {
     return <Badge variant="outline" className="bg-gray-100 dark:bg-gray-800 dark:border-gray-700 ml-2 whitespace-nowrap">Recurring</Badge>;
   };
 
-  if (donations.length === 0) {
-    return <EmptyDonationsState />;
-  }
-
   return (
     <div className="overflow-x-auto">
       <Table>
@@ -83,20 +78,28 @@ const DonationsTableContent = ({ donations }: DonationsTableContentProps) => {
           </TableRow>
         </TableHeader>
         <TableBody className="divide-y divide-gray-200 dark:divide-gray-800 text-sm">
-          {donations.map((donation) => (
-            <TableRow key={donation.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
-              <TableCell className="px-6 py-4 text-gray-600 dark:text-gray-400">{donation.date}</TableCell>
-              <TableCell className="px-6 py-4 dark:text-gray-300">{donation.name || "Anonymous"}</TableCell>
-              <TableCell className="px-6 py-4 text-blue-500 dark:text-blue-400">{donation.email || "---"}</TableCell>
-              <TableCell className="px-6 py-4">
-                <div className="flex items-center flex-nowrap">
-                  {renderDonationTypeBadge(donation)}
-                  {renderDurationBadge(donation)}
-                </div>
+          {donations.length > 0 ? (
+            donations.map((donation) => (
+              <TableRow key={donation.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                <TableCell className="px-6 py-4 text-gray-600 dark:text-gray-400">{donation.date}</TableCell>
+                <TableCell className="px-6 py-4 dark:text-gray-300">{donation.name || "Anonymous"}</TableCell>
+                <TableCell className="px-6 py-4 text-blue-500 dark:text-blue-400">{donation.email || "---"}</TableCell>
+                <TableCell className="px-6 py-4">
+                  <div className="flex items-center flex-nowrap">
+                    {renderDonationTypeBadge(donation)}
+                    {renderDurationBadge(donation)}
+                  </div>
+                </TableCell>
+                <TableCell className="px-6 py-4 text-right font-medium dark:text-gray-300">${donation.amount.toFixed(2)}</TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={5} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+                No donations found
               </TableCell>
-              <TableCell className="px-6 py-4 text-right font-medium dark:text-gray-300">${donation.amount.toFixed(2)}</TableCell>
             </TableRow>
-          ))}
+          )}
         </TableBody>
       </Table>
     </div>

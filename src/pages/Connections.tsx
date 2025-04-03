@@ -1,11 +1,10 @@
 
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import IntegrationsTab from "@/components/Account/IntegrationsTab";
 
 const Connections = () => {
-  return (
-    <div className="space-y-6">
+  return <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Connections</h1>
         <p className="text-muted-foreground mt-2">
@@ -13,19 +12,8 @@ const Connections = () => {
         </p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Integrations</CardTitle>
-          <CardDescription>
-            Connect with external services to enhance your donor management
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <IntegrationsTab />
-        </CardContent>
-      </Card>
-    </div>
-  );
+      <IntegrationsTab />
+    </div>;
 };
 
 export default Connections;

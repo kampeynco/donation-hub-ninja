@@ -1,6 +1,6 @@
 
-import React, { useCallback } from "react";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import React from "react";
+import { NavLink } from "react-router-dom";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { BadgeCustom } from "@/components/ui/badge-custom";
@@ -28,9 +28,6 @@ const SidebarItem = ({
   badge, 
   showNotificationBadge 
 }: SidebarItemProps) => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  
   // Safely get notifications context
   let unreadCount = 0;
   try {
@@ -43,42 +40,20 @@ const SidebarItem = ({
     console.error("Notifications context not available:", error);
   }
 
-  // Determine if this item is active (exact path match or starts with path for nested routes)
-  const isActive = location.pathname === path || 
-    (path !== '/' && location.pathname.startsWith(path + '/'));
-
-  // Handle manual click for refresh logic with improved debugging
-  const handleClick = useCallback((e: React.MouseEvent) => {
-    console.log(`SidebarItem clicked: ${name} (${path}), current path: ${location.pathname}, isActive: ${isActive}`);
-    
-    // Always force navigation to ensure the route refreshes properly
-    if (isActive) {
-      e.preventDefault();
-      console.log(`Forcing refresh of current route: ${path}`);
-      // Force a full reload through navigate with replace to avoid history stacking
-      navigate(path, { replace: true });
-    } else {
-      // For non-active paths, still log but let the NavLink handle it normally
-      console.log(`Regular navigation to: ${path}`);
-    }
-  }, [isActive, navigate, path, name, location.pathname]);
-
   return (
     <Tooltip delayDuration={0}>
       <TooltipTrigger asChild>
         <NavLink
           to={path}
           className="block"
-          end={path === '/' || path === '/dashboard'} // Only use end for home and dashboard
-          onClick={handleClick}
         >
-          {({ isActive: navLinkActive }) => (
+          {({ isActive }) => (
             <div className="relative">
               <Button 
                 variant="ghost" 
                 size="sm" 
                 className={`${collapsed ? "justify-center w-full" : "w-full flex items-center justify-start"} ${
-                  navLinkActive ? "bg-donor-blue text-white hover:bg-donor-blue hover:text-white" : ""
+                  isActive ? "bg-donor-blue text-white hover:bg-donor-blue hover:text-white" : ""
                 }`}
               >
                 <Icon className="h-5 w-5" />
@@ -89,7 +64,7 @@ const SidebarItem = ({
                 <div className="absolute top-1/2 -translate-y-1/2 right-2">
                   <BadgeCustom 
                     variant={badge.variant as any}
-                    className={`flex items-center gap-1 ${navLinkActive ? "bg-white/20 text-white border-white/30 dark:bg-white/20 dark:text-white dark:border-white/30" : ""}`}
+                    className={`flex items-center gap-1 ${isActive ? "bg-white/20 text-white border-white/30 dark:bg-white/20 dark:text-white dark:border-white/30" : ""}`}
                   >
                     {badge.icon && <badge.icon className="h-3 w-3" />}
                     {badge.text}
@@ -106,7 +81,7 @@ const SidebarItem = ({
                       <Badge 
                         variant="destructive"
                         className={`flex items-center justify-center ${
-                          navLinkActive ? "bg-white text-donor-blue hover:bg-white hover:text-donor-blue" : "hover:bg-destructive"
+                          isActive ? "bg-white text-donor-blue hover:bg-white hover:text-donor-blue" : "hover:bg-destructive"
                         }`}
                       >
                         {unreadCount}
