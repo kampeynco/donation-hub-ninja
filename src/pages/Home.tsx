@@ -57,7 +57,7 @@ const Home = () => {
             Donor intent is hiding in plain sight. Donor Camp reveals it—and automates your next move.
           </h1>
           <p className="text-xl md:text-2xl mb-10 max-w-2xl">
-            Donor Camp helps you track donations, manage donor relationships, and grow your fundraising efforts.
+            Engage the right donors at the right time. Donor Camp captures intent and connects it to the tools your team already uses.
           </p>
           <Link to="/auth/signup">
             <Button size="lg" className="bg-white text-primary hover:bg-gray-100 font-semibold px-8">
