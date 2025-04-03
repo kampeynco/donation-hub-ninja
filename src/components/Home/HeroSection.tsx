@@ -42,7 +42,8 @@ const HeroSection = () => {
               change that.
             </h1>
             <p className="text-[1.25rem] font-[300] mb-6 md:mb-8 max-w-2xl mx-auto px-4 leading-[1.5]">
-              Engage the right donors at the right time. Donor Camp captures intent and connects it to the tools your team already uses.
+              Connect your fundraising stack. We analyze donor<br />
+              data for insights to engage them when ready to donate.
             </p>
             
             {/* Testimonial cards for mobile - placed between text and buttons */}
