@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { IconArrowRight, IconCreditCard } from "@tabler/icons-react";
+import { IconArrowRight, IconLock } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import NotInterestedModal from "@/components/Personas/NotInterestedModal";
@@ -16,7 +16,7 @@ const Personas = () => {
         <div className="flex flex-col md:flex-row items-center gap-8">
           <div className="max-w-xl">
             <div className="inline-flex items-center px-3 py-1 rounded-full bg-blue-100 text-blue-700 mb-4">
-              <IconCreditCard className="h-4 w-4 mr-2" />
+              <IconLock className="h-4 w-4 mr-2" />
               <span className="text-sm font-medium">Paid Plans</span>
             </div>
             <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-6">Get started with Personas today</h1>
