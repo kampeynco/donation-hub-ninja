@@ -30,7 +30,8 @@ function TrueFocus({
   treatAsOneUnit = false, // Default to false for backward compatibility
 }: TrueFocusProps) {
   const words = sentence.split(" ");
-  const [currentIndex, setCurrentIndex] = useState(0);
+  // Initialize currentIndex to null when in manual mode, otherwise 0
+  const [currentIndex, setCurrentIndex] = useState(manualMode ? null : 0);
   const [lastActiveIndex, setLastActiveIndex] = useState<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const wordRefs = useRef<(HTMLSpanElement | null)[]>([]);
@@ -39,7 +40,7 @@ function TrueFocus({
   useEffect(() => {
     if (!manualMode) {
       const interval = setInterval(() => {
-        setCurrentIndex((prev) => (prev + 1) % words.length);
+        setCurrentIndex((prev) => (prev === null ? 0 : (prev + 1) % words.length));
       }, (animationDuration + pauseBetweenAnimations) * 1000);
 
       return () => clearInterval(interval);
@@ -102,7 +103,7 @@ function TrueFocus({
 
   const handleMouseLeave = () => {
     if (manualMode) {
-      setCurrentIndex(lastActiveIndex || 0);
+      setCurrentIndex(null);
     }
   };
 
@@ -147,7 +148,7 @@ function TrueFocus({
           y: focusRect.y,
           width: focusRect.width,
           height: focusRect.height,
-          opacity: currentIndex >= 0 ? 1 : 0,
+          opacity: currentIndex !== null ? 1 : 0,
         }}
         transition={{
           duration: animationDuration,
