@@ -16,14 +16,27 @@ const FeatureProtectedRoute: React.FC<FeatureProtectedRouteProps> = ({
   featureId 
 }) => {
   const { user } = useAuth();
-  const { isVisible, isLoading } = useFeatureVisibility(featureId);
+  const { isVisible, isLoading, refreshVisibility } = useFeatureVisibility(featureId);
+  
+  // Ensure we have the latest feature status when the route is loaded
+  useEffect(() => {
+    if (user?.id) {
+      console.log(`[FeatureProtectedRoute] User ${user.id.substring(0, 8)} accessing feature: ${featureId}`);
+      refreshVisibility();
+    }
+  }, [user?.id, featureId, refreshVisibility]);
   
   // Debug log for troubleshooting
   useEffect(() => {
-    console.log(`FeatureProtectedRoute for ${featureId}:`, { isVisible, isLoading });
-  }, [featureId, isVisible, isLoading]);
+    console.log(`[FeatureProtectedRoute(${featureId})] Status:`, { 
+      isVisible, 
+      isLoading, 
+      userId: user?.id ? user.id.substring(0, 8) : 'none'
+    });
+  }, [featureId, isVisible, isLoading, user?.id]);
 
   if (!user) {
+    console.log(`[FeatureProtectedRoute(${featureId})] No user, redirecting to signin`);
     return <Navigate to="/auth/signin" replace />;
   }
 
@@ -45,6 +58,7 @@ const FeatureProtectedRoute: React.FC<FeatureProtectedRouteProps> = ({
   }
 
   if (!isVisible) {
+    console.log(`[FeatureProtectedRoute(${featureId})] Feature not enabled, redirecting to account`);
     toast.error(`You don't have access to this feature. Enable it in your account settings.`);
     return <Navigate to="/account?tab=features" replace />;
   }

@@ -14,14 +14,27 @@ const UniverseProtectedRoute: React.FC<UniverseProtectedRouteProps> = ({
   children 
 }) => {
   const { user } = useAuth();
-  const { isVisible, isLoading } = useUniverseVisibility();
+  const { isVisible, isLoading, refreshVisibility } = useUniverseVisibility();
+  
+  // Ensure we have the latest feature status when the route is loaded
+  useEffect(() => {
+    if (user?.id) {
+      console.log(`[UniverseProtectedRoute] User ${user.id.substring(0, 8)} accessing Universe feature`);
+      refreshVisibility();
+    }
+  }, [user?.id, refreshVisibility]);
   
   // Debug log for troubleshooting
   useEffect(() => {
-    console.log("UniverseProtectedRoute:", { isVisible, isLoading });
-  }, [isVisible, isLoading]);
+    console.log("[UniverseProtectedRoute] Status:", { 
+      isVisible, 
+      isLoading,
+      userId: user?.id ? user.id.substring(0, 8) : 'none'
+    });
+  }, [isVisible, isLoading, user?.id]);
 
   if (!user) {
+    console.log(`[UniverseProtectedRoute] No user, redirecting to signin`);
     return <Navigate to="/auth/signin" replace />;
   }
 
@@ -43,6 +56,7 @@ const UniverseProtectedRoute: React.FC<UniverseProtectedRouteProps> = ({
   }
 
   if (!isVisible) {
+    console.log(`[UniverseProtectedRoute] Feature not enabled, redirecting to account`);
     toast.error(`You don't have access to the Universe feature. Enable it in your account settings.`);
     return <Navigate to="/account?tab=features" replace />;
   }

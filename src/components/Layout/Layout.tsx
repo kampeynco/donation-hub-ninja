@@ -55,11 +55,17 @@ const Layout = ({ children }: LayoutProps) => {
     return () => { isMounted = false; };
   }, [children, displayedChildren]);
 
-  // Prefetch feature status when component mounts or location changes
+  // Aggressively refresh feature status on each route change
   useEffect(() => {
-    if (user?.id) {
-      refreshFeatureCache(user.id);
-    }
+    const refreshFeatures = async () => {
+      if (user?.id) {
+        console.log(`[Layout] Route changed to ${location.pathname}, refreshing features for user ${user.id.substring(0, 8)}`);
+        const result = await refreshFeatureCache(user.id);
+        console.log(`[Layout] Feature refresh result:`, result);
+      }
+    };
+    
+    refreshFeatures();
   }, [user?.id, location.pathname]);
 
   return (
