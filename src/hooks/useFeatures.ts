@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { INITIAL_FEATURES, FeatureItem } from "@/types/features";
 import { supabase } from "@/integrations/supabase/client";
-import { WaitlistStatus, getFeatureVisibilityPreference } from "@/services/waitlistService";
+import { getFeatureVisibilityPreference } from "@/services/waitlistService";
 import { useFeatureActions } from "./useFeatureActions";
 import { useFeatureRealtime } from "./useFeatureRealtime";
 
@@ -14,7 +14,7 @@ export const useFeatures = () => {
   
   const { handleToggleFeature, handleToggleVisibility, isProcessing } = useFeatureActions(features, setFeatures);
   
-  // Use the realtime hook
+  // Use the realtime hook to update features when they change in the database
   useFeatureRealtime(user?.id, features, setFeatures);
 
   // Memoize the fetch function to avoid recreating it on every render

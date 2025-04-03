@@ -38,13 +38,8 @@ export const useFeatureActions = (features: FeatureItem[], setFeatures: React.Di
         setFeatures(updatedFeatures);
         
         // If already on waitlist or approved, remove from waitlist
-        const success = await resetWaitlistStatus(feature.name, user.id);
-        
-        if (success) {
-          toast.info(`${feature.name} has been disabled.`);
-        } else {
-          throw new Error("Failed to reset waitlist status");
-        }
+        await resetWaitlistStatus(feature.name, user.id);
+        toast.info(`${feature.name} has been disabled.`);
       } else {
         // Optimistic UI update
         updatedFeatures[featureIndex] = {
@@ -55,13 +50,27 @@ export const useFeatureActions = (features: FeatureItem[], setFeatures: React.Di
         setFeatures(updatedFeatures);
         
         // Join waitlist for the feature
-        const success = await joinWaitlist(feature.name, user.id);
+        await joinWaitlist(feature.name, user.id);
+        toast.success(`You've been added to the waitlist for ${feature.name}.`);
+      }
+      
+      // Ensure that after the database update, we actually fetch the new state
+      const { data } = await supabase
+        .from('waitlists')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('feature_name', feature.name)
+        .maybeSingle();
         
-        if (success) {
-          toast.success(`You've been added to the waitlist for ${feature.name}.`);
-        } else {
-          throw new Error("Failed to join waitlist");
-        }
+      // Apply the actual database state to ensure it matches
+      if (data) {
+        const realUpdatedFeatures = [...features];
+        realUpdatedFeatures[featureIndex] = {
+          ...feature,
+          status: data.status,
+          enabled: data.status === "approved"
+        };
+        setFeatures(realUpdatedFeatures);
       }
     } catch (error) {
       console.error(`Error updating feature ${featureId}:`, error);
@@ -73,7 +82,7 @@ export const useFeatureActions = (features: FeatureItem[], setFeatures: React.Di
         .select('*')
         .eq('user_id', user.id)
         .eq('feature_name', feature.name)
-        .single();
+        .maybeSingle();
         
       // Restore the correct state
       const updatedFeatures = [...features];

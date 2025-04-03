@@ -19,7 +19,8 @@ export const FeatureItem: React.FC<FeatureItemProps> = ({
   onToggleFeature, 
   onToggleVisibility 
 }) => {
-  const isEnabled = feature.status === "approved" || feature.status === "joined";
+  // A feature is enabled if it's approved or joined
+  const isEnabled = feature.enabled || feature.status === "joined" || feature.status === "approved";
   const isRejected = feature.status === "rejected";
   
   const handleToggleFeature = () => {
