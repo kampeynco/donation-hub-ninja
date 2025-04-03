@@ -1,11 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { 
-  Card, 
-  CardHeader, 
-  CardContent, 
-  CardTitle, 
-  CardDescription 
+  CardContent 
 } from "@/components/ui/card";
 import { IconCreditCard } from "@tabler/icons-react";
 import {
@@ -43,64 +39,56 @@ const IntegrationsTab = () => {
   const isConnected = Boolean(webhookCredentials?.actblue_webhook_url);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Integrations</CardTitle>
-        <CardDescription>
-          Connect and manage third-party integrations for your account
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <IntegrationCard
-            title="ActBlue"
-            description="Connect your ActBlue account to automatically sync donations"
-            icon={<IconCreditCard size={24} className="text-primary" />}
-            logoUrl={actBlueLogoUrl}
-            onConnectClick={() => setConfigModalOpen(true)}
-            onInstructionsClick={() => setInstructionsModalOpen(true)}
-            connected={isConnected}
-          />
-          
-          {/* Additional integration cards can be added here */}
-        </div>
+    <div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <IntegrationCard
+          title="ActBlue"
+          description="Connect your ActBlue account to automatically sync donations"
+          icon={<IconCreditCard size={24} className="text-primary" />}
+          logoUrl={actBlueLogoUrl}
+          onConnectClick={() => setConfigModalOpen(true)}
+          onInstructionsClick={() => setInstructionsModalOpen(true)}
+          connected={isConnected}
+        />
+        
+        {/* Additional integration cards can be added here */}
+      </div>
 
-        {/* Configuration Modal */}
-        <Dialog open={configModalOpen} onOpenChange={setConfigModalOpen}>
-          <DialogContent className="max-w-3xl">
-            <DialogHeader>
-              <DialogTitle>ActBlue Integration Configuration</DialogTitle>
-              <DialogDescription>
-                Configure your ActBlue webhook integration
-              </DialogDescription>
-            </DialogHeader>
-            <div className="mt-4">
-              <WebhookConfig
-                webhookCredentials={webhookCredentials}
-                setWebhookCredentials={setWebhookCredentials}
-                actBlueWebhookUrl={actBlueWebhookUrl}
-                setActBlueWebhookUrl={setActBlueWebhookUrl}
-              />
-            </div>
-          </DialogContent>
-        </Dialog>
+      {/* Configuration Modal */}
+      <Dialog open={configModalOpen} onOpenChange={setConfigModalOpen}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>ActBlue Integration Configuration</DialogTitle>
+            <DialogDescription>
+              Configure your ActBlue webhook integration
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-4">
+            <WebhookConfig
+              webhookCredentials={webhookCredentials}
+              setWebhookCredentials={setWebhookCredentials}
+              actBlueWebhookUrl={actBlueWebhookUrl}
+              setActBlueWebhookUrl={setActBlueWebhookUrl}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
 
-        {/* Instructions Modal */}
-        <Dialog open={instructionsModalOpen} onOpenChange={setInstructionsModalOpen}>
-          <DialogContent className="max-w-3xl">
-            <DialogHeader>
-              <DialogTitle>ActBlue Integration Instructions</DialogTitle>
-              <DialogDescription>
-                Follow these steps to set up your ActBlue integration
-              </DialogDescription>
-            </DialogHeader>
-            <div className="mt-4">
-              <WebhookInstructions />
-            </div>
-          </DialogContent>
-        </Dialog>
-      </CardContent>
-    </Card>
+      {/* Instructions Modal */}
+      <Dialog open={instructionsModalOpen} onOpenChange={setInstructionsModalOpen}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>ActBlue Integration Instructions</DialogTitle>
+            <DialogDescription>
+              Follow these steps to set up your ActBlue integration
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-4">
+            <WebhookInstructions />
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 };
 

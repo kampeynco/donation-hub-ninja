@@ -4,7 +4,8 @@ import {
   IconActivity,
   IconCurrentLocation,
   IconAdjustments,
-  IconSparkles
+  IconSparkles,
+  IconPlugConnected
 } from "@tabler/icons-react";
 
 export interface SidebarItemType {
@@ -45,6 +46,11 @@ const sidebarItems: SidebarItemType[] = [
     },
     // Initial state is visible, will be updated by DashboardSidebar
     hidden: false
+  },
+  {
+    name: "Connections",
+    path: "/connections",
+    icon: IconPlugConnected,
   },
   {
     name: "Settings",

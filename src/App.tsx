@@ -16,6 +16,7 @@ import Dashboard from "./pages/Dashboard";
 import Account from "./pages/Account";
 import Personas from "./pages/Personas";
 import Logs from "./pages/Logs";
+import Connections from "./pages/Connections";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -73,6 +74,16 @@ const App = () => (
                     <ProtectedRoute>
                       <Layout>
                         <Personas />
+                      </Layout>
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/connections" 
+                  element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <Connections />
                       </Layout>
                     </ProtectedRoute>
                   } 
