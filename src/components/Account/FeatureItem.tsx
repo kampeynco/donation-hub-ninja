@@ -19,7 +19,9 @@ export const FeatureItem: React.FC<FeatureItemProps> = ({
   isLoading = false
 }) => {
   const handleToggleFeature = () => {
-    onToggleFeature(feature.id);
+    if (!isLoading) {
+      onToggleFeature(feature.id);
+    }
   };
   
   return (

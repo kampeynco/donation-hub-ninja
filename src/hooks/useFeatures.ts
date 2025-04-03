@@ -15,7 +15,7 @@ export const useFeatures = () => {
   const { user } = useAuth();
   const [features, setFeatures] = useState<FeatureItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [processingFeatures, setProcessingFeatures] = useState<Record<string, boolean>>({});
 
   // Fetch features from database
   const fetchFeatures = useCallback(async () => {
@@ -74,10 +74,11 @@ export const useFeatures = () => {
 
   // Toggle feature
   const handleToggleFeature = async (featureId: string) => {
-    if (!user?.id || isProcessing) return;
+    if (!user?.id || processingFeatures[featureId]) return;
     
     try {
-      setIsProcessing(true);
+      // Mark this specific feature as processing
+      setProcessingFeatures(prev => ({ ...prev, [featureId]: true }));
       
       // Find the feature
       const featureIndex = features.findIndex(f => f.id === featureId);
@@ -118,7 +119,8 @@ export const useFeatures = () => {
       // Revert changes on error
       fetchFeatures();
     } finally {
-      setIsProcessing(false);
+      // Clear processing state for this feature
+      setProcessingFeatures(prev => ({ ...prev, [featureId]: false }));
     }
   };
 
@@ -160,7 +162,9 @@ export const useFeatures = () => {
 
   return {
     features,
-    loading: loading || isProcessing,
+    loading,
+    // Check if any feature is being processed
+    isProcessing: Object.values(processingFeatures).some(Boolean),
     handleToggleFeature,
     refetchFeatures: fetchFeatures
   };

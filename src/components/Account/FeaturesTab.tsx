@@ -9,6 +9,7 @@ const FeaturesTab = () => {
   const {
     features,
     loading,
+    isProcessing,
     handleToggleFeature,
     refetchFeatures
   } = useFeatures();
@@ -40,7 +41,7 @@ const FeaturesTab = () => {
                   key={feature.id} 
                   feature={feature} 
                   onToggleFeature={handleToggleFeature}
-                  isLoading={loading}
+                  isLoading={loading || isProcessing}
                 />
               ))}
             </div>
