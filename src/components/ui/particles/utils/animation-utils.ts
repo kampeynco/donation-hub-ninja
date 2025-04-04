@@ -1,4 +1,3 @@
-
 import { useCallback } from "react";
 import { Circle, CanvasSize } from "../types";
 import { remapValue } from "../utils";
@@ -9,7 +8,7 @@ import {
   updateDataPackets 
 } from "../circle-params";
 import { getParticleRenderer, renderNetworkConnections } from "../renderers";
-import { updateCableParticles, renderCablePaths } from "./cable-utils";
+import { renderCablePaths, updateCableParticles } from "./cable";
 
 /**
  * Handles particle animation logic

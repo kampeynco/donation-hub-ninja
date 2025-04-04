@@ -1,6 +1,5 @@
-
 import { useCallback, useEffect, useRef, useState } from "react";
-import { createCablePaths } from "./utils/cable-utils";
+import { createCablePaths } from "./utils/cable";
 
 export function useCablePaths(
   canvasRef: React.RefObject<HTMLCanvasElement>,
