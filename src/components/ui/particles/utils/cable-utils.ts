@@ -20,30 +20,106 @@ export function createCablePaths(
   
   const canvasRect = canvasRef.current.getBoundingClientRect();
   
-  // Get target elements
-  const targetElements = targetTextIds.map(id => document.getElementById(id));
+  // Try to get the specific elements with IDs
+  const donorElement = document.getElementById('donor-text');
+  const campElement = document.getElementById('camp-text');
   
-  // Get character positions
-  let allCharPositions: any[] = [];
-  targetElements.forEach(element => {
-    if (element) {
-      const positions = getCharacterPositions(element, [startChar, endChar]);
-      allCharPositions = [...allCharPositions, ...positions];
-    }
-  });
+  // Positions array that we'll populate
+  let startPositions: any[] = [];
+  let endPositions: any[] = [];
   
-  // Find our start and end character positions
-  const startPositions = allCharPositions.filter(pos => pos.char === startChar);
-  const endPositions = allCharPositions.filter(pos => pos.char === endChar);
+  // Try to get positions from specific elements first
+  if (donorElement && campElement) {
+    const donorRect = donorElement.getBoundingClientRect();
+    const campRect = campElement.getBoundingClientRect();
+    
+    startPositions = [{
+      char: startChar,
+      x: donorRect.left + donorRect.width / 2,
+      y: donorRect.top + donorRect.height / 2,
+      width: donorRect.width,
+      height: donorRect.height
+    }];
+    
+    endPositions = [{
+      char: endChar,
+      x: campRect.left + campRect.width / 2,
+      y: campRect.top + campRect.height / 2,
+      width: campRect.width,
+      height: campRect.height
+    }];
+  }
   
+  // Fallback to searching in all target text elements
   if (startPositions.length === 0 || endPositions.length === 0) {
-    console.warn("Could not find target characters in text");
-    return paths;
+    // Get target elements
+    const targetElements = targetTextIds.map(id => document.getElementById(id));
+    
+    // Get character positions
+    let allCharPositions: any[] = [];
+    targetElements.forEach(element => {
+      if (element) {
+        const positions = getCharacterPositions(element, [startChar, endChar]);
+        allCharPositions = [...allCharPositions, ...positions];
+      }
+    });
+    
+    // Find our start and end character positions
+    startPositions = allCharPositions.filter(pos => pos.char === startChar);
+    endPositions = allCharPositions.filter(pos => pos.char === endChar);
+  }
+  
+  // If we still have no positions, use fixed positions as a fallback
+  if (startPositions.length === 0 || endPositions.length === 0) {
+    console.warn("Could not find target characters in text, using fallback positions");
+    const heroElement = document.getElementById('hero-title');
+    
+    if (heroElement) {
+      const rect = heroElement.getBoundingClientRect();
+      const left = rect.left + rect.width * 0.2;
+      const right = rect.left + rect.width * 0.7;
+      const middle = rect.top + rect.height * 0.6;
+      
+      startPositions = [{
+        char: startChar,
+        x: left,
+        y: middle,
+        width: 20,
+        height: 40
+      }];
+      
+      endPositions = [{
+        char: endChar,
+        x: right,
+        y: middle,
+        width: 20,
+        height: 40
+      }];
+    } else {
+      // If all else fails, use fixed positions
+      startPositions = [{
+        char: startChar,
+        x: window.innerWidth * 0.3,
+        y: window.innerHeight * 0.4,
+        width: 20,
+        height: 40
+      }];
+      
+      endPositions = [{
+        char: endChar,
+        x: window.innerWidth * 0.7,
+        y: window.innerHeight * 0.4,
+        width: 20,
+        height: 40
+      }];
+    }
   }
   
   // Use the first found position for each character
   const startPos = startPositions[0];
   const endPos = endPositions[0];
+  
+  console.log("Using cable positions:", { start: startPos, end: endPos });
   
   // Create multiple cables from left side to start character
   for (let i = 0; i < numLeftCables; i++) {

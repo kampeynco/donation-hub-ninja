@@ -14,31 +14,68 @@ export function getCharacterPositions(element: HTMLElement | null, targetChars: 
   // Create a range to measure positions
   const range = document.createRange();
   
-  // Find all occurrences of target characters
-  for (const char of targetChars) {
-    let idx = 0;
-    while ((idx = text.indexOf(char, idx)) !== -1) {
-      try {
-        // Set start of range to the character
-        range.setStart(element.firstChild || element, idx);
-        range.setEnd(element.firstChild || element, idx + 1);
-        
-        // Get the bounding rectangle
-        const rect = range.getBoundingClientRect();
-        
-        // Add to positions array
+  // Loop through all child nodes to find text nodes
+  const processNode = (node) => {
+    if (node.nodeType === Node.TEXT_NODE) {
+      const nodeText = node.textContent || '';
+      
+      // Find all occurrences of target characters in this text node
+      for (const char of targetChars) {
+        let idx = 0;
+        while ((idx = nodeText.indexOf(char, idx)) !== -1) {
+          try {
+            // Set start of range to the character
+            range.setStart(node, idx);
+            range.setEnd(node, idx + 1);
+            
+            // Get the bounding rectangle
+            const rect = range.getBoundingClientRect();
+            
+            // Add to positions array if valid
+            if (rect.width > 0 && rect.height > 0) {
+              positions.push({
+                char,
+                x: rect.left + rect.width / 2,
+                y: rect.top + rect.height / 2,
+                width: rect.width,
+                height: rect.height
+              });
+            }
+            
+            idx += 1;
+          } catch (e) {
+            console.error(`Error measuring character ${char} at index ${idx}:`, e);
+            idx += 1;
+          }
+        }
+      }
+    } else if (node.nodeType === Node.ELEMENT_NODE && node.childNodes.length > 0) {
+      // Recursively process child nodes
+      Array.from(node.childNodes).forEach(processNode);
+    }
+  };
+  
+  // Process all child nodes of the element
+  Array.from(element.childNodes).forEach(processNode);
+  
+  // If we still didn't find positions, try a fallback approach
+  if (positions.length === 0) {
+    console.warn("Using fallback position detection for:", targetChars);
+    // Find character positions approximately based on element position and width
+    const rect = element.getBoundingClientRect();
+    const textLength = text.length;
+    
+    for (const char of targetChars) {
+      const firstIndex = text.indexOf(char);
+      if (firstIndex >= 0) {
+        const approximateX = rect.left + (rect.width * (firstIndex / textLength));
         positions.push({
           char,
-          x: rect.left + rect.width / 2,
+          x: approximateX,
           y: rect.top + rect.height / 2,
-          width: rect.width,
+          width: rect.width / textLength,
           height: rect.height
         });
-        
-        idx += 1;
-      } catch (e) {
-        console.error(`Error measuring character ${char} at index ${idx}:`, e);
-        idx += 1;
       }
     }
   }

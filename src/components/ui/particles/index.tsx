@@ -15,6 +15,7 @@ export const Particles: React.FC<ParticlesProps> = ({
   vx = 0,
   vy = 0,
   variant = "default",
+  targetTexts,
 }) => {
   const { canvasRef, canvasContainerRef } = useParticlesAnimation({
     quantity,
@@ -25,7 +26,8 @@ export const Particles: React.FC<ParticlesProps> = ({
     vx,
     vy,
     variant,
-    refresh
+    refresh,
+    targetTexts
   });
 
   return (

@@ -45,7 +45,7 @@ const HeroSection = () => {
               ) : (
                 <>can be hidden.<br /></>
               )}
-              Donor Camp<br />
+              <span id="donor-text">D</span>onor Cam<span id="camp-text">p</span><br />
               uncovers it.
             </h1>
             <p className="text-base md:text-[1.25rem] font-[300] mb-6 md:mb-8 max-w-2xl mx-auto px-2 md:px-4 leading-[1.5] text-gray-700">
