@@ -1,7 +1,13 @@
+
 import { useCallback } from "react";
 import { Circle, CanvasSize } from "../types";
 import { remapValue } from "../utils";
-import { generateCircleParams, createNetworkConnections, createDataPackets, updateDataPackets } from "../circle-params";
+import { 
+  generateCircleParams, 
+  createNetworkConnections, 
+  createDataPackets, 
+  updateDataPackets 
+} from "../circle-params";
 import { getParticleRenderer, renderNetworkConnections } from "../renderers";
 import { updateCableParticles, renderCablePaths } from "./cable-utils";
 

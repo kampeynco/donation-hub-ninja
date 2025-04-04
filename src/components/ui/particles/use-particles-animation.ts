@@ -15,7 +15,7 @@ interface UseParticlesAnimationProps {
   color: string;
   vx: number;
   vy: number;
-  variant: "default" | "journey" | "cable";
+  variant: "default" | "journey" | "cable" | "network";
   refresh: boolean;
   targetTexts?: string[];
 }
