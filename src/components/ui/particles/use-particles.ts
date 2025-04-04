@@ -2,10 +2,7 @@
 import { useRef, useEffect } from "react";
 import { Circle, CanvasRefs, CanvasSize } from "./types";
 import { hexToRgb } from "./utils";
-import { 
-  resizeCanvas,
-  clearContext 
-} from "./canvas-operations";
+import { resizeCanvas, clearContext } from "./canvas-operations";
 import { 
   drawParticles, 
   animateParticles 
