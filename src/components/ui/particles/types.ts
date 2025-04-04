@@ -1,5 +1,5 @@
 
-import { RefObject } from "react";
+import { RefObject, MutableRefObject } from "react";
 
 export interface MousePosition {
   x: number;
@@ -43,8 +43,8 @@ export interface ParticlesProps {
 export interface CanvasRefs {
   canvasRef: RefObject<HTMLCanvasElement>;
   canvasContainerRef: RefObject<HTMLDivElement>;
-  context: RefObject<CanvasRenderingContext2D | null>;
-  circles: RefObject<Circle[]>;
-  mouse: RefObject<{ x: number; y: number }>;
-  canvasSize: RefObject<CanvasSize>;
+  context: MutableRefObject<CanvasRenderingContext2D | null>;
+  circles: MutableRefObject<Circle[]>;
+  mouse: MutableRefObject<{ x: number; y: number }>;
+  canvasSize: MutableRefObject<CanvasSize>;
 }

@@ -36,10 +36,10 @@ export function useParticles({
 }: {
   canvasRef: React.RefObject<HTMLCanvasElement>;
   canvasContainerRef: React.RefObject<HTMLDivElement>;
-  context: React.RefObject<CanvasRenderingContext2D | null>;
-  circles: React.RefObject<Circle[]>;
-  mouse: React.RefObject<{ x: number; y: number }>;
-  canvasSize: React.RefObject<CanvasSize>;
+  context: React.MutableRefObject<CanvasRenderingContext2D | null>;
+  circles: React.MutableRefObject<Circle[]>;
+  mouse: React.MutableRefObject<{ x: number; y: number }>;
+  canvasSize: React.MutableRefObject<CanvasSize>;
   quantity: number;
   staticity: number;
   ease: number;
@@ -70,7 +70,7 @@ export function useParticles({
   useEffect(() => {
     if (canvasRef.current) {
       const ctx = canvasRef.current.getContext("2d");
-      if (ctx && context.current !== ctx) {
+      if (ctx) {
         context.current = ctx;
       }
     }
