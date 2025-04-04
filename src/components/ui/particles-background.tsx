@@ -9,7 +9,7 @@ export interface ParticlesBackgroundProps {
   staticity?: number;
   ease?: number;
   size?: number;
-  variant?: "default" | "journey" | "cable";
+  variant?: "default" | "journey" | "cable" | "network";
   targetTexts?: string[];
 }
 

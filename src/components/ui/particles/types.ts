@@ -14,7 +14,7 @@ export interface ParticlesProps {
   color?: string;
   vx?: number;
   vy?: number;
-  variant?: "default" | "journey" | "cable";
+  variant?: "default" | "journey" | "cable" | "network";
   targetTexts?: string[];
 }
 
@@ -42,6 +42,9 @@ export type Circle = {
   pathProgress?: number;
   pathSpeed?: number;
   pathLength?: number;
+  isNode?: boolean;
+  connections?: number[];
+  dataPackets?: { progress: number, targetIdx: number }[];
 };
 
 export interface CanvasSize {
