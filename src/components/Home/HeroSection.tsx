@@ -29,9 +29,9 @@ const HeroSection = () => {
                 treatAsOneUnit={true}
               /><br />
               {isMobile ? (
-                <>can be unclear.<br /></>
+                <>can be hidden.<br /></>
               ) : (
-                <>can be unclear.<br /></>
+                <>can be hidden.<br /></>
               )}
               Donor Camp<br />
               uncovers it.
