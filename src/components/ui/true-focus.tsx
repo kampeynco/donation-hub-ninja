@@ -13,7 +13,7 @@ interface TrueFocusProps {
   className?: string;
   fontSize?: string;
   fontWeight?: string;
-  treatAsOneUnit?: boolean; // New prop to treat all words as a single unit
+  treatAsOneUnit?: boolean;
 }
 
 function TrueFocus({
@@ -27,7 +27,7 @@ function TrueFocus({
   className = "",
   fontSize,
   fontWeight,
-  treatAsOneUnit = false, // Default to false for backward compatibility
+  treatAsOneUnit = false,
 }: TrueFocusProps) {
   const words = sentence.split(" ");
   // Initialize currentIndex to null when in manual mode, otherwise 0
@@ -93,9 +93,9 @@ function TrueFocus({
     }
   }, [currentIndex, words.length, treatAsOneUnit]);
 
-  const handleMouseEnter = (index: number) => {
+  const handleMouseEnter = () => {
     if (manualMode) {
-      setCurrentIndex(index);
+      setCurrentIndex(0);
     }
   };
 
@@ -109,8 +109,8 @@ function TrueFocus({
     <div
       className={`relative inline-flex gap-3 items-center ${className}`}
       ref={containerRef}
-      onMouseEnter={treatAsOneUnit && manualMode ? () => setCurrentIndex(0) : undefined}
-      onMouseLeave={treatAsOneUnit && manualMode ? handleMouseLeave : undefined}
+      onMouseEnter={manualMode ? handleMouseEnter : undefined}
+      onMouseLeave={manualMode ? handleMouseLeave : undefined}
     >
       {words.map((word, index) => {
         const isActive = treatAsOneUnit ? currentIndex !== null : index === currentIndex;
@@ -118,7 +118,7 @@ function TrueFocus({
           <span
             key={index}
             ref={(el) => (wordRefs.current[index] = el)}
-            className="relative cursor-pointer"
+            className="relative"
             style={{
               filter: manualMode
                 ? isActive
@@ -131,8 +131,6 @@ function TrueFocus({
               fontSize: fontSize,
               fontWeight: fontWeight,
             }}
-            onMouseEnter={!treatAsOneUnit ? () => handleMouseEnter(index) : undefined}
-            onMouseLeave={!treatAsOneUnit ? handleMouseLeave : undefined}
           >
             {word}
           </span>

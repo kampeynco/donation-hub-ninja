@@ -26,7 +26,7 @@ const HeroSection = () => {
             <h1 className="text-3xl md:text-[4rem] font-bold mb-4 md:mb-6 leading-[1.2] md:leading-[1.125] text-gray-900">
               Your{" "}
               <TrueFocus 
-                sentence="donors intent"
+                sentence="donors' intent"
                 manualMode={true}
                 blurAmount={3}
                 borderColor="#007AFF"
