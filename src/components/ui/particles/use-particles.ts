@@ -69,7 +69,10 @@ export function useParticles({
   // Initialize canvas and context
   useEffect(() => {
     if (canvasRef.current) {
-      context.current = canvasRef.current.getContext("2d");
+      const ctx = canvasRef.current.getContext("2d");
+      if (ctx && context.current !== ctx) {
+        context.current = ctx;
+      }
     }
     
     // Initialize canvas
@@ -84,9 +87,7 @@ export function useParticles({
     // Cleanup
     return () => {
       window.removeEventListener("resize", initCanvas);
-      if (animationFrameId.current) {
-        cancelAnimationFrame(animationFrameId.current);
-      }
+      stopAnimationLoop();
     };
   }, [color]);
 
@@ -94,6 +95,13 @@ export function useParticles({
   useEffect(() => {
     initCanvas();
   }, [refresh]);
+
+  // Cleanup when component unmounts
+  useEffect(() => {
+    return () => {
+      stopAnimationLoop();
+    };
+  }, []);
 
   // Initialize the canvas
   const initCanvas = () => {
@@ -105,8 +113,19 @@ export function useParticles({
     drawParticles(refs, quantity, size, rgb, dpr);
   };
 
+  // Stop animation loop and cancel any pending animation frames
+  const stopAnimationLoop = () => {
+    if (animationFrameId.current !== null) {
+      cancelAnimationFrame(animationFrameId.current);
+      animationFrameId.current = null;
+    }
+  };
+
   // Animation loop
   const startAnimationLoop = () => {
+    // First, stop any existing animation loop
+    stopAnimationLoop();
+    
     const animate = () => {
       const rgb = hexToRgb(color);
       
