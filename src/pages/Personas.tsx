@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { IconArrowRight, IconLock } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
@@ -32,7 +33,11 @@ const Personas = () => {
             </div>
           </div>
           <div className="flex-1 hidden md:block">
-            <img src={personasImage} alt="Donor Personas visualization" className="max-w-full rounded-lg shadow-lg" />
+            <img 
+              src={personasImage} 
+              alt="Donor Personas visualization" 
+              className="max-w-[75%] mx-auto rounded-lg shadow-lg" 
+            />
           </div>
         </div>
 
