@@ -26,6 +26,8 @@ export function drawParticles(
     particleQuantity = Math.floor(quantity * 0.7); // Fewer but larger particles for nebula
   } else if (variant === "cosmic") {
     particleQuantity = Math.floor(quantity * 1.2); // More particles for cosmic effect
+  } else if (variant === "journey") {
+    particleQuantity = Math.floor(quantity * 1.5); // More particles for journey visualization
   }
   
   for (let i = 0; i < particleQuantity; i++) {

@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useTheme } from "@/context/ThemeContext";
 import { Particles } from "./particles";
@@ -13,7 +12,7 @@ export interface ParticlesBackgroundProps {
   connectionDistance?: number;
   connectionOpacity?: number;
   connectionWidth?: number;
-  variant?: "default" | "nebula" | "wave" | "grid" | "cosmic";
+  variant?: "default" | "nebula" | "wave" | "grid" | "cosmic" | "journey";
 }
 
 export function ParticlesBackground({
@@ -33,10 +32,16 @@ export function ParticlesBackground({
   const [refresh, setRefresh] = useState(false);
 
   useEffect(() => {
-    // Set particle color based on theme
-    setColor(theme === "dark" ? "#ffffff" : "#007AFF");
+    // Set particle color based on theme and variant
+    if (variant === "journey") {
+      // Journey variant uses predefined colors for the different stages
+      setColor("#007AFF"); // Base color, will be overridden by particle types
+    } else {
+      // Other variants use theme-based coloring
+      setColor(theme === "dark" ? "#ffffff" : "#007AFF");
+    }
     setRefresh(prev => !prev); // Toggle refresh to redraw particles
-  }, [theme]);
+  }, [theme, variant]);
 
   return (
     <Particles
