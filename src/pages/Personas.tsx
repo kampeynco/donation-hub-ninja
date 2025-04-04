@@ -7,8 +7,8 @@ import NotInterestedModal from "@/components/Personas/NotInterestedModal";
 import WaitlistButton from "@/components/Personas/WaitlistButton";
 import { Card, CardContent } from "@/components/ui/card";
 
-// Import the uploaded image from public/lovable-uploads/
-const personasImage = "/lovable-uploads/35af406b-6b5e-411d-98c7-b9d0642b92a0.png";
+// Using the Supabase URL for the image
+const personasImage = "https://igjnhwvtasegwyiwcdkr.supabase.co/storage/v1/object/public/assets/images/personascard.png";
 
 const Personas = () => {
   const [modalOpen, setModalOpen] = useState(false);
