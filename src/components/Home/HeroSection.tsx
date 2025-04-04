@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -35,8 +36,8 @@ const HeroSection = () => {
                   unclear.<br />
                 </>
               )}
-              Donor Camp's here<br />
-              to change that.
+              We are here to<br />
+              change that.
             </h1>
             <p className="text-base md:text-[1.25rem] font-[300] mb-6 md:mb-8 max-w-2xl mx-auto px-2 md:px-4 leading-[1.5] text-gray-700">
               Connect your fundraising stack, and we'll analyze donor
