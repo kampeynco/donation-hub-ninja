@@ -29,7 +29,7 @@ const HeroSection = () => {
                 treatAsOneUnit={true}
               /><br />
               {isMobile ? (
-                <>can be unclear.</>
+                <>can be unclear.<br /></>
               ) : (
                 <>
                   can be<br />
