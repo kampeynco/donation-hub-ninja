@@ -7,11 +7,11 @@ const LIGHT_LOGO_MARK = "https://igjnhwvtasegwyiwcdkr.supabase.co/storage/v1/obj
 
 const HomeHeader = () => {
   return (
-    <header className="w-full bg-white text-gray-900">
-      <div className="container mx-auto px-4 py-4 md:py-6 flex justify-between items-center">
+    <header className="w-full bg-white text-gray-900 fixed top-0 left-0 right-0 z-50">
+      <div className="container mx-auto px-4 py-3 md:py-4 flex justify-between items-center">
         <Link to="/" className="flex items-center gap-2">
-          <div className="flex h-[2.5rem] w-[2.5rem] items-center justify-center rounded-full bg-primary">
-            <img src={LIGHT_LOGO_MARK} alt="Donor Camp Logo" className="w-[1.75rem] h-[1.75rem]" />
+          <div className="flex h-10 w-10 md:h-[2.5rem] md:w-[2.5rem] items-center justify-center rounded-full bg-primary">
+            <img src={LIGHT_LOGO_MARK} alt="Donor Camp Logo" className="w-6 h-6 md:w-[1.75rem] md:h-[1.75rem]" />
           </div>
           <span className="text-base md:text-lg font-semibold tracking-tight">Donor Camp</span>
         </Link>
