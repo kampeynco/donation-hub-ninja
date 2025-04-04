@@ -11,8 +11,8 @@ export function initCableParticles(
   quantity: number,
   canvasSize: React.MutableRefObject<CanvasSize>,
   drawCircle: (context: CanvasRenderingContext2D, circle: Circle, update?: boolean) => void,
-  cablePaths?: { path: Path2D; length: number; points: { x: number; y: number }[]; color: string; width: number }[],
-  size: number
+  size: number,
+  cablePaths?: { path: Path2D; length: number; points: { x: number; y: number }[]; color: string; width: number }[]
 ) {
   // If cable variant and paths exist, draw the cable paths
   if (cablePaths && cablePaths.length > 0) {
@@ -33,8 +33,8 @@ export function animateCableParticles(
   context: CanvasRenderingContext2D,
   circles: React.MutableRefObject<Circle[]>,
   canvasSize: React.MutableRefObject<CanvasSize>,
-  cablePaths?: { path: Path2D; length: number; points: { x: number; y: number }[]; color: string; width: number }[],
-  drawCircle: (context: CanvasRenderingContext2D, circle: Circle, update?: boolean) => void
+  drawCircle: (context: CanvasRenderingContext2D, circle: Circle, update?: boolean) => void,
+  cablePaths?: { path: Path2D; length: number; points: { x: number; y: number }[]; color: string; width: number }[]
 ) {
   // If cable variant and paths exist
   if (cablePaths && cablePaths.length > 0) {

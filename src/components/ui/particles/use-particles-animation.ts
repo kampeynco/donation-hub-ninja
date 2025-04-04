@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef } from "react";
 import { Circle, CanvasSize } from "./types";
 import { useMousePosition } from "./use-mouse-position";
 import { useCanvasManagement } from "./utils/canvas-utils";
-import { useParticleAnimation } from "./utils/animation-utils";
+import { useParticleAnimation } from "./utils/animation/use-particle-animation";
 import { useMouseTracking } from "./utils/mouse-utils";
 import { useCablePaths } from "./use-cable-paths";
 

@@ -59,7 +59,7 @@ export function useParticleAnimation(
         initNetworkParticles(context, quantity, canvasSize, drawCircle, circles, size);
         break;
       case "cable":
-        initCableParticles(context, quantity, canvasSize, drawCircle, cablePaths, size);
+        initCableParticles(context, quantity, canvasSize, drawCircle, size, cablePaths);
         break;
       case "journey":
         initJourneyParticles(context, quantity, canvasSize, drawCircle, size);
@@ -93,8 +93,8 @@ export function useParticleAnimation(
           context, 
           circles, 
           canvasSize, 
-          cablePaths, 
-          drawCircle
+          drawCircle, 
+          cablePaths
         );
         break;
       case "journey":
