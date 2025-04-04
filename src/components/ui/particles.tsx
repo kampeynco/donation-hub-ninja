@@ -38,7 +38,9 @@ interface ParticlesProps {
   color?: string
   vx?: number
   vy?: number
+  variant?: "default" | "journey"
 }
+
 function hexToRgb(hex: string): number[] {
   hex = hex.replace("#", "")
 
@@ -66,6 +68,7 @@ const Particles: React.FC<ParticlesProps> = ({
   color = "#ffffff",
   vx = 0,
   vy = 0,
+  variant = "default",
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const canvasContainerRef = useRef<HTMLDivElement>(null)
@@ -87,7 +90,7 @@ const Particles: React.FC<ParticlesProps> = ({
     return () => {
       window.removeEventListener("resize", initCanvas)
     }
-  }, [color])
+  }, [color, variant])
 
   useEffect(() => {
     onMouseMove()
@@ -127,6 +130,8 @@ const Particles: React.FC<ParticlesProps> = ({
     dx: number
     dy: number
     magnetism: number
+    color?: string
+    type?: string
   }
 
   const resizeCanvas = () => {
@@ -143,27 +148,68 @@ const Particles: React.FC<ParticlesProps> = ({
   }
 
   const circleParams = (): Circle => {
-    const x = Math.floor(Math.random() * canvasSize.current.w)
-    const y = Math.floor(Math.random() * canvasSize.current.h)
-    const translateX = 0
-    const translateY = 0
-    const pSize = Math.floor(Math.random() * 2) + size
-    const alpha = 0
-    const targetAlpha = parseFloat((Math.random() * 0.6 + 0.1).toFixed(1))
-    const dx = (Math.random() - 0.5) * 0.1
-    const dy = (Math.random() - 0.5) * 0.1
-    const magnetism = 0.1 + Math.random() * 4
-    return {
-      x,
-      y,
-      translateX,
-      translateY,
-      size: pSize,
-      alpha,
-      targetAlpha,
-      dx,
-      dy,
-      magnetism,
+    if (variant === "journey") {
+      // Journey map specific parameters
+      const types = ["data", "processed", "insight"];
+      const type = types[Math.floor(Math.random() * types.length)];
+      const colors = {
+        data: "#007AFF", // blue for raw data
+        processed: "#4CD964", // green for processed data
+        insight: "#FFCC00", // yellow for insights
+      };
+      
+      // Position particles in a flow pattern from left to right
+      const x = Math.floor(Math.random() * canvasSize.current.w * 0.3); // Start more on the left
+      const y = Math.floor(Math.random() * canvasSize.current.h);
+      const translateX = 0;
+      const translateY = 0;
+      const pSize = (type === "data" ? 1 : type === "processed" ? 1.5 : 2) * size;
+      const alpha = 0;
+      const targetAlpha = parseFloat((Math.random() * 0.4 + 0.1).toFixed(1));
+      
+      // Data flows faster from left to right
+      const dx = (Math.random() * 0.5 + 0.2) * (type === "data" ? 1.5 : type === "processed" ? 1 : 0.5);
+      const dy = (Math.random() - 0.5) * 0.05; // Slight vertical movement
+      const magnetism = 0.1 + Math.random() * 2;
+      
+      return {
+        x,
+        y,
+        translateX,
+        translateY,
+        size: pSize,
+        alpha,
+        targetAlpha,
+        dx,
+        dy,
+        magnetism,
+        color: colors[type as keyof typeof colors],
+        type
+      };
+    } else {
+      // Default parameters
+      const x = Math.floor(Math.random() * canvasSize.current.w)
+      const y = Math.floor(Math.random() * canvasSize.current.h)
+      const translateX = 0
+      const translateY = 0
+      const pSize = Math.floor(Math.random() * 2) + size
+      const alpha = 0
+      const targetAlpha = parseFloat((Math.random() * 0.6 + 0.1).toFixed(1))
+      const dx = (Math.random() - 0.5) * 0.1
+      const dy = (Math.random() - 0.5) * 0.1
+      const magnetism = 0.1 + Math.random() * 4
+      return {
+        x,
+        y,
+        translateX,
+        translateY,
+        size: pSize,
+        alpha,
+        targetAlpha,
+        dx,
+        dy,
+        magnetism,
+      }
     }
   }
 
@@ -175,7 +221,14 @@ const Particles: React.FC<ParticlesProps> = ({
       context.current.translate(translateX, translateY)
       context.current.beginPath()
       context.current.arc(x, y, size, 0, 2 * Math.PI)
-      context.current.fillStyle = `rgba(${rgb.join(", ")}, ${alpha})`
+      
+      if (variant === "journey" && circle.color) {
+        const customRgb = hexToRgb(circle.color);
+        context.current.fillStyle = `rgba(${customRgb.join(", ")}, ${alpha})`;
+      } else {
+        context.current.fillStyle = `rgba(${rgb.join(", ")}, ${alpha})`;
+      }
+      
       context.current.fill()
       context.current.setTransform(dpr, 0, 0, dpr, 0, 0)
 
@@ -239,30 +292,52 @@ const Particles: React.FC<ParticlesProps> = ({
       } else {
         circle.alpha = circle.targetAlpha * remapClosestEdge
       }
-      circle.x += circle.dx + vx
-      circle.y += circle.dy + vy
-      circle.translateX +=
-        (mouse.current.x / (staticity / circle.magnetism) - circle.translateX) /
-        ease
-      circle.translateY +=
-        (mouse.current.y / (staticity / circle.magnetism) - circle.translateY) /
-        ease
+      
+      // Update position with different behavior based on variant
+      if (variant === "journey") {
+        // Journey particles move faster from left to right
+        circle.x += circle.dx
+        circle.y += circle.dy
+        
+        // Mouse interaction is gentler in journey mode
+        circle.translateX +=
+          (mouse.current.x / (staticity / (circle.magnetism * 0.5)) - circle.translateX) /
+          (ease * 2)
+        circle.translateY +=
+          (mouse.current.y / (staticity / (circle.magnetism * 0.5)) - circle.translateY) /
+          (ease * 2)
+      } else {
+        // Default behavior
+        circle.x += circle.dx + vx
+        circle.y += circle.dy + vy
+        circle.translateX +=
+          (mouse.current.x / (staticity / circle.magnetism) - circle.translateX) /
+          ease
+        circle.translateY +=
+          (mouse.current.y / (staticity / circle.magnetism) - circle.translateY) /
+          ease
+      }
 
       drawCircle(circle, true)
 
-      // circle gets out of the canvas
+      // Check if circle gets out of the canvas
       if (
         circle.x < -circle.size ||
         circle.x > canvasSize.current.w + circle.size ||
         circle.y < -circle.size ||
         circle.y > canvasSize.current.h + circle.size
       ) {
-        // remove the circle from the array
-        circles.current.splice(i, 1)
-        // create a new circle
-        const newCircle = circleParams()
-        drawCircle(newCircle)
-        // update the circle position
+        // For journey variant, particles that exit right side reappear on the left
+        if (variant === "journey" && circle.x > canvasSize.current.w + circle.size) {
+          circle.x = -circle.size;
+          circle.y = Math.random() * canvasSize.current.h;
+        } else {
+          // Remove the circle from the array
+          circles.current.splice(i, 1)
+          // Create a new circle
+          const newCircle = circleParams()
+          drawCircle(newCircle)
+        }
       }
     })
     window.requestAnimationFrame(animate)

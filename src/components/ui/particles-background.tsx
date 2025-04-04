@@ -9,6 +9,7 @@ export interface ParticlesBackgroundProps {
   staticity?: number;
   ease?: number;
   size?: number;
+  variant?: "default" | "journey";
 }
 
 export function ParticlesBackground({
@@ -17,6 +18,7 @@ export function ParticlesBackground({
   staticity = 50,
   ease = 50,
   size = 0.4,
+  variant = "default",
 }: ParticlesBackgroundProps) {
   const { theme } = useTheme();
   const [color, setColor] = useState("#007AFF");
@@ -37,6 +39,7 @@ export function ParticlesBackground({
       size={size}
       color={color}
       refresh={refresh}
+      variant={variant}
     />
   );
 }

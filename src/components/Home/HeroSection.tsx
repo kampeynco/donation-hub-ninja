@@ -10,13 +10,14 @@ const HeroSection = () => {
 
   return (
     <div className="bg-white text-gray-900 relative overflow-hidden">
-      {/* Particles Background */}
+      {/* Particles Background - using journey variant */}
       <ParticlesBackground 
         className="absolute inset-0 z-0" 
-        quantity={isMobile ? 50 : 100}
+        quantity={isMobile ? 50 : 120}
         staticity={60}
         ease={80}
         size={0.5}
+        variant="journey"
       />
       
       <div className="container mx-auto px-4 flex items-center justify-center min-h-[90vh] md:h-[100vh] max-w-7xl py-16 md:py-0">
