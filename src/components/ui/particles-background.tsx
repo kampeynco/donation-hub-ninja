@@ -9,6 +9,10 @@ export interface ParticlesBackgroundProps {
   staticity?: number;
   ease?: number;
   size?: number;
+  showConnections?: boolean;
+  connectionDistance?: number;
+  connectionOpacity?: number;
+  connectionWidth?: number;
 }
 
 export function ParticlesBackground({
@@ -17,6 +21,10 @@ export function ParticlesBackground({
   staticity = 50,
   ease = 50,
   size = 0.4,
+  showConnections = true,
+  connectionDistance = 100,
+  connectionOpacity = 0.2,
+  connectionWidth = 0.5,
 }: ParticlesBackgroundProps) {
   const { theme } = useTheme();
   const [color, setColor] = useState("#007AFF");
@@ -37,6 +45,10 @@ export function ParticlesBackground({
       size={size}
       color={color}
       refresh={refresh}
+      showConnections={showConnections}
+      connectionDistance={connectionDistance}
+      connectionOpacity={connectionOpacity}
+      connectionWidth={connectionWidth}
     />
   );
 }
