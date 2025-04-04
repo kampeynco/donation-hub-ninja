@@ -21,6 +21,7 @@ const Particles: React.FC<ParticlesProps> = ({
   connectionDistance = 100,
   connectionOpacity = 0.2,
   connectionWidth = 0.5,
+  variant = "default",
 }) => {
   // Initialize refs for canvas elements and state
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -55,7 +56,8 @@ const Particles: React.FC<ParticlesProps> = ({
     connectionDistance,
     connectionOpacity,
     connectionWidth,
-    refresh
+    refresh,
+    variant
   });
 
   // Update mouse position when it moves

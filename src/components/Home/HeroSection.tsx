@@ -10,17 +10,18 @@ const HeroSection = () => {
 
   return (
     <div className="bg-white text-gray-900 relative overflow-hidden">
-      {/* Enhanced Particles Network Background */}
+      {/* Enhanced Particles Network Background with cosmic variant */}
       <ParticlesBackground 
         className="absolute inset-0 z-0" 
-        quantity={isMobile ? 50 : 150}
-        staticity={60}
-        ease={80}
-        size={0.5}
+        quantity={isMobile ? 60 : 180}
+        staticity={70}
+        ease={90}
+        size={0.6}
         showConnections={true}
-        connectionDistance={isMobile ? 80 : 120}
+        connectionDistance={isMobile ? 100 : 140}
         connectionOpacity={0.15}
-        connectionWidth={0.6}
+        connectionWidth={0.5}
+        variant="cosmic"
       />
       
       <div className="container mx-auto px-4 flex items-center justify-center min-h-[90vh] md:h-[100vh] max-w-7xl py-16 md:py-0">

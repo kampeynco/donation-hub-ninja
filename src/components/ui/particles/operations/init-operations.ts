@@ -11,7 +11,8 @@ export function drawParticles(
   quantity: number,
   size: number,
   rgb: number[],
-  dpr: number
+  dpr: number,
+  variant: string = "default"
 ) {
   const { context, circles, canvasSize } = refs;
   
@@ -19,8 +20,16 @@ export function drawParticles(
   
   if (!context.current) return;
   
-  for (let i = 0; i < quantity; i++) {
-    const circle = createCircleParams(canvasSize.current, size);
-    drawCircle(circle, context.current, rgb, dpr, false, circles.current);
+  // Adjust quantity based on variant
+  let particleQuantity = quantity;
+  if (variant === "nebula") {
+    particleQuantity = Math.floor(quantity * 0.7); // Fewer but larger particles for nebula
+  } else if (variant === "cosmic") {
+    particleQuantity = Math.floor(quantity * 1.2); // More particles for cosmic effect
+  }
+  
+  for (let i = 0; i < particleQuantity; i++) {
+    const circle = createCircleParams(canvasSize.current, size, variant);
+    drawCircle(circle, context.current, rgb, dpr, false, circles.current, variant);
   }
 }

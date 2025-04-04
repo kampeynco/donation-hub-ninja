@@ -13,6 +13,7 @@ export interface ParticlesBackgroundProps {
   connectionDistance?: number;
   connectionOpacity?: number;
   connectionWidth?: number;
+  variant?: "default" | "nebula" | "wave" | "grid" | "cosmic";
 }
 
 export function ParticlesBackground({
@@ -25,6 +26,7 @@ export function ParticlesBackground({
   connectionDistance = 100,
   connectionOpacity = 0.2,
   connectionWidth = 0.5,
+  variant = "default",
 }: ParticlesBackgroundProps) {
   const { theme } = useTheme();
   const [color, setColor] = useState("#007AFF");
@@ -49,6 +51,7 @@ export function ParticlesBackground({
       connectionDistance={connectionDistance}
       connectionOpacity={connectionOpacity}
       connectionWidth={connectionWidth}
+      variant={variant}
     />
   );
 }

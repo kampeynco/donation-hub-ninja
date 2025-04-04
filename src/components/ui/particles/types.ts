@@ -22,6 +22,9 @@ export interface Circle {
   dx: number;
   dy: number;
   magnetism: number;
+  color?: number[]; // Optional custom color for individual particles
+  pulse?: number; // For pulsing effect in cosmic variant
+  pulseSpeed?: number; // Speed of pulse
 }
 
 export interface ParticlesProps {
@@ -38,6 +41,7 @@ export interface ParticlesProps {
   connectionDistance?: number;
   connectionOpacity?: number;
   connectionWidth?: number;
+  variant?: "default" | "nebula" | "wave" | "grid" | "cosmic";
 }
 
 export interface CanvasRefs {

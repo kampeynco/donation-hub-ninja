@@ -20,7 +20,8 @@ export function animateParticles(
   connectionDistance: number,
   connectionOpacity: number,
   connectionWidth: number,
-  size: number
+  size: number,
+  variant: string = "default"
 ) {
   const { context, circles, mouse, canvasSize } = refs;
   
@@ -49,6 +50,16 @@ export function animateParticles(
     } else {
       circle.alpha = circle.targetAlpha * remapClosestEdge;
     }
+    
+    // Variant-specific animation
+    if (variant === "wave") {
+      // Add sine wave movement to y position
+      circle.y += Math.sin(Date.now() / 1000 + circle.x / 100) * 0.2;
+    } else if (variant === "cosmic" && circle.pulse !== undefined && circle.pulseSpeed !== undefined) {
+      // Update pulse for cosmic variant
+      circle.pulse += circle.pulseSpeed;
+    }
+    
     circle.x += circle.dx + vx;
     circle.y += circle.dy + vy;
     circle.translateX +=
@@ -58,7 +69,7 @@ export function animateParticles(
       (mouse.current.y / (staticity / circle.magnetism) - circle.translateY) /
       ease;
 
-    drawCircle(circle, context.current, rgb, dpr, true);
+    drawCircle(circle, context.current, rgb, dpr, true, undefined, variant);
 
     // circle gets out of the canvas
     if (
@@ -70,8 +81,8 @@ export function animateParticles(
       // remove the circle from the array
       circles.current.splice(i, 1);
       // create a new circle
-      const newCircle = createCircleParams(canvasSize.current, size);
-      drawCircle(newCircle, context.current, rgb, dpr, false, circles.current);
+      const newCircle = createCircleParams(canvasSize.current, size, variant);
+      drawCircle(newCircle, context.current, rgb, dpr, false, circles.current, variant);
     }
   });
 
@@ -82,6 +93,7 @@ export function animateParticles(
     connectionDistance,
     connectionOpacity,
     connectionWidth,
-    rgb
+    rgb,
+    variant
   );
 }

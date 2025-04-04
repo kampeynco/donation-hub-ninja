@@ -29,7 +29,8 @@ export function useParticles({
   connectionDistance,
   connectionOpacity,
   connectionWidth,
-  refresh
+  refresh,
+  variant = "default"
 }: {
   canvasRef: React.RefObject<HTMLCanvasElement>;
   canvasContainerRef: React.RefObject<HTMLDivElement>;
@@ -49,6 +50,7 @@ export function useParticles({
   connectionOpacity: number;
   connectionWidth: number;
   refresh: boolean;
+  variant?: "default" | "nebula" | "wave" | "grid" | "cosmic";
 }) {
   const dpr = typeof window !== "undefined" ? window.devicePixelRatio : 1;
   const animationFrameId = useRef<number | null>(null);
@@ -84,7 +86,7 @@ export function useParticles({
     // Convert color to RGB for use in drawing
     const rgb = hexToRgb(color);
     
-    drawParticles(refs, quantity, size, rgb, dpr);
+    drawParticles(refs, quantity, size, rgb, dpr, variant);
   };
 
   /**
@@ -119,7 +121,8 @@ export function useParticles({
         connectionDistance,
         connectionOpacity,
         connectionWidth,
-        size
+        size,
+        variant
       );
       
       animationFrameId.current = window.requestAnimationFrame(animateFrame);
@@ -142,7 +145,7 @@ export function useParticles({
       window.removeEventListener("resize", initCanvas);
       stopAnimationLoop();
     };
-  }, [color]);
+  }, [color, variant]);
 
   // Handle refresh prop changes
   useEffect(() => {
