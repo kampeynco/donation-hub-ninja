@@ -10,21 +10,22 @@ const HeroSection = () => {
 
   return (
     <div className="bg-white text-gray-900 relative overflow-hidden">
-      {/* Particles Background - using journey variant */}
+      {/* Particles Background - using cable variant */}
       <ParticlesBackground 
         className="absolute inset-0 z-0" 
-        quantity={isMobile ? 60 : 150}
+        quantity={isMobile ? 30 : 60}
         staticity={40}
         ease={60}
-        size={0.6}
-        variant="journey"
+        size={0.8}
+        variant="cable"
+        targetTexts={["hero-title"]}
       />
       
       <div className="container mx-auto px-4 flex items-center justify-center min-h-[90vh] md:h-[100vh] max-w-7xl py-16 md:py-0">
         <div className="relative w-full">
           {/* Main hero content */}
           <div className="text-center max-w-4xl mx-auto z-20 relative py-4 md:py-8">
-            <h1 className="text-3xl md:text-[4rem] font-bold mb-4 md:mb-6 leading-[1.2] md:leading-[1.125] text-gray-900">
+            <h1 id="hero-title" className="text-3xl md:text-[4rem] font-bold mb-4 md:mb-6 leading-[1.2] md:leading-[1.125] text-gray-900">
               Your{" "}
               <TrueFocus 
                 sentence="donors' intent"

@@ -1,15 +1,15 @@
-
 import { useCallback } from "react";
 import { Circle, CanvasSize } from "../types";
 import { remapValue } from "../utils";
 import { generateCircleParams } from "../circle-params";
 import { getParticleRenderer } from "../renderers";
+import { updateCableParticles, renderCablePaths } from "./cable-utils";
 
 /**
  * Handles particle animation logic
  */
 export function useParticleAnimation(
-  variant: "default" | "journey",
+  variant: "default" | "journey" | "cable",
   circles: React.MutableRefObject<Circle[]>,
   mouse: React.MutableRefObject<{ x: number; y: number }>,
   canvasSize: React.MutableRefObject<CanvasSize>,
@@ -18,7 +18,8 @@ export function useParticleAnimation(
   size: number,
   vx: number,
   vy: number,
-  dpr: number
+  dpr: number,
+  cablePaths?: { path: Path2D; length: number; points: { x: number; y: number }[]; color: string; width: number }[]
 ) {
   const renderParticle = getParticleRenderer(variant);
 
@@ -49,37 +50,71 @@ export function useParticleAnimation(
     context: CanvasRenderingContext2D,
     quantity: number
   ) => {
-    for (let i = 0; i < quantity; i++) {
-      const circle = generateCircleParams(canvasSize.current, variant, size);
-      drawCircle(context, circle);
+    // If we're using cable variant, draw the cable paths first
+    if (variant === "cable" && cablePaths && cablePaths.length > 0) {
+      renderCablePaths(context, cablePaths);
+      
+      // Create particles that follow the paths
+      for (let i = 0; i < quantity; i++) {
+        const circle = generateCircleParams(canvasSize.current, variant, size, cablePaths);
+        drawCircle(context, circle);
+      }
+    } else {
+      // Use default behavior for other variants
+      for (let i = 0; i < quantity; i++) {
+        const circle = generateCircleParams(canvasSize.current, variant, size);
+        drawCircle(context, circle);
+      }
     }
-  }, [canvasSize, drawCircle, size, variant]);
+  }, [canvasSize, drawCircle, size, variant, cablePaths]);
 
   /**
    * Animates all particles
    */
   const animateParticles = useCallback((context: CanvasRenderingContext2D) => {
-    circles.current.forEach((circle: Circle, i: number) => {
-      const edge = [
-        circle.x + circle.translateX - circle.size, // distance from left edge
-        canvasSize.current.w - circle.x - circle.translateX - circle.size, // distance from right edge
-        circle.y + circle.translateY - circle.size, // distance from top edge
-        canvasSize.current.h - circle.y - circle.translateY - circle.size, // distance from bottom edge
-      ];
-      const closestEdge = edge.reduce((a, b) => Math.min(a, b));
-      const remapClosestEdge = parseFloat(
-        remapValue(closestEdge, 0, 20, 0, 1).toFixed(2),
-      );
-      if (remapClosestEdge > 1) {
-        circle.alpha += 0.02;
-        if (circle.alpha > circle.targetAlpha) {
-          circle.alpha = circle.targetAlpha;
-        }
-      } else {
-        circle.alpha = circle.targetAlpha * remapClosestEdge;
-      }
+    // If cable variant, draw the cable paths on each frame
+    if (variant === "cable" && cablePaths && cablePaths.length > 0) {
+      // Clear context
+      context.globalAlpha = 1;
       
-      if (variant === "journey") {
+      // Draw the cable paths
+      renderCablePaths(context, cablePaths);
+      
+      // Update cable particles
+      updateCableParticles(circles.current);
+      
+      // Draw the particles
+      circles.current.forEach((circle, i) => {
+        drawCircle(context, circle, true);
+        
+        // If particle completed its journey, reset it
+        if (circle.pathProgress && circle.pathProgress >= 1) {
+          circles.current.splice(i, 1);
+          const newCircle = generateCircleParams(canvasSize.current, "cable", size, cablePaths);
+          drawCircle(context, newCircle);
+        }
+      });
+    } else if (variant === "journey") {
+      circles.current.forEach((circle: Circle, i: number) => {
+        const edge = [
+          circle.x + circle.translateX - circle.size, 
+          canvasSize.current.w - circle.x - circle.translateX - circle.size, 
+          circle.y + circle.translateY - circle.size, 
+          canvasSize.current.h - circle.y - circle.translateY - circle.size, 
+        ];
+        const closestEdge = edge.reduce((a, b) => Math.min(a, b));
+        const remapClosestEdge = parseFloat(
+          remapValue(closestEdge, 0, 20, 0, 1).toFixed(2),
+        );
+        if (remapClosestEdge > 1) {
+          circle.alpha += 0.02;
+          if (circle.alpha > circle.targetAlpha) {
+            circle.alpha = circle.targetAlpha;
+          }
+        } else {
+          circle.alpha = circle.targetAlpha * remapClosestEdge;
+        }
+        
         circle.x += circle.dx;
         circle.y += circle.dy;
         
@@ -89,7 +124,46 @@ export function useParticleAnimation(
         circle.translateY +=
           (mouse.current.y / (staticity / (circle.magnetism * 0.5)) - circle.translateY) /
           ease;
-      } else {
+
+        drawCircle(context, circle, true);
+
+        if (
+          circle.x < -circle.size ||
+          circle.x > canvasSize.current.w + circle.size ||
+          circle.y < -circle.size ||
+          circle.y > canvasSize.current.h + circle.size
+        ) {
+          if (circle.x > canvasSize.current.w + circle.size) {
+            circle.x = -circle.size;
+            circle.y = Math.random() * canvasSize.current.h;
+          } else {
+            circles.current.splice(i, 1);
+            const newCircle = generateCircleParams(canvasSize.current, variant, size);
+            drawCircle(context, newCircle);
+          }
+        }
+      });
+    } else {
+      circles.current.forEach((circle: Circle, i: number) => {
+        const edge = [
+          circle.x + circle.translateX - circle.size, 
+          canvasSize.current.w - circle.x - circle.translateX - circle.size, 
+          circle.y + circle.translateY - circle.size, 
+          canvasSize.current.h - circle.y - circle.translateY - circle.size, 
+        ];
+        const closestEdge = edge.reduce((a, b) => Math.min(a, b));
+        const remapClosestEdge = parseFloat(
+          remapValue(closestEdge, 0, 20, 0, 1).toFixed(2),
+        );
+        if (remapClosestEdge > 1) {
+          circle.alpha += 0.02;
+          if (circle.alpha > circle.targetAlpha) {
+            circle.alpha = circle.targetAlpha;
+          }
+        } else {
+          circle.alpha = circle.targetAlpha * remapClosestEdge;
+        }
+        
         circle.x += circle.dx + vx;
         circle.y += circle.dy + vy;
         circle.translateX +=
@@ -98,27 +172,22 @@ export function useParticleAnimation(
         circle.translateY +=
           (mouse.current.y / (staticity / circle.magnetism) - circle.translateY) /
           ease;
-      }
 
-      drawCircle(context, circle, true);
+        drawCircle(context, circle, true);
 
-      if (
-        circle.x < -circle.size ||
-        circle.x > canvasSize.current.w + circle.size ||
-        circle.y < -circle.size ||
-        circle.y > canvasSize.current.h + circle.size
-      ) {
-        if (variant === "journey" && circle.x > canvasSize.current.w + circle.size) {
-          circle.x = -circle.size;
-          circle.y = Math.random() * canvasSize.current.h;
-        } else {
+        if (
+          circle.x < -circle.size ||
+          circle.x > canvasSize.current.w + circle.size ||
+          circle.y < -circle.size ||
+          circle.y > canvasSize.current.h + circle.size
+        ) {
           circles.current.splice(i, 1);
           const newCircle = generateCircleParams(canvasSize.current, variant, size);
           drawCircle(context, newCircle);
         }
-      }
-    });
-  }, [canvasSize, circles, drawCircle, ease, mouse, size, staticity, variant, vx, vy]);
+      });
+    }
+  }, [canvasSize, circles, drawCircle, ease, mouse, size, staticity, variant, vx, vy, cablePaths]);
 
   return {
     drawCircle,

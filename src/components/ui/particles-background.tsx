@@ -9,7 +9,8 @@ export interface ParticlesBackgroundProps {
   staticity?: number;
   ease?: number;
   size?: number;
-  variant?: "default" | "journey";
+  variant?: "default" | "journey" | "cable";
+  targetTexts?: string[];
 }
 
 export function ParticlesBackground({
@@ -19,6 +20,7 @@ export function ParticlesBackground({
   ease = 50,
   size = 0.4,
   variant = "default",
+  targetTexts,
 }: ParticlesBackgroundProps) {
   const { theme } = useTheme();
   const [color, setColor] = useState("#007AFF");
@@ -40,6 +42,7 @@ export function ParticlesBackground({
       color={color}
       refresh={refresh}
       variant={variant}
+      targetTexts={targetTexts}
     />
   );
 }

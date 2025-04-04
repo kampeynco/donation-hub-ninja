@@ -5,6 +5,7 @@ import { useMousePosition } from "./use-mouse-position";
 import { useCanvasManagement } from "./utils/canvas-utils";
 import { useParticleAnimation } from "./utils/animation-utils";
 import { useMouseTracking } from "./utils/mouse-utils";
+import { useCablePaths } from "./use-cable-paths";
 
 interface UseParticlesAnimationProps {
   quantity: number;
@@ -14,8 +15,9 @@ interface UseParticlesAnimationProps {
   color: string;
   vx: number;
   vy: number;
-  variant: "default" | "journey";
+  variant: "default" | "journey" | "cable";
   refresh: boolean;
+  targetTexts?: string[];
 }
 
 export const useParticlesAnimation = ({
@@ -28,6 +30,7 @@ export const useParticlesAnimation = ({
   vy,
   variant,
   refresh,
+  targetTexts = ["hero-title"]
 }: UseParticlesAnimationProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvasContainerRef = useRef<HTMLDivElement>(null);
@@ -38,10 +41,15 @@ export const useParticlesAnimation = ({
   const canvasSize = useRef<CanvasSize>({ w: 0, h: 0 });
   const dpr = typeof window !== "undefined" ? window.devicePixelRatio : 1;
   
+  // Get cable paths if using cable variant
+  const cablePaths = variant === "cable" 
+    ? useCablePaths(canvasRef, canvasSize, targetTexts, "D", "p", 4) 
+    : undefined;
+  
   // Use our utility hooks
   const { clearContext, resizeCanvas } = useCanvasManagement(canvasRef, canvasContainerRef, canvasSize, dpr);
   const { drawCircle, initParticles, animateParticles } = useParticleAnimation(
-    variant, circles, mouse, canvasSize, staticity, ease, size, vx, vy, dpr
+    variant, circles, mouse, canvasSize, staticity, ease, size, vx, vy, dpr, cablePaths
   );
   const { trackMousePosition } = useMouseTracking(canvasRef, mouse, canvasSize, mousePosition);
 
@@ -101,7 +109,7 @@ export const useParticlesAnimation = ({
   // Refresh particles when requested
   useEffect(() => {
     initCanvas();
-  }, [initCanvas, refresh]);
+  }, [initCanvas, refresh, cablePaths]);
 
   return {
     canvasRef,

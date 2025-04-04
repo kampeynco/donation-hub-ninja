@@ -14,7 +14,8 @@ export interface ParticlesProps {
   color?: string;
   vx?: number;
   vy?: number;
-  variant?: "default" | "journey";
+  variant?: "default" | "journey" | "cable";
+  targetTexts?: string[];
 }
 
 export interface ParticleRendererProps {
@@ -37,9 +38,28 @@ export type Circle = {
   magnetism: number;
   color?: string;
   type?: string;
+  path?: Path2D;
+  pathProgress?: number;
+  pathSpeed?: number;
+  pathLength?: number;
 };
 
 export interface CanvasSize {
   w: number;
   h: number;
+}
+
+export interface TextPosition {
+  char: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export interface CablePath {
+  path: Path2D;
+  length: number;
+  color: string;
+  width: number;
 }
