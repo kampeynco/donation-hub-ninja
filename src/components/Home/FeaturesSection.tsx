@@ -4,7 +4,7 @@ import FeatureCard from "./FeatureCard";
 
 const FeaturesSection = () => {
   return (
-    <section className="py-12 md:py-16 lg:py-20 bg-white">
+    <section className="py-12 md:py-16 lg:py-20 bg-[#f8fafc]">
       <div className="container mx-auto px-4">
         <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-6 md:mb-10 lg:mb-16">
           Everything you need to manage your fundraising

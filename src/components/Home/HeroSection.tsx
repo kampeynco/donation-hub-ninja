@@ -8,7 +8,7 @@ const HeroSection = () => {
   const isMobile = useIsMobile();
 
   return (
-    <div className="bg-white text-gray-900">
+    <div className="bg-white text-gray-900 relative">
       <div className="container mx-auto px-4 flex items-center justify-center min-h-[90vh] md:h-[100vh] max-w-7xl py-16 md:py-0">
         <div className="relative w-full">
           {/* Main hero content */}
@@ -59,6 +59,14 @@ const HeroSection = () => {
             </div>
           </div>
         </div>
+      </div>
+      
+      {/* Wavy border at the bottom */}
+      <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-[0] z-10">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none" className="relative block w-full h-[70px] md:h-[100px]">
+          <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V0S65.41,91.94,321.39,56.44Z" 
+                fill="#f8fafc"></path>
+        </svg>
       </div>
     </div>
   );
