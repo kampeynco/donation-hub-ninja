@@ -7,7 +7,7 @@ const LIGHT_LOGO_MARK = "https://igjnhwvtasegwyiwcdkr.supabase.co/storage/v1/obj
 
 const HomeHeader = () => {
   return (
-    <header className="w-full bg-white text-gray-900 border-b border-gray-100">
+    <header className="w-full bg-white text-gray-900">
       <div className="container mx-auto px-4 py-4 md:py-6 flex justify-between items-center">
         <Link to="/" className="flex items-center gap-2">
           <div className="flex h-[2.5rem] w-[2.5rem] items-center justify-center rounded-full bg-primary">
