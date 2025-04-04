@@ -149,17 +149,17 @@ export const Particles: React.FC<ParticlesProps> = ({
       
       // Update position with different behavior based on variant
       if (variant === "journey") {
-        // Journey particles move faster from left to right
+        // Journey particles move from left to right
         circle.x += circle.dx;
         circle.y += circle.dy;
         
         // Mouse interaction is gentler in journey mode
         circle.translateX +=
           (mouse.current.x / (staticity / (circle.magnetism * 0.5)) - circle.translateX) /
-          (ease * 2);
+          ease;
         circle.translateY +=
           (mouse.current.y / (staticity / (circle.magnetism * 0.5)) - circle.translateY) /
-          (ease * 2);
+          ease;
       } else {
         // Default behavior
         circle.x += circle.dx + vx;

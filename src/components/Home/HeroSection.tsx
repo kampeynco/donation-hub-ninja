@@ -13,10 +13,10 @@ const HeroSection = () => {
       {/* Particles Background - using journey variant */}
       <ParticlesBackground 
         className="absolute inset-0 z-0" 
-        quantity={isMobile ? 50 : 120}
-        staticity={60}
-        ease={80}
-        size={0.5}
+        quantity={isMobile ? 60 : 150}
+        staticity={40}
+        ease={60}
+        size={0.6}
         variant="journey"
       />
       
