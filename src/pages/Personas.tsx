@@ -50,7 +50,7 @@ const Personas = () => {
               <div className="w-12 h-12 flex items-center justify-center rounded-full bg-blue-100 mb-4">
                 <IconArrowRight className="h-6 w-6 text-blue-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">Enrich donors from multiple sources</h3>
+              <h3 className="text-xl font-semibold mb-3">Enrich from multiple sources</h3>
               <p className="text-gray-600 dark:text-gray-300">Easily connect donor data from your fundraising stack to establish a single source of truth.</p>
             </CardContent>
           </Card>
