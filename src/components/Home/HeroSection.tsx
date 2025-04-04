@@ -29,12 +29,12 @@ const HeroSection = () => {
                 treatAsOneUnit={true}
               /><br />
               {isMobile ? (
-                <>can be unclear.<br /></>
+                <>be unclear.<br /></>
               ) : (
-                <>can be unclear.<br /></>
+                <>be unclear.<br /></>
               )}
-              Donor Camp can<br />
-              change that.
+              Donor Camp<br />
+              uncovers it.
             </h1>
             <p className="text-base md:text-[1.25rem] font-[300] mb-6 md:mb-8 max-w-2xl mx-auto px-2 md:px-4 leading-[1.5] text-gray-700">
               Connect your fundraising stack, and we'll analyze your data for<br />
