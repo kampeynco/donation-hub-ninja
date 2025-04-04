@@ -37,8 +37,8 @@ const HeroSection = () => {
               change that.
             </h1>
             <p className="text-base md:text-[1.25rem] font-[300] mb-6 md:mb-8 max-w-2xl mx-auto px-2 md:px-4 leading-[1.5] text-gray-700">
-              Connect your fundraising stack, and we'll analyze data for<br />
-              insights to engage donors when they're ready to donate.
+              Connect your fundraising stack, and we'll analyze your data for<br />
+              actionable insights to know when donors are ready to donate.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center px-2 md:px-4">
