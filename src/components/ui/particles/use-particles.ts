@@ -50,7 +50,7 @@ export function useParticles({
   connectionOpacity: number;
   connectionWidth: number;
   refresh: boolean;
-  variant?: "default" | "nebula" | "wave" | "grid" | "cosmic";
+  variant?: "default" | "nebula" | "wave" | "grid" | "cosmic" | "journey";
 }) {
   const dpr = typeof window !== "undefined" ? window.devicePixelRatio : 1;
   const animationFrameId = useRef<number | null>(null);
