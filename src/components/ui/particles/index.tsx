@@ -1,18 +1,11 @@
 
 import { cn } from "@/lib/utils";
-import React, { useEffect, useRef, useState } from "react";
-import { ParticlesProps, CanvasRefs, Circle, CanvasSize, MousePosition } from "./types";
-import { hexToRgb } from "./utils";
+import React, { useRef } from "react";
+import { ParticlesProps, Circle, CanvasSize } from "./types";
 import { useMousePosition } from "./use-mouse-position";
-import { 
-  resizeCanvas, 
-  updateMousePosition, 
-  clearContext 
-} from "./canvas-operations";
-import { 
-  drawParticles, 
-  animateParticles 
-} from "./particle-operations";
+import { useParticles } from "./use-particles";
+import { updateMousePosition } from "./canvas-operations";
+import { useEffect } from "react";
 
 const Particles: React.FC<ParticlesProps> = ({
   className = "",
@@ -29,6 +22,7 @@ const Particles: React.FC<ParticlesProps> = ({
   connectionOpacity = 0.2,
   connectionWidth = 0.5,
 }) => {
+  // Initialize refs for canvas elements and state
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const context = useRef<CanvasRenderingContext2D | null>(null);
@@ -36,10 +30,9 @@ const Particles: React.FC<ParticlesProps> = ({
   const mousePosition = useMousePosition();
   const mouse = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const canvasSize = useRef<CanvasSize>({ w: 0, h: 0 });
-  const dpr = typeof window !== "undefined" ? window.devicePixelRatio : 1;
 
   // Group refs for easier passing to functions
-  const refs: CanvasRefs = {
+  const refs = {
     canvasRef,
     canvasContainerRef,
     context,
@@ -48,61 +41,27 @@ const Particles: React.FC<ParticlesProps> = ({
     canvasSize
   };
 
-  // Initialize canvas and start animation
-  useEffect(() => {
-    if (canvasRef.current) {
-      context.current = canvasRef.current.getContext("2d");
-    }
-    initCanvas();
-    animate();
-    window.addEventListener("resize", initCanvas);
-
-    return () => {
-      window.removeEventListener("resize", initCanvas);
-    };
-  }, [color]);
+  // Use our particles hook to manage animation
+  useParticles({
+    ...refs,
+    quantity,
+    staticity,
+    ease,
+    size,
+    color,
+    vx,
+    vy,
+    showConnections,
+    connectionDistance,
+    connectionOpacity,
+    connectionWidth,
+    refresh
+  });
 
   // Update mouse position when it moves
   useEffect(() => {
     updateMousePosition(mousePosition, refs);
   }, [mousePosition.x, mousePosition.y]);
-
-  // Refresh canvas when refresh prop changes
-  useEffect(() => {
-    initCanvas();
-  }, [refresh]);
-
-  // Initialize the canvas
-  const initCanvas = () => {
-    resizeCanvas(refs);
-    
-    // Convert color to RGB for use in drawing
-    const rgb = hexToRgb(color);
-    
-    drawParticles(refs, quantity, size, rgb, dpr);
-  };
-
-  // Animation loop
-  const animate = () => {
-    const rgb = hexToRgb(color);
-    
-    animateParticles(
-      refs,
-      staticity,
-      ease,
-      vx,
-      vy,
-      rgb,
-      dpr,
-      showConnections,
-      connectionDistance,
-      connectionOpacity,
-      connectionWidth,
-      size
-    );
-    
-    window.requestAnimationFrame(animate);
-  };
 
   return (
     <div
