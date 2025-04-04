@@ -32,7 +32,6 @@ function TrueFocus({
   const words = sentence.split(" ");
   // Initialize currentIndex to null when in manual mode, otherwise 0
   const [currentIndex, setCurrentIndex] = useState(manualMode ? null : 0);
-  const [lastActiveIndex, setLastActiveIndex] = useState<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const wordRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const [focusRect, setFocusRect] = useState({ x: 0, y: 0, width: 0, height: 0 });
@@ -96,7 +95,6 @@ function TrueFocus({
 
   const handleMouseEnter = (index: number) => {
     if (manualMode) {
-      setLastActiveIndex(index);
       setCurrentIndex(index);
     }
   };
