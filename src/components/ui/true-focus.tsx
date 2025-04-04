@@ -32,6 +32,7 @@ function TrueFocus({
   const words = sentence.split(" ");
   // Initialize currentIndex to null when in manual mode, otherwise 0
   const [currentIndex, setCurrentIndex] = useState(manualMode ? null : 0);
+  const [isHovering, setIsHovering] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const wordRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const [focusRect, setFocusRect] = useState({ x: 0, y: 0, width: 0, height: 0 });
@@ -95,12 +96,14 @@ function TrueFocus({
 
   const handleMouseEnter = () => {
     if (manualMode) {
+      setIsHovering(true);
       setCurrentIndex(0);
     }
   };
 
   const handleMouseLeave = () => {
     if (manualMode) {
+      setIsHovering(false);
       setCurrentIndex(null);
     }
   };
