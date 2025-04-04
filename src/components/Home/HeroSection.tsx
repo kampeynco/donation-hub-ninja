@@ -28,8 +28,14 @@ const HeroSection = () => {
                 className="inline-block"
                 treatAsOneUnit={true}
               /><br />
-              can be<br />
-              unclear.<br />
+              {isMobile ? (
+                <>can be unclear.</>
+              ) : (
+                <>
+                  can be<br />
+                  unclear.<br />
+                </>
+              )}
               We are here to<br />
               change that.
             </h1>
