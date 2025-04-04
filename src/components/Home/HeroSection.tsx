@@ -1,6 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { ParticlesBackground } from "@/components/ui/particles-background";
+import { TrueFocus } from "@/components/ui/true-focus";
 import { useNavigate } from "react-router-dom";
 
 const HeroSection = () => {
@@ -26,7 +27,7 @@ const HeroSection = () => {
         <div className="max-w-3xl">
           <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white md:text-5xl lg:text-6xl">
             <span className="block">Manage your donors</span>
-            <span className="block">and <span className="text-donor-blue">track donations</span> with ease</span>
+            <span className="block">and <TrueFocus sentence="track donations" treatAsOneUnit={true} borderColor="#007AFF" glowColor="rgba(0, 122, 255, 0.6)" /> with ease</span>
           </h1>
           <p className="mt-6 text-lg text-gray-600 dark:text-gray-300">
             Transform your fundraising efforts with powerful donor management, 
