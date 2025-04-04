@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
 import { useTheme } from "@/context/ThemeContext";
-import { Particles } from "./particles";
+import { Particles } from "./particles/index";
 
 export interface ParticlesBackgroundProps {
   className?: string;
