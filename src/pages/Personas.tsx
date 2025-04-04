@@ -8,7 +8,7 @@ import WaitlistButton from "@/components/Personas/WaitlistButton";
 import { Card, CardContent } from "@/components/ui/card";
 
 // Using the Supabase URL for the image
-const personasImage = "https://igjnhwvtasegwyiwcdkr.supabase.co/storage/v1/object/public/assets/images/updatepcard.png";
+const personasImage = "https://igjnhwvtasegwyiwcdkr.supabase.co/storage/v1/object/public/assets/images/personascard.png";
 
 const Personas = () => {
   const [modalOpen, setModalOpen] = useState(false);

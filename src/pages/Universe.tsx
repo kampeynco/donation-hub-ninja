@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { IconArrowRight, IconLock } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
@@ -5,9 +6,13 @@ import { Separator } from "@/components/ui/separator";
 import NotInterestedModal from "@/components/Personas/NotInterestedModal";
 import WaitlistButton from "@/components/Personas/WaitlistButton";
 import { Card, CardContent } from "@/components/ui/card";
-const universeImage = "/lovable-uploads/35af406b-6b5e-411d-98c7-b9d0642b92a0.png";
+
+// Using the Supabase URL for the image
+const universeImage = "https://igjnhwvtasegwyiwcdkr.supabase.co/storage/v1/object/public/assets/images/universecard.png";
+
 const Universe = () => {
   const [modalOpen, setModalOpen] = useState(false);
+  
   return <div className="flex flex-col items-center justify-center min-h-[calc(100vh-120px)] mt-6">
       <div className="max-w-6xl w-full space-y-10 px-4 md:px-6">
         {/* Main section */}
@@ -27,7 +32,11 @@ const Universe = () => {
             </div>
           </div>
           <div className="flex-1 hidden md:block">
-            <img src={universeImage} alt="Universe visualization" className="max-w-full rounded-lg shadow-lg" />
+            <img 
+              src={universeImage} 
+              alt="Universe visualization" 
+              className="max-w-[75%] mx-auto rounded-lg shadow-lg" 
+            />
           </div>
         </div>
 
