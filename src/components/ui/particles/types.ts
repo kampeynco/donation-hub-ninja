@@ -17,6 +17,13 @@ export interface ParticlesProps {
   variant?: "default" | "journey";
 }
 
+export interface ParticleRendererProps {
+  context: CanvasRenderingContext2D;
+  circle: Circle;
+  update?: boolean;
+  dpr: number;
+}
+
 export type Circle = {
   x: number;
   y: number;
