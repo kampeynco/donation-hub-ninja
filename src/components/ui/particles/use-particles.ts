@@ -63,19 +63,75 @@ export function useParticles({
     canvasSize
   };
 
-  // Initialize canvas and context
-  useEffect(() => {
+  /**
+   * Initialize the canvas context
+   */
+  const setupCanvasContext = () => {
     if (canvasRef.current) {
       const ctx = canvasRef.current.getContext("2d");
       if (ctx) {
         context.current = ctx;
       }
     }
+  };
+
+  /**
+   * Initialize the canvas
+   */
+  const initCanvas = () => {
+    resizeCanvas(refs);
     
-    // Initialize canvas
+    // Convert color to RGB for use in drawing
+    const rgb = hexToRgb(color);
+    
+    drawParticles(refs, quantity, size, rgb, dpr);
+  };
+
+  /**
+   * Stop animation loop and cancel any pending animation frames
+   */
+  const stopAnimationLoop = () => {
+    if (animationFrameId.current !== null) {
+      cancelAnimationFrame(animationFrameId.current);
+      animationFrameId.current = null;
+    }
+  };
+
+  /**
+   * Create and start the animation loop
+   */
+  const startAnimationLoop = () => {
+    // First, stop any existing animation loop
+    stopAnimationLoop();
+    
+    const animateFrame = () => {
+      const rgb = hexToRgb(color);
+      
+      animateParticles(
+        refs,
+        staticity,
+        ease,
+        vx,
+        vy,
+        rgb,
+        dpr,
+        showConnections,
+        connectionDistance,
+        connectionOpacity,
+        connectionWidth,
+        size
+      );
+      
+      animationFrameId.current = window.requestAnimationFrame(animateFrame);
+    };
+
+    animateFrame();
+  };
+
+  // Initialize canvas and context
+  useEffect(() => {
+    setupCanvasContext();
     initCanvas();
-    
-    // Start animation loop
     startAnimationLoop();
     
     // Add resize listener
@@ -95,57 +151,8 @@ export function useParticles({
 
   // Cleanup when component unmounts
   useEffect(() => {
-    return () => {
-      stopAnimationLoop();
-    };
+    return stopAnimationLoop;
   }, []);
-
-  // Initialize the canvas
-  const initCanvas = () => {
-    resizeCanvas(refs);
-    
-    // Convert color to RGB for use in drawing
-    const rgb = hexToRgb(color);
-    
-    drawParticles(refs, quantity, size, rgb, dpr);
-  };
-
-  // Stop animation loop and cancel any pending animation frames
-  const stopAnimationLoop = () => {
-    if (animationFrameId.current !== null) {
-      cancelAnimationFrame(animationFrameId.current);
-      animationFrameId.current = null;
-    }
-  };
-
-  // Animation loop
-  const startAnimationLoop = () => {
-    // First, stop any existing animation loop
-    stopAnimationLoop();
-    
-    const animate = () => {
-      const rgb = hexToRgb(color);
-      
-      animateParticles(
-        refs,
-        staticity,
-        ease,
-        vx,
-        vy,
-        rgb,
-        dpr,
-        showConnections,
-        connectionDistance,
-        connectionOpacity,
-        connectionWidth,
-        size
-      );
-      
-      animationFrameId.current = window.requestAnimationFrame(animate);
-    };
-
-    animate();
-  };
 
   return {
     initCanvas,
