@@ -3,12 +3,22 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { TrueFocus } from "@/components/ui/true-focus";
+import { ParticlesBackground } from "@/components/ui/particles-background";
 
 const HeroSection = () => {
   const isMobile = useIsMobile();
 
   return (
-    <div className="bg-white text-gray-900 relative">
+    <div className="bg-white text-gray-900 relative overflow-hidden">
+      {/* Particles Background */}
+      <ParticlesBackground 
+        className="absolute inset-0 z-0" 
+        quantity={isMobile ? 50 : 100}
+        staticity={60}
+        ease={80}
+        size={0.5}
+      />
+      
       <div className="container mx-auto px-4 flex items-center justify-center min-h-[90vh] md:h-[100vh] max-w-7xl py-16 md:py-0">
         <div className="relative w-full">
           {/* Main hero content */}
