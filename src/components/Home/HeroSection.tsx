@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { TrueFocus } from "@/components/ui/true-focus";
+import { BadgeCustom } from "@/components/ui/badge-custom";
 
 const HeroSection = () => {
   const isMobile = useIsMobile();
@@ -13,6 +14,9 @@ const HeroSection = () => {
         <div className="relative w-full">
           {/* Main hero content */}
           <div className="text-center max-w-4xl mx-auto z-20 relative py-4 md:py-8">
+            <div className="flex justify-center mb-4">
+              <BadgeCustom variant="beta" className="font-medium">Built for ActBlue</BadgeCustom>
+            </div>
             <h1 id="hero-title" className="text-3xl md:text-[4rem] font-bold mb-4 md:mb-6 leading-[1.2] md:leading-[1.125] text-gray-900">
               Your{" "}
               <TrueFocus 
