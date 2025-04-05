@@ -14,10 +14,10 @@ const HeroSection = () => {
         <div className="relative w-full">
           {/* Main hero content */}
           <div className="text-center max-w-4xl mx-auto z-20 relative py-4 md:py-8">
-            <div className="flex justify-center mb-4">
-              <BadgeCustom variant="beta" className="font-medium relative flex items-center">
-                <span className="bg-[#ea384c] text-white text-xs py-0.5 px-2 rounded-full mr-2 font-semibold">NEW</span>
-                Built for ActBlue
+            <div className="flex justify-start mb-4 max-w-fit mx-auto">
+              <BadgeCustom variant="beta" className="font-medium relative flex items-center px-3 py-1.5">
+                <span className="bg-[#ea384c] text-white text-sm py-0.5 px-2 rounded-full mr-2 font-semibold">NEW</span>
+                <span className="text-sm">Built for ActBlue</span>
               </BadgeCustom>
             </div>
             <h1 id="hero-title" className="text-3xl md:text-[4rem] font-bold mb-4 md:mb-6 leading-[1.2] md:leading-[1.125] text-gray-900">
