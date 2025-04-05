@@ -17,7 +17,7 @@ const HeroSection = () => {
             <div className="flex justify-start mb-4 max-w-fit mx-auto">
               <BadgeCustom variant="beta" className="font-medium relative flex items-center" style={{ padding: '0.15rem 0.5rem 0.15rem 0.25rem' }}>
                 <span className="bg-[#ea384c] text-white text-sm py-0.5 px-2 rounded-full mr-2 font-semibold">NEW</span>
-                <span className="text-sm">Built for ActBlue</span>
+                <span className="text-sm">Next-Gen CRM. ActBlue ready.</span>
               </BadgeCustom>
             </div>
             <h1 id="hero-title" className="text-3xl md:text-[4rem] font-bold mb-4 md:mb-6 leading-[1.2] md:leading-[1.125] text-gray-900">
