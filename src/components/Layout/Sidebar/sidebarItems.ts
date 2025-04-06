@@ -6,7 +6,7 @@ import {
   IconStarFilled,
   IconPlugConnected,
   IconUsers,
-  IconSegment
+  IconChartPie
 } from "@tabler/icons-react";
 
 export interface SidebarItemType {
@@ -45,7 +45,7 @@ const sidebarItems: SidebarItemType[] = [
   {
     name: "Segments",
     path: "/personas",
-    icon: IconSegment,
+    icon: IconChartPie,
     badge: {
       text: "Beta",
       variant: "beta",
