@@ -5,7 +5,7 @@ import {
   IconAdjustments,
   IconStarFilled,
   IconPlugConnected,
-  IconUsers,
+  IconEmpathize,
   IconChartPie
 } from "@tabler/icons-react";
 
@@ -33,7 +33,7 @@ const sidebarItems: SidebarItemType[] = [
   {
     name: "Donors",
     path: "/universe",
-    icon: IconUsers,
+    icon: IconEmpathize,
     badge: {
       text: "Beta",
       variant: "beta",
