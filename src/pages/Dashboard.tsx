@@ -42,14 +42,7 @@ const Dashboard = () => {
         <IntegrationsTab />
       </div>
 
-      <Card className="shadow-sm overflow-hidden dark:bg-gray-800 dark:border-gray-700">
-        <CardHeader className="bg-white dark:bg-gray-800 px-6 py-5 border-b dark:border-gray-700">
-          <CardTitle className="text-lg font-medium">Recent Donations</CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          <DonationsTable donations={donations} />
-        </CardContent>
-      </Card>
+      
     </div>;
 };
 export default Dashboard;
