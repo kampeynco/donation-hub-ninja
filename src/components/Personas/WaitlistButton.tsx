@@ -32,7 +32,7 @@ const WaitlistButton = () => {
       }
       
       try {
-        const status = await checkWaitlistStatus('Personas', user.id);
+        const status = await checkWaitlistStatus('Segments', user.id);
         if (isMounted) {
           // Convert WaitlistEntry to WaitlistStatusState
           setWaitlistStatus(status ? {
@@ -62,14 +62,14 @@ const WaitlistButton = () => {
     
     setLoading(true);
     try {
-      await joinWaitlist('Personas', user.id);
-      const status = await checkWaitlistStatus('Personas', user.id);
+      await joinWaitlist('Segments', user.id);
+      const status = await checkWaitlistStatus('Segments', user.id);
       // Convert WaitlistEntry to WaitlistStatusState
       setWaitlistStatus(status ? {
         status: status.status,
         rejection_reason: status.rejection_reason || null
       } : null);
-      toast.success('You\'ve been added to the Personas waitlist.');
+      toast.success('You\'ve been added to the Segments waitlist.');
     } catch (error: any) {
       toast.error('Error joining waitlist: ' + (error.message || 'An unexpected error occurred.'));
     } finally {

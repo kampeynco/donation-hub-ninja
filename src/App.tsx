@@ -14,10 +14,10 @@ import SignIn from "./pages/Auth/SignIn";
 import SignUp from "./pages/Auth/SignUp";
 import Dashboard from "./pages/Dashboard";
 import Account from "./pages/Account";
-import Personas from "./pages/Personas";
-import Universe from "./pages/Universe";
+import Segments from "./pages/Segments";
+import Donors from "./pages/Donors";
 import FeatureProtectedRoute from "./components/Auth/FeatureProtectedRoute";
-import UniverseProtectedRoute from "./components/Auth/UniverseProtectedRoute";
+import DonorsProtectedRoute from "./components/Auth/UniverseProtectedRoute";
 import Logs from "./pages/Logs";
 import NotFound from "./pages/NotFound";
 
@@ -83,9 +83,9 @@ const App = () => {
                 <Route 
                   path="/personas" 
                   element={
-                    <FeatureProtectedRoute featureId="personas">
+                    <FeatureProtectedRoute featureId="segments">
                       <Layout>
-                        <Personas />
+                        <Segments />
                       </Layout>
                     </FeatureProtectedRoute>
                   } 
@@ -93,11 +93,11 @@ const App = () => {
                 <Route 
                   path="/universe" 
                   element={
-                    <UniverseProtectedRoute>
+                    <DonorsProtectedRoute>
                       <Layout>
-                        <Universe />
+                        <Donors />
                       </Layout>
-                    </UniverseProtectedRoute>
+                    </DonorsProtectedRoute>
                   } 
                 />
                 

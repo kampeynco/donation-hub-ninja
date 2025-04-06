@@ -10,16 +10,16 @@ export interface FeatureItem {
 
 export const INITIAL_FEATURES: FeatureItem[] = [
   {
-    id: "personas",
-    name: "Personas",
-    description: "Access donor personas and analytics",
+    id: "segments",
+    name: "Segments",
+    description: "Access donor segments and analytics",
     enabled: true,
     beta: true,
     hidden: true
   },
   {
-    id: "universe",
-    name: "Universe",
+    id: "donors",
+    name: "Donors",
     description: "View donor activity across the platform",
     enabled: true,
     beta: true,

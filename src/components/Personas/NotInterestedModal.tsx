@@ -55,10 +55,10 @@ const NotInterestedModal = ({ open, onOpenChange }: NotInterestedModalProps) => 
     
     try {
       // Use declineFeature to set waitlist status to "declined"
-      await declineFeature("Personas", user.id, data.reason || "Not specified");
+      await declineFeature("Segments", user.id, data.reason || "Not specified");
       
       // Save preference to localStorage for sidebar visibility
-      setFeatureVisibilityPreference("Personas", true);
+      setFeatureVisibilityPreference("Segments", true);
       
       // Close modal
       onOpenChange(false);

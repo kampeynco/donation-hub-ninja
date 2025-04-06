@@ -38,18 +38,18 @@ const DashboardSidebar = () => {
     
     // Create a new array of sidebar items with visibility based on features
     const updatedItems = sidebarItems.map(item => {
-      // Hide Personas from sidebar navigation if feature is disabled
-      if (item.name === "Personas") {
+      // Hide Segments from sidebar navigation if feature is disabled
+      if (item.name === "Segments") {
         return {
           ...item,
-          hidden: !hasFeature("personas")
+          hidden: !hasFeature("segments")
         };
       }
-      // Hide Universe from sidebar navigation if feature is disabled
-      if (item.name === "Universe") {
+      // Hide Donors from sidebar navigation if feature is disabled
+      if (item.name === "Donors") {
         return {
           ...item,
-          hidden: !hasFeature("universe")
+          hidden: !hasFeature("donors")
         };
       }
       return item;

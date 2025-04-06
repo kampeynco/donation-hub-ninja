@@ -7,8 +7,8 @@ import { toast } from "sonner";
 import { INITIAL_FEATURES } from "@/types/features";
 
 export interface Feature {
-  personas: boolean;
-  universe: boolean;
+  segments: boolean;
+  donors: boolean;
 }
 
 export const useFeatures = () => {
@@ -46,18 +46,18 @@ export const useFeatures = () => {
       // Convert the database feature flags to FeatureItem[]
       const featureItems: FeatureItem[] = [
         {
-          id: "personas",
-          name: "Personas",
-          description: "Access donor personas and analytics",
-          enabled: data.personas,
+          id: "segments",
+          name: "Segments",
+          description: "Access donor segments and analytics",
+          enabled: data.segments,
           beta: true,
           hidden: false // Always show in the features tab
         },
         {
-          id: "universe",
-          name: "Universe",
+          id: "donors",
+          name: "Donors",
           description: "View donor activity across the platform",
-          enabled: data.universe,
+          enabled: data.donors,
           beta: true,
           hidden: false // Always show in the features tab
         }
