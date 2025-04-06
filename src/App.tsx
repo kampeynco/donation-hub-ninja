@@ -113,9 +113,9 @@ const App = () => {
                 />
                 
                 {/* Redirects for old routes */}
-                <Route path="/donors" element={<Navigate to="/logs" replace />} />
-                <Route path="/donations" element={<Navigate to="/personas" replace />} />
-                <Route path="/reports" element={<Navigate to="/account" replace />} />
+                <Route path="/donors" element={<Navigate to="/universe" replace />} />
+                <Route path="/segments" element={<Navigate to="/personas" replace />} />
+                <Route path="/activity" element={<Navigate to="/logs" replace />} />
                 
                 {/* 404 route */}
                 <Route path="*" element={<NotFound />} />

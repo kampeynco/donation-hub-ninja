@@ -2,11 +2,11 @@
 import { 
   IconTent,
   IconActivity,
-  IconCurrentLocation,
   IconAdjustments,
   IconStarFilled,
   IconPlugConnected,
-  IconWorld
+  IconUsers,
+  IconSegment
 } from "@tabler/icons-react";
 
 export interface SidebarItemType {
@@ -31,39 +31,34 @@ const sidebarItems: SidebarItemType[] = [
     icon: IconTent,
   },
   {
-    name: "Logs",
+    name: "Donors",
+    path: "/universe",
+    icon: IconUsers,
+    badge: {
+      text: "Beta",
+      variant: "beta",
+      icon: IconStarFilled
+    },
+    // Initial state is visible, will be updated by DashboardSidebar
+    hidden: false
+  },
+  {
+    name: "Segments",
+    path: "/personas",
+    icon: IconSegment,
+    badge: {
+      text: "Beta",
+      variant: "beta",
+      icon: IconStarFilled
+    },
+    // Initial state is visible, will be updated by DashboardSidebar
+    hidden: false
+  },
+  {
+    name: "Activity",
     path: "/logs",
     icon: IconActivity,
     showNotificationBadge: true
-  },
-  {
-    name: "Personas",
-    path: "/personas",
-    icon: IconCurrentLocation,
-    badge: {
-      text: "Beta",
-      variant: "beta",
-      icon: IconStarFilled
-    },
-    // Initial state is visible, will be updated by DashboardSidebar
-    hidden: false
-  },
-  {
-    name: "Universe",
-    path: "/universe",
-    icon: IconWorld,
-    badge: {
-      text: "Beta",
-      variant: "beta",
-      icon: IconStarFilled
-    },
-    // Initial state is visible, will be updated by DashboardSidebar
-    hidden: false
-  },
-  {
-    name: "Connections",
-    path: "/connections",
-    icon: IconPlugConnected,
   },
   {
     name: "Settings",
