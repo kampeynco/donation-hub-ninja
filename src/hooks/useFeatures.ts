@@ -49,7 +49,7 @@ export const useFeatures = () => {
           id: "segments",
           name: "Segments",
           description: "Access donor segments and analytics",
-          enabled: data.segments,
+          enabled: data.segments || false,
           beta: true,
           hidden: false // Always show in the features tab
         },
@@ -57,7 +57,7 @@ export const useFeatures = () => {
           id: "donors",
           name: "Donors",
           description: "View donor activity across the platform",
-          enabled: data.donors,
+          enabled: data.donors || false, 
           beta: true,
           hidden: false // Always show in the features tab
         }
