@@ -5,6 +5,7 @@ import DonationsTable from "@/components/Dashboard/DonationsTable";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { fetchRecentDonations, fetchDonationStats } from "@/services/donations";
 import { IconActivity, IconMoodDollar, IconHeartDollar } from "@tabler/icons-react";
+import IntegrationsTab from "@/components/Account/IntegrationsTab";
 
 const Dashboard = () => {
   const {
@@ -57,6 +58,12 @@ const Dashboard = () => {
             icon={<IconHeartDollar className="h-6 w-6" />}
           />
         </div>
+      </div>
+
+      {/* Connections Section */}
+      <div>
+        <h2 className="text-2xl font-semibold tracking-tight mb-6">Connections</h2>
+        <IntegrationsTab />
       </div>
 
       <Card className="shadow-sm overflow-hidden dark:bg-gray-800 dark:border-gray-700">

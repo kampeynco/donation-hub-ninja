@@ -19,7 +19,6 @@ import Universe from "./pages/Universe";
 import FeatureProtectedRoute from "./components/Auth/FeatureProtectedRoute";
 import UniverseProtectedRoute from "./components/Auth/UniverseProtectedRoute";
 import Logs from "./pages/Logs";
-import Connections from "./pages/Connections";
 import NotFound from "./pages/NotFound";
 
 // Create a client
@@ -101,21 +100,12 @@ const App = () => {
                     </UniverseProtectedRoute>
                   } 
                 />
-                <Route 
-                  path="/connections" 
-                  element={
-                    <ProtectedRoute>
-                      <Layout>
-                        <Connections />
-                      </Layout>
-                    </ProtectedRoute>
-                  } 
-                />
                 
                 {/* Redirects for old routes */}
                 <Route path="/donors" element={<Navigate to="/universe" replace />} />
                 <Route path="/segments" element={<Navigate to="/personas" replace />} />
                 <Route path="/activity" element={<Navigate to="/logs" replace />} />
+                <Route path="/connections" element={<Navigate to="/dashboard" replace />} />
                 
                 {/* 404 route */}
                 <Route path="*" element={<NotFound />} />

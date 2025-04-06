@@ -4,7 +4,6 @@ import {
   IconActivity,
   IconAdjustments,
   IconStarFilled,
-  IconPlugConnected,
   IconEmpathize,
   IconCurrentLocation
 } from "@tabler/icons-react";
