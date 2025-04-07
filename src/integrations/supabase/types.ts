@@ -665,7 +665,7 @@ export type Database = {
       }
     }
     Enums: {
-      feature_name: "Personas"
+      feature_name: "Segments" | "Donors"
       location_type: "main" | "work"
       notification_action: "user" | "system" | "donor"
       recurring_period: "once" | "weekly" | "monthly"

@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 // Define feature names and their corresponding waitlist statuses
-export type FeatureName = "Segments";
+export type FeatureName = "Segments" | "Donors";
 export type WaitlistStatus = "joined" | "approved" | "rejected" | "declined" | null;
 
 // Define the waitlist entry interface
