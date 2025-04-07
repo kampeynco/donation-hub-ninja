@@ -15,7 +15,7 @@ const SidebarLogo = ({ collapsed }: SidebarLogoProps) => {
   const logoSrc = theme === "dark" ? DARK_LOGO_MARK : LIGHT_LOGO_MARK;
 
   return (
-    <div className="p-4 flex items-center">
+    <div className={`p-4 flex items-center ${collapsed ? 'justify-center' : ''}`}>
       <div className="w-8 h-8 flex items-center justify-center shrink-0">
         <img src={logoSrc} alt="Donor Camp Logo" className="w-full h-full object-contain" />
       </div>
