@@ -24,7 +24,7 @@ const AuthSidebar: React.FC<AuthSidebarProps> = ({
           <div className="flex h-8 w-8 items-center justify-center">
             <img src={DARK_LOGO_MARK} alt="Donor Camp Logo" className="w-full h-full object-contain" />
           </div>
-          <span className="text-xl font-semibold tracking-tight flex items-center">Donor Camp</span>
+          <span className="text-[1.75rem] font-semibold tracking-tight flex items-center">Donor Camp</span>
         </Link>
         
         <h1 className="text-4xl font-bold mb-6">{title}</h1>

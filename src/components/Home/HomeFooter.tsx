@@ -18,7 +18,7 @@ const HomeFooter = () => {
             <div className="flex h-7 w-7 md:h-8 md:w-8 items-center justify-center">
               <img src={DARK_LOGO_MARK} alt="Donor Camp Logo" className="w-full h-full object-contain" />
             </div>
-            <span className="text-base font-semibold tracking-tight flex items-center">Donor Camp</span>
+            <span className="text-[1.75rem] font-semibold tracking-tight flex items-center">Donor Camp</span>
           </Link>
           <div className="text-gray-400 text-xs md:text-sm">
             © {new Date().getFullYear()} Donor Camp. All rights reserved.
