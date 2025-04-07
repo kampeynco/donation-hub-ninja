@@ -18,7 +18,7 @@ const HomeHeader = () => {
           <div className="flex h-8 w-8 md:h-9 md:w-9 items-center justify-center">
             <img src={logoSrc} alt="Donor Camp Logo" className="w-full h-full object-contain" />
           </div>
-          <span className="text-base md:text-lg font-semibold tracking-tight">Donor Camp</span>
+          <span className="text-base md:text-lg font-semibold tracking-tight flex items-center">Donor Camp</span>
         </Link>
         <div className="flex gap-2 md:gap-4">
           <Link to="/auth/signin">

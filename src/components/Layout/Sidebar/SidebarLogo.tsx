@@ -19,7 +19,7 @@ const SidebarLogo = ({ collapsed }: SidebarLogoProps) => {
       <div className="w-8 h-8 flex items-center justify-center shrink-0">
         <img src={logoSrc} alt="Donor Camp Logo" className="w-full h-full object-contain" />
       </div>
-      {!collapsed && <span className="ml-3 font-semibold text-base">Donor Camp</span>}
+      {!collapsed && <span className="ml-3 font-semibold text-base flex items-center">Donor Camp</span>}
     </div>
   );
 };
