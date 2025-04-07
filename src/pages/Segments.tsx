@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { IconArrowRight, IconLock } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
@@ -9,12 +8,9 @@ import { Card, CardContent } from "@/components/ui/card";
 
 // Using the Supabase URL for the image
 const segmentsImage = "https://igjnhwvtasegwyiwcdkr.supabase.co/storage/v1/object/public/assets/images/personascard2.png";
-
 const Segments = () => {
   const [modalOpen, setModalOpen] = useState(false);
-  
-  return (
-    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-120px)] mt-6">
+  return <div className="flex flex-col items-center justify-center min-h-[calc(100vh-120px)] mt-6">
       <div className="max-w-6xl w-full space-y-10 px-4 md:px-6">
         {/* Main section */}
         <div className="flex flex-col md:flex-row items-center gap-8">
@@ -24,7 +20,7 @@ const Segments = () => {
               <span className="text-sm font-medium">Paid Plans</span>
             </div>
             <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-6">Get started with Segments today</h1>
-            <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">Donor Segments is the only solution designed to help campaigns build and share real-time profiles at scale and enable fundraisers with self-service access to a complete view of your donor insights.</p>
+            <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">Segments is the only solution designed to help campaigns build and share real-time profiles at scale and enable fundraisers with self-service access to a complete view of your donor insights.</p>
             <div className="flex items-center gap-4">
               <WaitlistButton />
               <Button variant="link" onClick={() => setModalOpen(true)} className="text-donor-blue flex items-center">
@@ -33,11 +29,7 @@ const Segments = () => {
             </div>
           </div>
           <div className="flex-1 hidden md:block">
-            <img 
-              src={segmentsImage} 
-              alt="Donor Segments visualization" 
-              className="max-w-[75%] mx-auto rounded-lg shadow-lg" 
-            />
+            <img src={segmentsImage} alt="Donor Segments visualization" className="max-w-[75%] mx-auto rounded-lg shadow-lg" />
           </div>
         </div>
 
@@ -79,8 +71,6 @@ const Segments = () => {
 
       {/* Modal for "Not Interested" feedback */}
       <NotInterestedModal open={modalOpen} onOpenChange={setModalOpen} />
-    </div>
-  );
+    </div>;
 };
-
 export default Segments;
