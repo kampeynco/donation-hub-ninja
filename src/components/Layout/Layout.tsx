@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import DashboardSidebar from "./DashboardSidebar";
 import { useEffect } from "react";
+import { useFeatureCache } from "@/hooks/useFeatureCache";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -12,11 +13,9 @@ interface LayoutProps {
 const Layout = ({ children }: LayoutProps) => {
   // Prefetch feature status when component mounts
   useEffect(() => {
-    // Importing dynamically to avoid circular dependencies
-    import("@/hooks/useFeatureCache").then(({ useFeatureCache }) => {
-      const { refreshCache } = useFeatureCache();
-      refreshCache();
-    });
+    // Use the hook directly inside the effect to avoid the React hook rules error
+    const { refreshCache } = useFeatureCache();
+    refreshCache();
   }, []);
 
   return (

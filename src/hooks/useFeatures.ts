@@ -49,7 +49,7 @@ export const useFeatures = () => {
           id: "segments",
           name: "Segments",
           description: "Access donor segments and analytics",
-          enabled: data.segments || false,
+          enabled: data.personas || false,
           beta: true,
           hidden: false // Always show in the features tab
         },
@@ -57,7 +57,7 @@ export const useFeatures = () => {
           id: "donors",
           name: "Donors",
           description: "View donor activity across the platform",
-          enabled: data.donors || false, 
+          enabled: data.universe || false, 
           beta: true,
           hidden: false // Always show in the features tab
         }
@@ -94,11 +94,19 @@ export const useFeatures = () => {
         enabled: newEnabledState
       };
       setFeatures(updatedFeatures);
+
+      // Map the frontend feature ID to the database column name
+      const dbColumnMapping: Record<string, string> = {
+        'segments': 'personas',
+        'donors': 'universe'
+      };
+      
+      const dbColumn = dbColumnMapping[featureId];
       
       // Update the database
       const { error } = await supabase
         .from('features')
-        .update({ [featureId]: newEnabledState })
+        .update({ [dbColumn]: newEnabledState })
         .eq('user_id', user.id);
       
       if (error) {

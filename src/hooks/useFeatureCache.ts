@@ -25,17 +25,13 @@ export function useFeatureCache() {
   const [isLoading, setIsLoading] = useState(!isCacheFresh());
   const [featureCache, setFeatureCache] = useState<FeatureCache>(globalFeatureCache);
 
-  // Process feature data from database response
-  const processFeatureData = useCallback((data: any): FeatureCache => {
+  // Map database columns to frontend feature IDs
+  const mapDbToFeatureId = useCallback((dbData: any): FeatureCache => {
     const newCache: FeatureCache = {};
-    if (data) {
-      Object.entries(data).forEach(([key, value]) => {
-        // Skip non-boolean and internal properties
-        if (typeof value === 'boolean' && 
-            !['id', 'user_id', 'created_at', 'updated_at'].includes(key)) {
-          newCache[key] = value;
-        }
-      });
+    if (dbData) {
+      // Map the database column names to our frontend feature IDs
+      newCache["segments"] = dbData.personas || false;
+      newCache["donors"] = dbData.universe || false;
     }
     return newCache;
   }, []);
@@ -80,7 +76,7 @@ export function useFeatureCache() {
           console.error('Error fetching feature flags:', error);
         } else {
           // Update global cache and timestamp
-          globalFeatureCache = processFeatureData(data);
+          globalFeatureCache = mapDbToFeatureId(data);
           lastFetchTimestamp = Date.now();
           
           // Update local state
@@ -99,7 +95,7 @@ export function useFeatureCache() {
     } catch (error) {
       console.error("Error during feature fetch:", error);
     }
-  }, [user, processFeatureData]);
+  }, [user, mapDbToFeatureId]);
 
   // Set up realtime subscription to keep cache updated
   useEffect(() => {
