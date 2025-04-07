@@ -1,0 +1,221 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Core Identity
+
+**App Name:** Donor Camp
+**Tagline:** "Manage your donors and track donations with ease"
+**Purpose:** A platform for organizations to track donations, manage donor relationships, and grow fundraising efforts through data-driven insights
+
+## Visual Identity
+
+### Logo
+* **Fallback logo:** Star icon within a white circular background
+* **Multiple logo variations for different contexts:**
+    * **Dark background logo:** `dc_logomark_darkbg.png` (used for favicon)
+    * **Light background logo:** `updated_dc_logomark_light.png` (used in sidebar)
+    * **Dark variant for light backgrounds:** `updated_dc_logomark_dark.png` (used in headers/footers)
+    * **Integration partner logo:** `updated_actblue_icon.png` (used for ActBlue integration)
+* **Primary blue star color:** `#007AFF`
+* Clean, professional aesthetic that conveys trust and reliability
+
+### Typography
+* **Primary Font Family:** Inter
+* **Secondary Fonts:** `system-ui`, `sans-serif` (fallbacks)
+* **Weight Range:** Regular (400), Medium (500), Semibold (600), Bold (700)
+* **Feature Settings:** `"ss01"`, `"ss02"`, `"cv01"`, `"cv02"` for enhanced readability
+
+### Color System
+#### Primary Palette:
+* **Primary Blue:** `#007AFF` / HSL(210, 100%, 50%)
+    * Used for primary actions, links, and key UI elements
+* **Primary Text on Blue:** Near white for optimal contrast
+
+#### Secondary Palette:
+* **Secondary Light Blue:** HSL(210, 40%, 96.1%)
+    * Applied to secondary elements and backgrounds
+* **Secondary Text:** Near black for readability
+
+#### Brand-Specific Colors:
+* **Donor Green:** `#4CD964` - Success states and positive metrics
+* **Donor Blue:** `#007AFF` - Core brand interactions
+* **Donor Gray:** `#F5F5F7` - Backgrounds and dividers
+
+#### UI Color Definitions:
+* **Background:** White (HSL(0, 0%, 100%))
+* **Foreground/Text:** Near black (HSL(222.2, 84%, 4.9%))
+* **Destructive/Error:** Bright red
+* **Muted:** Light blue-gray
+* **Border:** Light gray
+
+#### Dark Mode Support:
+* Implemented with darker backgrounds and lighter text
+* Maintains contrast ratios for accessibility
+
+## Design System
+
+### Component Library
+
+#### Button System
+* **Primary:** Blue fill with white text
+* **Secondary:** Light blue fill with dark text
+* **Outline:** White with border, blue text on hover
+* **Destructive:** Red fill with white text
+* **Ghost:** Transparent with hover effect
+* **Link:** Blue text with underline on hover
+* **Sizes:** Small, Default, Large, Icon-only
+
+#### Card System
+* White background with subtle border definition
+* Light shadow for depth
+* Rounded corners (`border-radius: 0.5rem`)
+* Standardized header and content padding
+
+#### Iconography
+* Using Tabler icons (`@tabler/icons-react`)
+* Standard sizes: 24px (default), 16px (small)
+* Color consistency with brand colors
+* Frequently used icons: Users, CreditCard, ReportMoney, ArrowRight, Activity
+
+#### Layout & Spacing
+* **Container Width:** Max-width of 1400px (2xl breakpoint)
+* **Border Radius:** `0.5rem` (standard)
+* **Padding Standards:** Container padding of 2rem
+* **Spacing System:** Following Tailwind CSS scale
+* **Responsive Grid:** 12-column grid system
+
+#### Animation & Interaction
+* **Transition timing:** 0.2s ease-out
+* Hover effects on interactive elements
+* Loading states with appropriate animations
+* Accordion animations for expandable content
+
+## Current Functionality
+
+1.  **User & Account Management**
+    * **Authentication**
+        * Email/password signup and login
+        * JWT-based authentication with Supabase
+        * Session management with automatic renewal
+        * Account deletion functionality
+    * **Profile Management**
+        * Personal details: first name, last name
+        * Organization name
+        * Mobile phone with formatting: (###) ###-####
+        * Profile data stored in Supabase `profiles` table
+
+2.  **Donation Management**
+    * **Dashboard & Analytics**
+        * Key metrics displayed:
+            * Recent activity (last 24 hours)
+            * Total unique donors
+            * Total funds raised across all donations
+        * Recent donations table with sorting and filtering
+    * **Donation Tracking**
+        * Recent donations table showing donor information
+        * Donation amounts and dates
+        * Support for recurring donation information
+
+3.  **Integration Capabilities**
+    * **ActBlue Integration**
+        * Webhook configuration for automatic donation syncing
+        * Secure API credential management (username/password)
+        * Webhook URL configuration
+        * Testing capabilities for webhook connectivity
+
+4.  **Notification System**
+    * **Multi-Channel Notifications**
+        * Web notifications through in-app alerts
+        * Email notifications (configured via settings)
+        * SMS notifications for users with verified mobile numbers
+    * **Notification Types**
+        * Marketing updates and platform announcements
+        * Weekly activity reports
+        * Donation receipts and alerts
+        * Recurring donation notifications
+    * **Preference Management**
+        * Granular control over notification types per channel:
+            * Web notifications
+            * Email notifications
+            * Text notifications
+        * Channel-specific customization options
+        * Settings stored in Supabase `notification_settings` table
+
+5.  **Activity Logs**
+    * **Notification Management**
+        * Complete notification history with read/unread status
+        * Filterable by type: all, donor, user, system
+        * Mark as read/unread functionality
+        * Delete notifications
+        * Dark mode support
+
+6.  **Beta Features (Waitlist Only)**
+    * **Personas Feature**
+        * Waitlist system for upcoming Personas feature
+        * Feature description and marketing copy
+        * Waitlist signup functionality
+    * **Universe Feature**
+        * Waitlist system for upcoming Universe feature
+        * Feature description and marketing copy
+        * Waitlist signup functionality
+
+## Technical Implementation
+
+### Frontend
+* React-based single-page application
+* React Router for navigation
+* Tailwind CSS for styling with custom theme configuration
+* Shadcn/UI component library
+* React Query for data fetching and caching
+* Responsive design with mobile support
+* Form validation and error handling
+* Toast notifications for user feedback
+
+### Backend
+* Supabase for authentication and database
+* Edge functions for webhook handling
+* Real-time updates via Supabase Realtime
+
+### Data Models
+#### User-Related Tables
+* `profiles`: User profile information (committee name, contact details)
+* `notification_settings`: User notification preferences
+* `features`: Feature flags and access controls
+* `waitlists`: Feature waitlist registrations
+
+#### Donation-Related Tables
+* `donations`: Records of all donations
+* `donors`: Information about donors
+* `emails`: Email addresses associated with donors
+* `phones`: Phone numbers associated with donors
+* `locations`: Address information for donors
+* `employer_data`: Employment information for donors
+* `custom_fields`: Additional metadata for donations
+* `user_donors`: Mapping between users and donors
+
+#### Integration Tables
+* `webhooks`: Webhook configuration for ActBlue integration
+* `merchandise`: Merchandise associated with donations
+
+### Security
+* Row-level security policies for database access
+* Secure credential management
+* Protected routes requiring authentication
+
+### User Experience
+#### Account Management
+* Profile settings with personal information editing
+* Notification preferences management
+* Webhook configuration for technical users
+
+#### Dashboard
+* Summary statistics for donation activity
+* Recent donations table
+* Mobile-responsive layout
+
+#### Notifications
+* In-app notification center
+* Multi-channel notification delivery
+* Notification filtering and management
