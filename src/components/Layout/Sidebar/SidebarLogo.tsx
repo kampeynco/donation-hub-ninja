@@ -3,8 +3,8 @@ import React from "react";
 import { useTheme } from "@/context/ThemeContext";
 
 // Logo mark images from assets bucket
-const LIGHT_LOGO_MARK = "https://igjnhwvtasegwyiwcdkr.supabase.co/storage/v1/object/public/assets/images/flame_logomark_blue.png";
-const DARK_LOGO_MARK = "https://igjnhwvtasegwyiwcdkr.supabase.co/storage/v1/object/public/assets/images/flame_logomark_white.png";
+const LIGHT_LOGO_MARK = "https://igjnhwvtasegwyiwcdkr.supabase.co/storage/v1/object/public/assets/images/donorcamp_logo_blue.png";
+const DARK_LOGO_MARK = "https://igjnhwvtasegwyiwcdkr.supabase.co/storage/v1/object/public/assets/images/donorcamp_logo_white.png";
 
 interface SidebarLogoProps {
   collapsed: boolean;

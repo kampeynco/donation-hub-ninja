@@ -2,7 +2,7 @@
 import { Link } from "react-router-dom";
 
 // Logo mark image from assets bucket - always use the white version on the sidebar since it has a dark background
-const DARK_LOGO_MARK = "https://igjnhwvtasegwyiwcdkr.supabase.co/storage/v1/object/public/assets/images/flame_logomark_white.png";
+const DARK_LOGO_MARK = "https://igjnhwvtasegwyiwcdkr.supabase.co/storage/v1/object/public/assets/images/donorcamp_logo_white.png";
 
 interface AuthSidebarProps {
   title: string;
