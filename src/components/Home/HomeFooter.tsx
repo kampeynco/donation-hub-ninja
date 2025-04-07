@@ -15,10 +15,10 @@ const HomeFooter = () => {
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-center">
           <Link to="/" className="flex items-center gap-2 mb-4 md:mb-0">
-            <div className="flex h-[2.8rem] w-[2.8rem] items-center justify-center">
-              <img src={DARK_LOGO_MARK} alt="Donor Camp Logo" className="w-full h-full" />
+            <div className="flex h-7 w-7 md:h-8 md:w-8 items-center justify-center">
+              <img src={DARK_LOGO_MARK} alt="Donor Camp Logo" className="w-full h-full object-contain" />
             </div>
-            <span className="text-base md:text-lg font-semibold tracking-tight">Donor Camp</span>
+            <span className="text-base font-semibold tracking-tight">Donor Camp</span>
           </Link>
           <div className="text-gray-400 text-xs md:text-sm">
             © {new Date().getFullYear()} Donor Camp. All rights reserved.

@@ -16,10 +16,10 @@ const SidebarLogo = ({ collapsed }: SidebarLogoProps) => {
 
   return (
     <div className="p-4 flex items-center">
-      <div className="w-[2.8rem] h-[2.8rem] flex items-center justify-center shrink-0">
-        <img src={logoSrc} alt="Donor Camp Logo" className="w-full h-full" />
+      <div className="w-8 h-8 flex items-center justify-center shrink-0">
+        <img src={logoSrc} alt="Donor Camp Logo" className="w-full h-full object-contain" />
       </div>
-      {!collapsed && <span className="ml-3 font-bold text-lg">Donor Camp</span>}
+      {!collapsed && <span className="ml-3 font-semibold text-base">Donor Camp</span>}
     </div>
   );
 };

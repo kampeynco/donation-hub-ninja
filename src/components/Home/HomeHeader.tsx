@@ -15,8 +15,8 @@ const HomeHeader = () => {
     <header className="w-full bg-transparent text-gray-900 fixed top-0 left-0 right-0 z-50">
       <div className="container mx-auto px-4 py-3 md:py-4 flex justify-between items-center">
         <Link to="/" className="flex items-center gap-2">
-          <div className="flex h-10 w-10 md:h-[2.8rem] md:w-[2.8rem] items-center justify-center">
-            <img src={logoSrc} alt="Donor Camp Logo" className="w-full h-full" />
+          <div className="flex h-8 w-8 md:h-9 md:w-9 items-center justify-center">
+            <img src={logoSrc} alt="Donor Camp Logo" className="w-full h-full object-contain" />
           </div>
           <span className="text-base md:text-lg font-semibold tracking-tight">Donor Camp</span>
         </Link>
