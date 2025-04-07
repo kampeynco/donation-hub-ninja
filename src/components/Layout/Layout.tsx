@@ -11,12 +11,14 @@ interface LayoutProps {
 }
 
 const Layout = ({ children }: LayoutProps) => {
+  // Get the refreshCache function from the hook
+  const { refreshCache } = useFeatureCache();
+  
   // Prefetch feature status when component mounts
   useEffect(() => {
-    // Use the hook directly inside the effect to avoid the React hook rules error
-    const { refreshCache } = useFeatureCache();
+    // Call refreshCache from the hook instance we created above
     refreshCache();
-  }, []);
+  }, [refreshCache]); // Add refreshCache to the dependency array
 
   return (
     <TooltipProvider>
