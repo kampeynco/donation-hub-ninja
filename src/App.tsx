@@ -1,12 +1,18 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useRoutes,
+} from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { NotificationsProvider } from "./context/NotificationsContext";
+import routes from "tempo-routes";
 import ProtectedRoute from "./components/Auth/ProtectedRoute";
 import Layout from "./components/Layout/Layout";
 import Home from "./pages/Home";
@@ -40,73 +46,93 @@ const App = () => {
         <TooltipProvider>
           <ThemeProvider>
             <AuthProvider>
+              {/* Tempo routes */}
+              {import.meta.env.VITE_TEMPO && useRoutes(routes)}
               <Routes>
                 {/* Public routes */}
                 <Route path="/" element={<Home />} />
                 <Route path="/auth/signin" element={<SignIn />} />
-                <Route path="/login" element={<Navigate to="/auth/signin" replace />} />
+                <Route
+                  path="/login"
+                  element={<Navigate to="/auth/signin" replace />}
+                />
                 <Route path="/auth/signup" element={<SignUp />} />
-                
+
                 {/* Protected routes */}
-                <Route 
-                  path="/dashboard" 
+                <Route
+                  path="/dashboard"
                   element={
                     <ProtectedRoute>
                       <Layout>
                         <Dashboard />
                       </Layout>
                     </ProtectedRoute>
-                  } 
+                  }
                 />
-                <Route 
-                  path="/account" 
+                <Route
+                  path="/account"
                   element={
                     <ProtectedRoute>
                       <Layout>
                         <Account />
                       </Layout>
                     </ProtectedRoute>
-                  } 
+                  }
                 />
-                
+
                 {/* Updated routes for navigation items */}
-                <Route 
-                  path="/logs" 
+                <Route
+                  path="/logs"
                   element={
                     <ProtectedRoute>
                       <Layout>
                         <Logs />
                       </Layout>
                     </ProtectedRoute>
-                  } 
+                  }
                 />
-                <Route 
-                  path="/personas" 
+                <Route
+                  path="/personas"
                   element={
                     <FeatureProtectedRoute featureId="segments">
                       <Layout>
                         <Segments />
                       </Layout>
                     </FeatureProtectedRoute>
-                  } 
+                  }
                 />
-                <Route 
-                  path="/universe" 
+                <Route
+                  path="/universe"
                   element={
                     <DonorsProtectedRoute>
                       <Layout>
                         <Donors />
                       </Layout>
                     </DonorsProtectedRoute>
-                  } 
+                  }
                 />
-                
+
                 {/* Redirects for old routes */}
-                <Route path="/donors" element={<Navigate to="/universe" replace />} />
-                <Route path="/segments" element={<Navigate to="/personas" replace />} />
-                <Route path="/activity" element={<Navigate to="/logs" replace />} />
-                <Route path="/connections" element={<Navigate to="/dashboard" replace />} />
-                
+                <Route
+                  path="/donors"
+                  element={<Navigate to="/universe" replace />}
+                />
+                <Route
+                  path="/segments"
+                  element={<Navigate to="/personas" replace />}
+                />
+                <Route
+                  path="/activity"
+                  element={<Navigate to="/logs" replace />}
+                />
+                <Route
+                  path="/connections"
+                  element={<Navigate to="/dashboard" replace />}
+                />
+
+                {/* Allow Tempo to capture routes before the catchall */}
+                {import.meta.env.VITE_TEMPO && <Route path="/tempobook/*" />}
+
                 {/* 404 route */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

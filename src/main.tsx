@@ -1,7 +1,10 @@
+import { createRoot } from "react-dom/client";
+import App from "./App.tsx";
+import "./index.css";
+import { TempoDevtools } from "tempo-devtools";
 
-import { createRoot } from 'react-dom/client';
-import App from './App.tsx';
-import './index.css';
+// Initialize Tempo Devtools
+TempoDevtools.init();
 
 // Get the root element and render the App
 const rootElement = document.getElementById("root");
