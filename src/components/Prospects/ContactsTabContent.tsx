@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { useContactManagement } from "@/hooks/useContactManagement";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,7 +14,6 @@ import {
   IconMail, 
   IconPhone, 
   IconMap, 
-  IconPlus,
   IconSearch,
   IconFilter
 } from "@tabler/icons-react";
@@ -26,6 +25,8 @@ import ContactTableActions from "./ContactTableActions";
 import ContactsTablePagination from "./ContactsTablePagination";
 import ContactsEmptyState from "./ContactsEmptyState";
 import ContactsTableHeader from "./ContactsTableHeader";
+import CreateContactModal from "./CreateContactModal";
+import ImportCSVModal from "./ImportCSVModal";
 import type { Contact } from "@/types/contact";
 
 export default function ContactsTabContent() {
@@ -39,9 +40,13 @@ export default function ContactsTabContent() {
     isLoading,
     filters,
     setFilters,
+    createContact,
+    isCreating
   } = useContactManagement();
 
-  const [searchTerm, setSearchTerm] = React.useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [importModalOpen, setImportModalOpen] = useState(false);
 
   // Apply search filter when user submits search
   const handleSearch = (e: React.FormEvent) => {
@@ -83,11 +88,17 @@ export default function ContactsTabContent() {
     }
   };
 
+  const handleCreateContact = (contactData: any) => {
+    createContact(contactData);
+    setCreateModalOpen(false);
+  };
+
   return (
     <div className="space-y-4">
       <ContactsTableHeader 
         totalContacts={totalContacts}
-        onCreateClick={() => {/* Open create contact modal */}}
+        onCreateClick={() => setCreateModalOpen(true)}
+        onImportClick={() => setImportModalOpen(true)}
       />
 
       {/* Search and filter bar */}
@@ -241,6 +252,20 @@ export default function ContactsTabContent() {
           itemsPerPage={limit}
         />
       )}
+
+      {/* Create Contact Modal */}
+      <CreateContactModal
+        open={createModalOpen}
+        onClose={() => setCreateModalOpen(false)}
+        onSubmit={handleCreateContact}
+        isSubmitting={isCreating}
+      />
+
+      {/* Import CSV Modal */}
+      <ImportCSVModal
+        open={importModalOpen}
+        onClose={() => setImportModalOpen(false)}
+      />
     </div>
   );
 }

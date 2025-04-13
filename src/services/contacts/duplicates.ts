@@ -7,6 +7,7 @@ interface DuplicateFilters {
   page: number;
   limit: number;
   minConfidence: number;
+  sortOrder?: 'asc' | 'desc';
 }
 
 interface DuplicateResult {
@@ -34,7 +35,7 @@ export async function fetchDuplicates(filters: DuplicateFilters): Promise<Duplic
     if (!userId) return { data: [], count: 0 };
 
     // Calculate offset
-    const { page, limit, minConfidence } = filters;
+    const { page, limit, minConfidence, sortOrder = 'desc' } = filters;
     const offset = (page - 1) * limit;
 
     // Get duplicate matches
@@ -43,7 +44,7 @@ export async function fetchDuplicates(filters: DuplicateFilters): Promise<Duplic
       .select('*', { count: 'exact' })
       .gte('confidence_score', minConfidence)
       .eq('resolved', false)
-      .order('confidence_score', { ascending: false })
+      .order('confidence_score', { ascending: sortOrder === 'asc' })
       .range(offset, offset + limit - 1);
 
     if (error) {

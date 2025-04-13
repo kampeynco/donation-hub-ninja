@@ -7,5 +7,5 @@ export interface Notification {
   action: 'donor' | 'user' | 'system';
   contact_id?: string;
   date: string;
-  donor_id?: string; // Make donor_id optional for backward compatibility
+  donor_id?: string;
 }

@@ -13,11 +13,12 @@ import {
 import { 
   IconUsersGroup, 
   IconMoodConfuzed,
-  IconChevronRight 
+  IconChevronRight,
+  IconArrowUp,
+  IconArrowDown 
 } from "@tabler/icons-react";
 import { formatDate } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import DuplicateMatchDetails from "./DuplicateMatchDetails";
 import ContactsTablePagination from "./ContactsTablePagination";
@@ -31,9 +32,9 @@ export default function DuplicatesTabContent() {
     setPage,
     limit,
     totalPages,
-    minConfidence,
-    setMinConfidence,
     isLoading,
+    sortOrder,
+    setSortOrder,
   } = useDuplicates();
 
   const [selectedDuplicate, setSelectedDuplicate] = useState<DuplicateMatch | null>(null);
@@ -51,6 +52,11 @@ export default function DuplicatesTabContent() {
     }
   };
 
+  // Toggle sort order
+  const toggleSortOrder = () => {
+    setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+  };
+
   return (
     <div className="space-y-4">
       {/* Header */}
@@ -61,37 +67,20 @@ export default function DuplicatesTabContent() {
         </div>
       </div>
 
-      {/* Confidence slider */}
-      <div className="p-4 border rounded-md bg-gray-50 dark:bg-gray-900">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-          <div className="min-w-[180px]">
-            <p className="font-medium">Confidence threshold:</p>
-            <p className="text-sm text-gray-500">Show matches above {minConfidence}%</p>
-          </div>
-          <div className="flex-1">
-            <Slider
-              value={[minConfidence]}
-              min={50}
-              max={95}
-              step={5}
-              onValueChange={(value) => setMinConfidence(value[0])}
-              className="py-4"
-            />
-          </div>
-          <div className="min-w-[100px]">
-            <Badge variant="outline" className="px-3 py-1 text-sm">
-              {minConfidence}% minimum
-            </Badge>
-          </div>
-        </div>
-      </div>
-
       {/* Duplicates table */}
       <div className="border rounded-md">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Match Score</TableHead>
+              <TableHead onClick={toggleSortOrder} className="cursor-pointer hover:bg-gray-50">
+                <div className="flex items-center gap-1">
+                  Match Score 
+                  {sortOrder === 'asc' ? 
+                    <IconArrowUp className="h-4 w-4" /> : 
+                    <IconArrowDown className="h-4 w-4" />
+                  }
+                </div>
+              </TableHead>
               <TableHead>Details</TableHead>
               <TableHead>Found</TableHead>
               <TableHead className="text-right">Actions</TableHead>
@@ -118,8 +107,7 @@ export default function DuplicatesTabContent() {
                     <div className="text-center space-y-2">
                       <h3 className="text-lg font-medium">No duplicates found</h3>
                       <p className="text-sm text-gray-500 max-w-sm mx-auto">
-                        No duplicate contacts matching your confidence threshold were found.
-                        Try lowering the confidence threshold to see more potential matches.
+                        No duplicate contacts matching your criteria were found.
                       </p>
                     </div>
                   </div>

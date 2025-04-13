@@ -14,7 +14,7 @@ interface ResolveDuplicateParams {
 export function useDuplicates() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
-  const [minConfidence, setMinConfidence] = useState(75);
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const queryClient = useQueryClient();
 
   // Fetch duplicates
@@ -23,8 +23,8 @@ export function useDuplicates() {
     isLoading, 
     error 
   } = useQuery({
-    queryKey: ['duplicates', page, limit, minConfidence],
-    queryFn: () => fetchDuplicates({ page, limit, minConfidence }),
+    queryKey: ['duplicates', page, limit, sortOrder],
+    queryFn: () => fetchDuplicates({ page, limit, minConfidence: 50, sortOrder }),
   });
 
   // Fetch duplicate contact details
@@ -61,8 +61,8 @@ export function useDuplicates() {
     setPage,
     limit,
     setLimit,
-    minConfidence,
-    setMinConfidence,
+    sortOrder,
+    setSortOrder,
     totalPages: Math.ceil(duplicatesData.count / limit),
     isLoading,
     error,
