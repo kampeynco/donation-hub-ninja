@@ -1,114 +1,122 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { Notification } from "@/components/Notifications/NotificationBell";
-import { toast } from "@/hooks/use-toast";
+import { getCurrentUserId } from "@/services/donations/helpers";
+import { Notification } from "@/types/notification";
 
 /**
- * Creates a new notification in the database
+ * Fetches notifications for the current user with optional filtering
  */
-export async function createNotification({
-  message,
-  action,
-  donorId = null
-}: {
-  message: string;
-  action: 'user' | 'system' | 'donor';
-  donorId?: string | null;
-}): Promise<Notification | null> {
+export async function fetchNotifications(
+  type?: "all" | "donor" | "user" | "system",
+  page = 1,
+  limit = 50
+): Promise<Notification[]> {
   try {
-    const notificationData = {
-      message,
-      action,
-      contact_id: donorId,
-      date: new Date().toISOString(),
-      is_read: false
-    };
+    const userId = await getCurrentUserId();
+    if (!userId) return [];
+
+    const startIndex = (page - 1) * limit;
     
-    const { data, error } = await supabase
-      .from('notifications')
-      .insert(notificationData)
-      .select()
-      .single();
-      
-    if (error) {
-      console.error('Error creating notification:', error);
-      return null;
+    let query = supabase
+      .from("notifications")
+      .select("*")
+      .order("date", { ascending: false })
+      .range(startIndex, startIndex + limit - 1);
+
+    // Apply type filter if provided
+    if (type && type !== "all") {
+      query = query.eq("action", type);
     }
-    
-    // Convert contact_id to donor_id for backward compatibility with Notification type
-    const notification = {
-      ...data,
-      donor_id: data.contact_id
-    } as Notification;
-    
-    return notification;
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error("Error fetching notifications:", error);
+      return [];
+    }
+
+    // Convert to Notification type
+    return data as Notification[];
   } catch (error) {
-    console.error('Error in createNotification:', error);
-    return null;
+    console.error("Error in fetchNotifications:", error);
+    return [];
   }
 }
 
 /**
- * Marks a notification as read
+ * Fetches unread notification count for the current user
  */
-export async function markNotificationAsRead(id: string): Promise<boolean> {
+export async function fetchUnreadCount(): Promise<number> {
   try {
-    const { error } = await supabase
-      .from('notifications')
-      .update({ is_read: true })
-      .eq('id', id);
-      
+    const userId = await getCurrentUserId();
+    if (!userId) return 0;
+
+    const { count, error } = await supabase
+      .from("notifications")
+      .select("id", { count: "exact", head: true })
+      .eq("is_read", false);
+
     if (error) {
-      console.error('Error marking notification as read:', error);
+      console.error("Error fetching unread count:", error);
+      return 0;
+    }
+
+    return count || 0;
+  } catch (error) {
+    console.error("Error in fetchUnreadCount:", error);
+    return 0;
+  }
+}
+
+/**
+ * Marks a notification as read or unread
+ */
+export async function markNotificationReadStatus(
+  notificationId: string,
+  isRead = true
+): Promise<boolean> {
+  try {
+    const userId = await getCurrentUserId();
+    if (!userId) return false;
+
+    const { error } = await supabase
+      .from("notifications")
+      .update({ is_read: isRead })
+      .eq("id", notificationId);
+
+    if (error) {
+      console.error("Error marking notification:", error);
       return false;
     }
-    
+
     return true;
   } catch (error) {
-    console.error('Error in markNotificationAsRead:', error);
+    console.error("Error in markNotificationReadStatus:", error);
     return false;
   }
 }
 
 /**
- * Marks all unread notifications as read
+ * Marks all notifications as read
  */
-export async function markAllNotificationsAsRead(): Promise<boolean> {
+export async function markAllNotificationsRead(): Promise<boolean> {
   try {
-    const { data: unreadNotifications, error: fetchError } = await supabase
-      .from('notifications')
-      .select('id')
-      .eq('is_read', false);
-      
-    if (fetchError) {
-      console.error('Error fetching unread notifications:', fetchError);
-      return false;
-    }
-    
-    if (!unreadNotifications || unreadNotifications.length === 0) {
-      return true; // No unread notifications to update
-    }
-    
-    const unreadIds = unreadNotifications.map(n => n.id);
-    
-    const { error: updateError } = await supabase
-      .from('notifications')
+    const userId = await getCurrentUserId();
+    if (!userId) return false;
+
+    const { error } = await supabase
+      .from("notifications")
       .update({ is_read: true })
-      .in('id', unreadIds);
-      
-    if (updateError) {
-      console.error('Error marking all notifications as read:', updateError);
+      .eq("is_read", false);
+
+    if (error) {
+      console.error("Error marking all notifications as read:", error);
       return false;
     }
-    
-    toast({
-      title: 'Success',
-      description: 'All notifications marked as read',
-    });
-    
+
     return true;
   } catch (error) {
-    console.error('Error in markAllNotificationsAsRead:', error);
+    console.error("Error in markAllNotificationsRead:", error);
     return false;
   }
 }
@@ -116,63 +124,99 @@ export async function markAllNotificationsAsRead(): Promise<boolean> {
 /**
  * Deletes a notification
  */
-export async function deleteNotification(id: string): Promise<boolean> {
+export async function deleteNotification(
+  notificationId: string
+): Promise<boolean> {
   try {
-    console.log(`API: Attempting to delete notification with ID: ${id}`);
-    
+    const userId = await getCurrentUserId();
+    if (!userId) return false;
+
     const { error } = await supabase
-      .from('notifications')
+      .from("notifications")
       .delete()
-      .eq('id', id);
-      
+      .eq("id", notificationId);
+
     if (error) {
-      console.error('Error deleting notification:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to delete notification',
-        variant: 'destructive'
-      });
+      console.error("Error deleting notification:", error);
       return false;
     }
-    
-    console.log(`API: Successfully deleted notification with ID: ${id}`);
-    toast({
-      title: 'Success',
-      description: 'Notification deleted successfully',
-    });
-    
+
     return true;
   } catch (error) {
-    console.error('Error in deleteNotification:', error);
+    console.error("Error in deleteNotification:", error);
     return false;
   }
 }
 
 /**
- * Fetches recent notifications
+ * Fetches notifications by type for the current user (counts only)
  */
-export async function fetchRecentNotifications(limit = 10): Promise<Notification[]> {
+export async function fetchNotificationCountsByType(): Promise<{
+  all: number;
+  donor: number;
+  user: number;
+  system: number;
+}> {
   try {
-    const { data, error } = await supabase
-      .from('notifications')
-      .select('*')
-      .order('date', { ascending: false })
-      .limit(limit);
-      
-    if (error) {
-      console.error('Error fetching notifications:', error);
-      return [];
+    const userId = await getCurrentUserId();
+    if (!userId) return { all: 0, donor: 0, user: 0, system: 0 };
+
+    // Get all notifications count
+    const { count: allCount, error: allError } = await supabase
+      .from("notifications")
+      .select("id", { count: "exact", head: true });
+
+    if (allError) {
+      console.error("Error fetching all notifications count:", allError);
+      return { all: 0, donor: 0, user: 0, system: 0 };
     }
-    
-    // Map the data to include donor_id for backward compatibility
-    const notifications = data.map(item => ({
-      ...item,
-      donor_id: item.contact_id
-    })) as Notification[];
-    
-    return notifications;
+
+    // Get donor notifications count
+    const { count: donorCount, error: donorError } = await supabase
+      .from("notifications")
+      .select("id", { count: "exact", head: true })
+      .eq("action", "donor");
+
+    if (donorError) {
+      console.error("Error fetching donor notifications count:", donorError);
+      return { all: allCount || 0, donor: 0, user: 0, system: 0 };
+    }
+
+    // Get user notifications count
+    const { count: userCount, error: userError } = await supabase
+      .from("notifications")
+      .select("id", { count: "exact", head: true })
+      .eq("action", "user");
+
+    if (userError) {
+      console.error("Error fetching user notifications count:", userError);
+      return { all: allCount || 0, donor: donorCount || 0, user: 0, system: 0 };
+    }
+
+    // Get system notifications count
+    const { count: systemCount, error: systemError } = await supabase
+      .from("notifications")
+      .select("id", { count: "exact", head: true })
+      .eq("action", "system");
+
+    if (systemError) {
+      console.error("Error fetching system notifications count:", systemError);
+      return {
+        all: allCount || 0,
+        donor: donorCount || 0,
+        user: userCount || 0,
+        system: 0,
+      };
+    }
+
+    return {
+      all: allCount || 0,
+      donor: donorCount || 0,
+      user: userCount || 0,
+      system: systemCount || 0,
+    };
   } catch (error) {
-    console.error('Error in fetchRecentNotifications:', error);
-    return [];
+    console.error("Error in fetchNotificationCountsByType:", error);
+    return { all: 0, donor: 0, user: 0, system: 0 };
   }
 }
