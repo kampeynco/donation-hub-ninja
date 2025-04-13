@@ -1,14 +1,14 @@
 
 import { useState } from 'react';
 import { 
-  markNotificationAsRead,
-  markAllNotificationsAsRead,
-  fetchRecentNotifications,
+  markNotificationRead,
+  markAllNotificationsRead,
+  fetchNotifications,
   deleteNotification,
   createDonationNotification,
   createRecurringDonationNotification
 } from '@/services/notifications';
-import { Notification } from '@/components/Notifications/NotificationBell';
+import type { Notification } from '@/types/notification';
 
 /**
  * Hook for working with notifications
@@ -22,7 +22,7 @@ export function useNotifications() {
   const markAsRead = async (id: string) => {
     setIsLoading(true);
     try {
-      return await markNotificationAsRead(id);
+      return await markNotificationRead(id);
     } catch (error) {
       console.error('Error marking notification as read:', error);
       return false;
@@ -37,7 +37,7 @@ export function useNotifications() {
   const markAllAsRead = async () => {
     setIsLoading(true);
     try {
-      return await markAllNotificationsAsRead();
+      return await markAllNotificationsRead();
     } catch (error) {
       console.error('Error marking all notifications as read:', error);
       return false;
@@ -72,10 +72,10 @@ export function useNotifications() {
   /**
    * Fetch recent notifications
    */
-  const fetchNotifications = async (limit = 10): Promise<Notification[]> => {
+  const fetchRecentNotifications = async (limit = 10): Promise<Notification[]> => {
     setIsLoading(true);
     try {
-      const data = await fetchRecentNotifications(limit);
+      const data = await fetchNotifications(limit);
       return data;
     } catch (error) {
       console.error('Error fetching notifications:', error);
@@ -93,6 +93,6 @@ export function useNotifications() {
     markAsRead,
     markAllAsRead,
     deleteNotification: deleteNotificationById,
-    fetchNotifications
+    fetchNotifications: fetchRecentNotifications
   };
 }

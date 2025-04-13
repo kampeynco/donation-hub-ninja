@@ -1,58 +1,58 @@
 
-import { createNotification } from './api';
-import { toast } from '@/hooks/use-toast';
+import { v4 as uuidv4 } from 'uuid';
+import { createNewNotification } from './api';
 
 /**
- * Creates a notification for a new donation
+ * Create a notification for a new donation
  */
 export async function createDonationNotification(
-  donorName: string, 
-  amount: number, 
-  donorId: string | null = null
-): Promise<ReturnType<typeof createNotification> | null> {
+  amount: number,
+  contactId: string,
+  contactName: string | null
+) {
   try {
-    const formattedAmount = amount.toFixed(2);
-    const message = `${donorName} donated $${formattedAmount}`;
-    return await createNotification({
+    const message = `New $${amount} donation from ${contactName || 'a supporter'}`;
+    const notification = {
+      id: uuidv4(),
       message,
-      action: 'donor',
-      donorId
-    });
+      created_at: new Date().toISOString(),
+      is_read: false,
+      action: 'donor' as const,
+      contact_id: contactId,
+      date: new Date().toISOString()
+    };
+    
+    return await createNewNotification(notification);
   } catch (error) {
     console.error('Error creating donation notification:', error);
-    toast({
-      title: 'Error',
-      description: 'Failed to create notification',
-      variant: 'destructive'
-    });
-    return null;
+    return false;
   }
 }
 
 /**
- * Creates a notification for a recurring donation
+ * Create a notification for a recurring donation
  */
 export async function createRecurringDonationNotification(
-  donorName: string, 
-  amount: number, 
-  period: string, 
-  donorId: string | null = null
-): Promise<ReturnType<typeof createNotification> | null> {
+  amount: number,
+  period: string,
+  contactId: string,
+  contactName: string | null
+) {
   try {
-    const formattedAmount = amount.toFixed(2);
-    const message = `${donorName} set up a ${period} donation of $${formattedAmount}`;
-    return await createNotification({
+    const message = `New recurring $${amount} ${period} donation from ${contactName || 'a supporter'}`;
+    const notification = {
+      id: uuidv4(),
       message,
-      action: 'donor',
-      donorId
-    });
+      created_at: new Date().toISOString(),
+      is_read: false,
+      action: 'donor' as const,
+      contact_id: contactId,
+      date: new Date().toISOString()
+    };
+    
+    return await createNewNotification(notification);
   } catch (error) {
     console.error('Error creating recurring donation notification:', error);
-    toast({
-      title: 'Error',
-      description: 'Failed to create notification',
-      variant: 'destructive'
-    });
-    return null;
+    return false;
   }
 }

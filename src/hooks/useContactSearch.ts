@@ -15,7 +15,10 @@ export function useContactSearch() {
     refetch
   } = useQuery<Contact[]>({
     queryKey: ['contactSearch', searchTerm, limit],
-    queryFn: () => searchContacts(searchTerm, limit),
+    queryFn: async () => {
+      const results = await searchContacts(searchTerm, limit);
+      return results as Contact[];
+    },
     enabled: searchTerm.length >= 2,
   });
 

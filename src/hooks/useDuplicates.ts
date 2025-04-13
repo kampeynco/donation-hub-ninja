@@ -1,13 +1,15 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { 
-  fetchDuplicateMatches,
-  fetchDuplicateContacts,
-  resolveDuplicate
-} from '@/services/contacts/duplicates';
-import type { DuplicateMatch } from '@/types/contact';
+import { fetchDuplicates, fetchDuplicateContactsById, resolveDuplicateMatch } from '@/services/contacts/duplicates';
 import { toast } from 'sonner';
+import type { DuplicateMatch, Contact } from '@/types/contact';
+
+interface ResolveDuplicateParams {
+  duplicateId: string;
+  action: 'merge' | 'ignore';
+  primaryContactId?: string;
+}
 
 export function useDuplicates() {
   const [page, setPage] = useState(1);
@@ -15,36 +17,33 @@ export function useDuplicates() {
   const [minConfidence, setMinConfidence] = useState(75);
   const queryClient = useQueryClient();
 
-  // Fetch duplicate matches with pagination
-  const {
-    data: duplicatesData,
-    isLoading,
-    error
+  // Fetch duplicates
+  const { 
+    data: duplicatesData = { data: [], count: 0 },
+    isLoading, 
+    error 
   } = useQuery({
     queryKey: ['duplicates', page, limit, minConfidence],
-    queryFn: () => fetchDuplicateMatches(minConfidence, page, limit)
+    queryFn: () => fetchDuplicates({ page, limit, minConfidence }),
   });
 
-  const duplicates = duplicatesData?.data || [];
-  const totalDuplicates = duplicatesData?.count || 0;
-  const totalPages = Math.ceil(totalDuplicates / limit);
-
-  // Fetch contacts for a specific duplicate match
-  const fetchDuplicateContactsPair = async (duplicate: DuplicateMatch) => {
-    return await fetchDuplicateContacts(duplicate);
+  // Fetch duplicate contact details
+  const fetchDuplicateContacts = async (duplicate: DuplicateMatch) => {
+    try {
+      const result = await fetchDuplicateContactsById(duplicate.contact1_id, duplicate.contact2_id);
+      return {
+        contact1: result.contact1,
+        contact2: result.contact2
+      };
+    } catch (error) {
+      console.error('Error fetching duplicate contacts:', error);
+      throw error;
+    }
   };
 
-  // Resolve a duplicate match
-  const resolveDuplicateMutation = useMutation({
-    mutationFn: ({ 
-      duplicateId, 
-      action, 
-      primaryContactId 
-    }: { 
-      duplicateId: string, 
-      action: 'ignore' | 'merge', 
-      primaryContactId?: string 
-    }) => resolveDuplicate(duplicateId, action, primaryContactId),
+  // Resolve duplicate
+  const resolveMutation = useMutation({
+    mutationFn: (params: ResolveDuplicateParams) => resolveDuplicateMatch(params),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['duplicates'] });
       toast.success('Duplicate resolved successfully');
@@ -56,19 +55,19 @@ export function useDuplicates() {
   });
 
   return {
-    duplicates,
-    totalDuplicates,
+    duplicates: duplicatesData.data,
+    totalDuplicates: duplicatesData.count,
     page,
     setPage,
     limit,
     setLimit,
-    totalPages,
     minConfidence,
     setMinConfidence,
+    totalPages: Math.ceil(duplicatesData.count / limit),
     isLoading,
     error,
-    fetchDuplicateContacts: fetchDuplicateContactsPair,
-    resolveDuplicate: resolveDuplicateMutation.mutate,
-    isResolving: resolveDuplicateMutation.isPending
+    fetchDuplicateContacts,
+    resolveDuplicate: resolveMutation.mutate,
+    isResolving: resolveMutation.isPending
   };
 }

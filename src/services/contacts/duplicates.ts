@@ -1,217 +1,207 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { getCurrentUserId } from "@/services/donations/helpers";
-import type { DuplicateMatch } from "@/types/contact";
+import type { DuplicateMatch, Contact } from "@/types/contact";
+
+interface DuplicateFilters {
+  page: number;
+  limit: number;
+  minConfidence: number;
+}
+
+interface DuplicateResult {
+  data: DuplicateMatch[];
+  count: number;
+}
+
+interface DuplicateContactsResult {
+  contact1: Contact | null;
+  contact2: Contact | null;
+}
+
+interface ResolveDuplicateParams {
+  duplicateId: string;
+  action: 'merge' | 'ignore';
+  primaryContactId?: string;
+}
 
 /**
- * Fetches duplicate matches for the current user
+ * Fetch potential duplicate contacts
  */
-export async function fetchDuplicateMatches(minConfidence = 75, page = 1, limit = 20) {
+export async function fetchDuplicates(filters: DuplicateFilters): Promise<DuplicateResult> {
   try {
     const userId = await getCurrentUserId();
     if (!userId) return { data: [], count: 0 };
 
-    const startIndex = (page - 1) * limit;
+    // Calculate offset
+    const { page, limit, minConfidence } = filters;
+    const offset = (page - 1) * limit;
 
-    // Get contact IDs associated with the current user
-    const { data: userContacts, error: userContactsError } = await supabase
-      .from('user_contacts')
-      .select('contact_id')
-      .eq('user_id', userId);
-    
-    if (userContactsError) {
-      console.error('Error fetching user contacts:', userContactsError);
-      return { data: [], count: 0 };
-    }
-    
-    // Extract contact IDs as an array
-    const contactIds = userContacts?.map(uc => uc.contact_id) || [];
-    
-    if (contactIds.length === 0) {
-      return { data: [], count: 0 };
-    }
-
-    // First get the total count of duplicates
-    const { count, error: countError } = await supabase
+    // Get duplicate matches
+    const { data, error, count } = await supabase
       .from('duplicate_matches')
-      .select('id', { count: 'exact', head: true })
-      .or(`contact1_id.in.(${contactIds.join(',')}),contact2_id.in.(${contactIds.join(',')})`)
-      .gte('confidence_score', minConfidence)
-      .eq('resolved', false);
-    
-    if (countError) {
-      console.error('Error counting duplicate matches:', countError);
-      return { data: [], count: 0 };
-    }
-
-    // Then fetch the paginated data
-    const { data: duplicates, error: duplicatesError } = await supabase
-      .from('duplicate_matches')
-      .select(`
-        id,
-        contact1_id,
-        contact2_id,
-        confidence_score,
-        name_score,
-        email_score,
-        phone_score,
-        address_score,
-        created_at,
-        updated_at,
-        resolved,
-        reviewed_by,
-        reviewed_at
-      `)
-      .or(`contact1_id.in.(${contactIds.join(',')}),contact2_id.in.(${contactIds.join(',')})`)
+      .select('*', { count: 'exact' })
       .gte('confidence_score', minConfidence)
       .eq('resolved', false)
       .order('confidence_score', { ascending: false })
-      .range(startIndex, startIndex + limit - 1);
+      .range(offset, offset + limit - 1);
 
-    if (duplicatesError) {
-      console.error('Error fetching duplicate matches:', duplicatesError);
+    if (error) {
+      console.error('Error fetching duplicate matches:', error);
       return { data: [], count: 0 };
     }
 
-    return {
-      data: duplicates as DuplicateMatch[] || [],
+    return { 
+      data: data as DuplicateMatch[],
       count: count || 0
     };
   } catch (error) {
-    console.error('Error in fetchDuplicateMatches:', error);
+    console.error('Error in fetchDuplicates:', error);
     return { data: [], count: 0 };
   }
 }
 
 /**
- * Fetches contacts associated with a specific duplicate match
+ * Fetch details for both contacts in a duplicate match
  */
-export async function fetchDuplicateContacts(duplicateMatch: DuplicateMatch) {
+export async function fetchDuplicateContactsById(
+  contact1Id: string, 
+  contact2Id: string
+): Promise<DuplicateContactsResult> {
   try {
     const userId = await getCurrentUserId();
     if (!userId) return { contact1: null, contact2: null };
 
-    const { contact1_id, contact2_id } = duplicateMatch;
-
-    // Fetch first contact
-    const { data: contact1, error: contact1Error } = await supabase
+    // Fetch first contact details
+    const { data: contact1Data, error: contact1Error } = await supabase
       .from('contacts')
       .select(`
-        id,
-        first_name,
-        last_name,
-        status,
-        created_at,
-        updated_at,
-        emails (
-          id,
-          email,
-          type,
-          is_primary
-        ),
-        phones (
-          id,
-          phone,
-          type,
-          is_primary
-        ),
-        locations (
-          id,
-          street,
-          city,
-          state,
-          zip,
-          type,
-          is_primary
-        )
+        *,
+        emails(*),
+        phones(*),
+        locations(*),
+        donations(*),
+        employer_data(*)
       `)
-      .eq('id', contact1_id)
+      .eq('id', contact1Id)
       .single();
 
     if (contact1Error) {
-      console.error('Error fetching first contact for duplicate:', contact1Error);
-      return { contact1: null, contact2: null };
+      console.error('Error fetching contact 1:', contact1Error);
     }
 
-    // Fetch second contact
-    const { data: contact2, error: contact2Error } = await supabase
+    // Fetch second contact details
+    const { data: contact2Data, error: contact2Error } = await supabase
       .from('contacts')
       .select(`
-        id,
-        first_name,
-        last_name,
-        status,
-        created_at,
-        updated_at,
-        emails (
-          id,
-          email,
-          type,
-          is_primary
-        ),
-        phones (
-          id,
-          phone,
-          type,
-          is_primary
-        ),
-        locations (
-          id,
-          street,
-          city,
-          state,
-          zip,
-          type,
-          is_primary
-        )
+        *,
+        emails(*),
+        phones(*),
+        locations(*),
+        donations(*),
+        employer_data(*)
       `)
-      .eq('id', contact2_id)
+      .eq('id', contact2Id)
       .single();
 
     if (contact2Error) {
-      console.error('Error fetching second contact for duplicate:', contact2Error);
-      return { contact1: null, contact2: null };
+      console.error('Error fetching contact 2:', contact2Error);
     }
 
-    return { contact1, contact2 };
+    return {
+      contact1: contact1Data as Contact || null,
+      contact2: contact2Data as Contact || null
+    };
   } catch (error) {
-    console.error('Error in fetchDuplicateContacts:', error);
+    console.error('Error in fetchDuplicateContactsById:', error);
     return { contact1: null, contact2: null };
   }
 }
 
 /**
- * Marks a duplicate match as resolved
+ * Resolve a duplicate match (merge or ignore)
  */
-export async function resolveDuplicate(duplicateId: string, action: 'ignore' | 'merge', primaryContactId?: string) {
+export async function resolveDuplicateMatch(params: ResolveDuplicateParams): Promise<boolean> {
   try {
     const userId = await getCurrentUserId();
     if (!userId) return false;
 
-    // Mark the duplicate as resolved
-    const { error } = await supabase
-      .from('duplicate_matches')
-      .update({
-        resolved: true,
-        reviewed_by: userId,
-        reviewed_at: new Date().toISOString()
-      })
-      .eq('id', duplicateId);
+    const { duplicateId, action, primaryContactId } = params;
 
-    if (error) {
-      console.error('Error resolving duplicate:', error);
-      return false;
+    if (action === 'ignore') {
+      // Mark as resolved without merging
+      const { error } = await supabase
+        .from('duplicate_matches')
+        .update({
+          resolved: true,
+          reviewed_by: userId,
+          reviewed_at: new Date().toISOString()
+        })
+        .eq('id', duplicateId);
+
+      if (error) {
+        console.error('Error ignoring duplicate:', error);
+        return false;
+      }
+
+      return true;
+    } 
+    else if (action === 'merge' && primaryContactId) {
+      // Get the duplicate match details to know both contact IDs
+      const { data: duplicate, error: matchError } = await supabase
+        .from('duplicate_matches')
+        .select('contact1_id, contact2_id')
+        .eq('id', duplicateId)
+        .single();
+
+      if (matchError || !duplicate) {
+        console.error('Error fetching duplicate match:', matchError);
+        return false;
+      }
+
+      // Determine the secondary contact ID (the one to merge from)
+      const secondaryContactId = duplicate.contact1_id === primaryContactId 
+        ? duplicate.contact2_id 
+        : duplicate.contact1_id;
+
+      // Call server function to handle the merge (simplified for now)
+      // This would typically call a server function that handles the complex merge logic
+      
+      // For now, we'll just mark it as resolved
+      const { error } = await supabase
+        .from('duplicate_matches')
+        .update({
+          resolved: true,
+          reviewed_by: userId,
+          reviewed_at: new Date().toISOString()
+        })
+        .eq('id', duplicateId);
+
+      if (error) {
+        console.error('Error resolving duplicate:', error);
+        return false;
+      }
+
+      // Record the merge in history
+      const { error: historyError } = await supabase
+        .from('merge_history')
+        .insert([{
+          primary_contact_id: primaryContactId,
+          merged_contact_id: secondaryContactId,
+          merged_by: userId
+        }]);
+
+      if (historyError) {
+        console.error('Error recording merge history:', historyError);
+        // Don't return false here, as the main operation succeeded
+      }
+
+      return true;
     }
 
-    // If the action is to merge and we have a primary contact ID, we would handle the merge logic here
-    if (action === 'merge' && primaryContactId) {
-      // This would call a more complex merge function that we would implement separately
-      // mergeContacts(duplicateId, primaryContactId);
-    }
-
-    return true;
+    return false;
   } catch (error) {
-    console.error('Error in resolveDuplicate:', error);
+    console.error('Error in resolveDuplicateMatch:', error);
     return false;
   }
 }

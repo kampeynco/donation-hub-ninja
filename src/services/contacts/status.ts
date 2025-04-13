@@ -67,40 +67,36 @@ export async function getContactCountsByStatus() {
       return { prospect: 0, active: 0, donor: 0, total: 0 };
     }
 
-    // Build query to count by status
-    const { data, error } = await supabase
+    // Get counts by status 
+    const { data: prospects } = await supabase
       .from('contacts')
-      .select('status, count')
+      .select('id', { count: 'exact' })
       .in('id', contactIds)
-      .group('status');
+      .eq('status', 'prospect');
 
-    if (error) {
-      console.error('Error counting contacts by status:', error);
-      return { prospect: 0, active: 0, donor: 0, total: 0 };
-    }
+    const { data: active } = await supabase
+      .from('contacts')
+      .select('id', { count: 'exact' })
+      .in('id', contactIds)
+      .eq('status', 'active');
 
-    // Process results
-    const result = { prospect: 0, active: 0, donor: 0, total: 0 };
-    let total = 0;
+    const { data: donors } = await supabase
+      .from('contacts')
+      .select('id', { count: 'exact' })
+      .in('id', contactIds)
+      .eq('status', 'donor');
 
-    data?.forEach(item => {
-      const count = typeof item.count === 'number' ? item.count : 0;
-      switch (item.status) {
-        case 'prospect':
-          result.prospect = count;
-          break;
-        case 'active':
-          result.active = count;
-          break;
-        case 'donor':
-          result.donor = count;
-          break;
-      }
-      total += count;
-    });
+    const prospectCount = prospects?.length || 0;
+    const activeCount = active?.length || 0;
+    const donorCount = donors?.length || 0;
+    const total = prospectCount + activeCount + donorCount;
 
-    result.total = total;
-    return result;
+    return {
+      prospect: prospectCount,
+      active: activeCount,
+      donor: donorCount,
+      total: total
+    };
   } catch (error) {
     console.error('Error in getContactCountsByStatus:', error);
     return { prospect: 0, active: 0, donor: 0, total: 0 };
@@ -137,10 +133,10 @@ export async function getRecentDonorCount() {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    // Count unique donors with recent donations
-    const { count, error } = await supabase
+    // Query for unique contacts with recent donations
+    const { data, error } = await supabase
       .from('donations')
-      .select('contact_id', { count: 'exact', head: true, distinct: true })
+      .select('contact_id', { count: 'exact', head: true })
       .in('contact_id', contactIds)
       .gte('paid_at', thirtyDaysAgo.toISOString());
 
@@ -149,7 +145,15 @@ export async function getRecentDonorCount() {
       return 0;
     }
 
-    return count || 0;
+    // Find unique contact IDs with donations
+    const uniqueContactIds = new Set();
+    data?.forEach(donation => {
+      if (donation.contact_id) {
+        uniqueContactIds.add(donation.contact_id);
+      }
+    });
+
+    return uniqueContactIds.size;
   } catch (error) {
     console.error('Error in getRecentDonorCount:', error);
     return 0;

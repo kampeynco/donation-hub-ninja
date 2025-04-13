@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useContactManagement } from "@/hooks/useContactManagement";
 import { Button } from "@/components/ui/button";
@@ -26,6 +25,7 @@ import ContactTableActions from "./ContactTableActions";
 import ContactsTablePagination from "./ContactsTablePagination";
 import ContactsEmptyState from "./ContactsEmptyState";
 import ContactsTableHeader from "./ContactsTableHeader";
+import type { Contact } from "@/types/contact";
 
 export default function ContactsTabContent() {
   const {
@@ -169,7 +169,7 @@ export default function ContactsTabContent() {
                 </TableCell>
               </TableRow>
             ) : (
-              contacts.map((contact) => (
+              contacts.map((contact: Contact) => (
                 <TableRow key={contact.id}>
                   <TableCell className="font-medium">
                     {contact.first_name || contact.last_name ? (
