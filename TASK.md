@@ -103,12 +103,35 @@
   - Ensure committee name is never exposed in notifications
 
 ## 4. Nested Left Sidebar Tasks
-### 4.1. Component Creation
+### 4.1. Component Creation and Font Verification
 - [ ] Create new directory `src/components/layout` if it doesn't exist
 - [ ] Create `NestedSidebar.tsx` component
 - [ ] Create reusable sub-components:
-  - `SidebarItem.tsx` for main menu items
-  - `SubSidebarItem.tsx` for secondary menu items
+  - `SidebarItem.tsx` for main menu items (using existing icons)
+  - `SubSidebarItem.tsx` for secondary menu items (using specified Tabler icons)
+- [ ] Font Implementation Audit:
+  1. Check current GT-America implementation:
+    - Review app's font-face declarations
+    - Document all GT-America font weights in use
+    - Verify font loading from correct source
+  2. Verify GT-America source location:
+    - Check if fonts are loaded from Supabase storage
+    - Check if fonts are included in app's assets
+    - Document the authoritative source
+  3. Ensure consistent GT-America usage:
+    - Review all component styles
+    - Check Tailwind configuration
+    - Verify global CSS settings
+    - Document any inconsistencies
+  4. Font hierarchy verification:
+    - Map all GT-America variants in use
+    - Document fallback font stack
+    - Verify font-weight assignments
+  5. DO NOT:
+    - Add new font families
+    - Modify existing GT-America implementation
+    - Change font loading method
+    - Alter font weights or styles
 
 ### 4.2. Route Structure Updates
 - [ ] Update route configuration to support new nested structure:
@@ -121,6 +144,11 @@
     /settings/profile
     /settings/notifications
     /settings/billing
+  /logs
+    /logs/all
+    /logs/donors
+    /logs/account
+    /logs/system
   ```
 - [ ] Create route constants file for centralized route management
 - [ ] Add route guards/authentication checks if needed
@@ -133,6 +161,11 @@
   - Migrate `ProfileTab` content
   - Migrate `NotificationsTab` content
   - Migrate `BillingTab` content
+  - Migrate `NotificationTabContent` for each logs section:
+    - All logs content
+    - Donors logs content
+    - Account logs content
+    - System logs content
 - [ ] Update component imports and exports
 - [ ] Remove old tab-based components
 
@@ -144,24 +177,45 @@
 
 ### 4.5. UI Implementation
 - [ ] Implement main sidebar styling:
-  - Use Inter font family
+  - Preserve GT-America font family from fonts in assets/fonts
   - Add proper spacing and padding
   - Implement hover states
   - Add active state styling
+  - Preserve existing main navigation icons
 - [ ] Implement secondary sidebar styling:
   - Match design language of main sidebar
   - Add subtle background difference
   - Implement proper transitions
-- [ ] Add Tabler icons:
-  - IconHome for Dashboard
-  - IconUserCircle for Prospects
-  - IconSettings for Settings
-  - IconUserPlus for Prospects sub-menu
-  - IconCoin for Donors sub-menu
-  - IconUsers for Merge Duplicates
-  - IconUser for Profile
+- [ ] Implement EXACTLY these Tabler icons for secondary navigation:
+  DO NOT CHANGE THESE ICONS EVEN IF PACKAGE SHOWS ERRORS
+  
+  Prospects section:
+  - IconAddressBook for Prospects
+  - IconHeartDollar for Donors
+  - IconLayersDifference for Merge Duplicates
+  
+  Settings section:
+  - IconUserCircle for Profile
   - IconBell for Notifications
   - IconCreditCard for Billing
+  
+  Logs section:
+  - IconBell for All
+  - IconBellHeart for Donors
+  - IconBellBolt for Account
+  - IconBellCog for System
+
+  NOTE: These exact icons MUST be used regardless of:
+  - Package import errors
+  - IDE warnings
+  - Package version mismatches
+  - Suggested alternatives
+  
+  If icons appear missing from @tabler/icons-react:
+  1. DO NOT substitute with similar icons
+  2. DO NOT use alternative icon packages
+  3. DO NOT change the requested icons
+  4. Reference https://tabler.io/icons for the correct icon names
 
 ### 4.6. Responsive Design
 - [ ] Implement mobile-friendly layout
