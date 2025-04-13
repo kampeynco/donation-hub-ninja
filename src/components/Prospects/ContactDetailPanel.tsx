@@ -412,31 +412,36 @@ function PhoneItem({ phone, onSetPrimary }: { phone: Phone, onSetPrimary: () => 
 
 // Location list item component
 function LocationItem({ location, onSetPrimary }: { location: Location, onSetPrimary: () => void }) {
+  const correctedLocation = {
+    ...location,
+    type: location.type === 'main' ? 'home' : location.type
+  };
+
   return (
     <div className="flex justify-between items-center p-2 border rounded-md">
       <div>
         <div className="flex items-center gap-1.5">
           <span className="font-medium">
             {[
-              location.street,
-              location.city,
-              location.state,
-              location.zip
+              correctedLocation.street,
+              correctedLocation.city,
+              correctedLocation.state,
+              correctedLocation.zip
             ]
               .filter(Boolean)
               .join(", ")}
           </span>
-          {location.is_primary && (
+          {correctedLocation.is_primary && (
             <Badge variant="secondary" className="text-xs py-0">Primary</Badge>
           )}
         </div>
         <div className="text-xs text-gray-500 mt-0.5">
-          Type: {location.type.charAt(0).toUpperCase() + location.type.slice(1)}
-          {location.country && ` • Country: ${location.country}`}
+          Type: {correctedLocation.type.charAt(0).toUpperCase() + correctedLocation.type.slice(1)}
+          {correctedLocation.country && ` • Country: ${correctedLocation.country}`}
         </div>
       </div>
       <div>
-        {!location.is_primary && (
+        {!correctedLocation.is_primary && (
           <Button variant="ghost" size="sm" onClick={onSetPrimary}>
             Set Primary
           </Button>

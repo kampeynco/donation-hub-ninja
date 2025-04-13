@@ -17,7 +17,7 @@ export function useContactSearch() {
     queryKey: ['contactSearch', searchTerm, limit],
     queryFn: async () => {
       const results = await searchContacts(searchTerm, limit);
-      return results as Contact[];
+      return results;
     },
     enabled: searchTerm.length >= 2,
   });

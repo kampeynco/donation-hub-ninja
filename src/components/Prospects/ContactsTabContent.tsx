@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useContactManagement } from "@/hooks/useContactManagement";
 import { Button } from "@/components/ui/button";
@@ -169,53 +170,62 @@ export default function ContactsTabContent() {
                 </TableCell>
               </TableRow>
             ) : (
-              contacts.map((contact: Contact) => (
-                <TableRow key={contact.id}>
-                  <TableCell className="font-medium">
-                    {contact.first_name || contact.last_name ? (
-                      `${contact.first_name || ''} ${contact.last_name || ''}`.trim()
-                    ) : (
-                      <span className="text-gray-500">No name</span>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex flex-col gap-1">
-                      {contact.emails?.[0] && (
-                        <div className="flex items-center text-sm">
-                          <IconMail className="h-3.5 w-3.5 mr-1.5 text-gray-500" />
-                          <span className="truncate max-w-[200px]">{contact.emails[0].email}</span>
-                        </div>
+              contacts.map((contact) => {
+                // Ensure contact conforms to Contact type
+                const typedContact: Contact = {
+                  ...contact,
+                  // Ensure status is one of the valid options
+                  status: contact.status === 'inactive' ? 'active' : contact.status as 'prospect' | 'active' | 'donor'
+                };
+                
+                return (
+                  <TableRow key={typedContact.id}>
+                    <TableCell className="font-medium">
+                      {typedContact.first_name || typedContact.last_name ? (
+                        `${typedContact.first_name || ''} ${typedContact.last_name || ''}`.trim()
+                      ) : (
+                        <span className="text-gray-500">No name</span>
                       )}
-                      {contact.phones?.[0] && (
-                        <div className="flex items-center text-sm">
-                          <IconPhone className="h-3.5 w-3.5 mr-1.5 text-gray-500" />
-                          <span>{contact.phones[0].phone}</span>
-                        </div>
-                      )}
-                      {contact.locations?.[0]?.city && (
-                        <div className="flex items-center text-sm">
-                          <IconMap className="h-3.5 w-3.5 mr-1.5 text-gray-500" />
-                          <span>
-                            {[
-                              contact.locations[0].city,
-                              contact.locations[0].state
-                            ].filter(Boolean).join(', ')}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    {getStatusBadge(contact.status)}
-                  </TableCell>
-                  <TableCell>
-                    {formatDate(contact.created_at)}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <ContactTableActions contact={contact} />
-                  </TableCell>
-                </TableRow>
-              ))
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-col gap-1">
+                        {typedContact.emails?.[0] && (
+                          <div className="flex items-center text-sm">
+                            <IconMail className="h-3.5 w-3.5 mr-1.5 text-gray-500" />
+                            <span className="truncate max-w-[200px]">{typedContact.emails[0].email}</span>
+                          </div>
+                        )}
+                        {typedContact.phones?.[0] && (
+                          <div className="flex items-center text-sm">
+                            <IconPhone className="h-3.5 w-3.5 mr-1.5 text-gray-500" />
+                            <span>{typedContact.phones[0].phone}</span>
+                          </div>
+                        )}
+                        {typedContact.locations?.[0]?.city && (
+                          <div className="flex items-center text-sm">
+                            <IconMap className="h-3.5 w-3.5 mr-1.5 text-gray-500" />
+                            <span>
+                              {[
+                                typedContact.locations[0].city,
+                                typedContact.locations[0].state
+                              ].filter(Boolean).join(', ')}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {getStatusBadge(typedContact.status)}
+                    </TableCell>
+                    <TableCell>
+                      {formatDate(typedContact.created_at)}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <ContactTableActions contact={typedContact} />
+                    </TableCell>
+                  </TableRow>
+                );
+              })
             )}
           </TableBody>
         </Table>
