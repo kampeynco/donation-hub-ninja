@@ -101,3 +101,110 @@
   - Format donation notification without recipient details
   - Send notifications to relevant users only
   - Ensure committee name is never exposed in notifications
+
+## 4. Nested Left Sidebar Tasks
+### 4.1. Component Creation
+- [ ] Create new directory `src/components/layout` if it doesn't exist
+- [ ] Create `NestedSidebar.tsx` component
+- [ ] Create reusable sub-components:
+  - `SidebarItem.tsx` for main menu items
+  - `SubSidebarItem.tsx` for secondary menu items
+
+### 4.2. Route Structure Updates
+- [ ] Update route configuration to support new nested structure:
+  ```typescript
+  /prospects
+    /prospects/prospects
+    /prospects/donors
+    /prospects/merge
+  /settings
+    /settings/profile
+    /settings/notifications
+    /settings/billing
+  ```
+- [ ] Create route constants file for centralized route management
+- [ ] Add route guards/authentication checks if needed
+
+### 4.3. Component Migration
+- [ ] Move existing tab content components to standalone pages:
+  - Migrate `ProspectsContent` from tab content
+  - Migrate `DonorsContent` from tab content
+  - Migrate `MergeDuplicatesContent` from tab content
+  - Migrate `ProfileTab` content
+  - Migrate `NotificationsTab` content
+  - Migrate `BillingTab` content
+- [ ] Update component imports and exports
+- [ ] Remove old tab-based components
+
+### 4.4. State Management
+- [ ] Implement active route tracking
+- [ ] Add state management for sidebar collapse/expand
+- [ ] Handle secondary sidebar visibility based on route
+- [ ] Preserve user preferences (e.g., sidebar state)
+
+### 4.5. UI Implementation
+- [ ] Implement main sidebar styling:
+  - Use Inter font family
+  - Add proper spacing and padding
+  - Implement hover states
+  - Add active state styling
+- [ ] Implement secondary sidebar styling:
+  - Match design language of main sidebar
+  - Add subtle background difference
+  - Implement proper transitions
+- [ ] Add Tabler icons:
+  - IconHome for Dashboard
+  - IconUserCircle for Prospects
+  - IconSettings for Settings
+  - IconUserPlus for Prospects sub-menu
+  - IconCoin for Donors sub-menu
+  - IconUsers for Merge Duplicates
+  - IconUser for Profile
+  - IconBell for Notifications
+  - IconCreditCard for Billing
+
+### 4.6. Responsive Design
+- [ ] Implement mobile-friendly layout
+- [ ] Add collapse/expand functionality
+- [ ] Add touch gestures for mobile
+- [ ] Test breakpoints and responsive behavior
+
+### 4.7. Navigation Logic
+- [ ] Implement navigation state management
+- [ ] Add route change handlers
+- [ ] Implement breadcrumb generation
+- [ ] Handle deep linking
+
+### 4.8. Testing
+- [ ] Add unit tests for sidebar components
+- [ ] Add integration tests for navigation
+- [ ] Test responsive behavior
+- [ ] Test route handling
+- [ ] Cross-browser testing
+
+### 4.9. Performance Optimization
+- [ ] Implement code splitting for routes
+- [ ] Optimize component rendering
+- [ ] Add loading states
+- [ ] Implement transition animations
+
+### 4.10. Documentation
+- [ ] Add component documentation
+- [ ] Document routing structure
+- [ ] Add usage examples
+- [ ] Document state management
+- [ ] Add migration guide for existing code
+
+### 4.11. Cleanup
+- [ ] Remove old tab-based navigation code
+- [ ] Clean up unused imports
+- [ ] Remove deprecated routes
+- [ ] Update test files
+- [ ] Remove unused dependencies
+
+### 4.12. Final Review
+- [ ] Conduct accessibility audit
+- [ ] Review mobile responsiveness
+- [ ] Check performance metrics
+- [ ] Verify all routes work as expected
+- [ ] Ensure design consistency
