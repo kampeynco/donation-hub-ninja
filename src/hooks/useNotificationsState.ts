@@ -17,7 +17,12 @@ export function useNotificationsState(userId?: string) {
     try {
       setLoading(true);
       const data = await fetchNotifications(50);
-      setNotifications(data);
+      // Ensure all notifications have the donor_id field (even if it's undefined)
+      const normalizedData = data.map(notification => ({
+        ...notification,
+        donor_id: notification.contact_id || undefined
+      }));
+      setNotifications(normalizedData);
       setError(null);
     } catch (err) {
       console.error('Error fetching notifications:', err);

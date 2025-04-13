@@ -42,7 +42,7 @@ export interface Location {
   state: string | null;
   zip: string | null;
   country: string | null;
-  type: 'home' | 'work' | 'mailing' | 'other';
+  type: 'home' | 'work' | 'mailing' | 'other' | 'main';
   is_primary: boolean;
   contact_id?: string;
 }

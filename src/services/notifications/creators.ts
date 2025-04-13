@@ -19,7 +19,8 @@ export async function createDonationNotification(
       is_read: false,
       action: 'donor' as const,
       contact_id: contactId,
-      date: new Date().toISOString()
+      date: new Date().toISOString(),
+      donor_id: contactId // Add donor_id for compatibility
     };
     
     return await createNewNotification(notification);
@@ -47,7 +48,8 @@ export async function createRecurringDonationNotification(
       is_read: false,
       action: 'donor' as const,
       contact_id: contactId,
-      date: new Date().toISOString()
+      date: new Date().toISOString(),
+      donor_id: contactId // Add donor_id for compatibility
     };
     
     return await createNewNotification(notification);

@@ -7,4 +7,5 @@ export interface Notification {
   action: 'donor' | 'user' | 'system';
   contact_id?: string;
   date: string;
+  donor_id?: string; // Added to make compatible with NotificationBell
 }

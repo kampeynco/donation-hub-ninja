@@ -1,52 +1,71 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { getCurrentUserId } from "@/services/donations/helpers";
 import type { Notification } from "@/types/notification";
+
+/**
+ * Fetch notifications with optional limit
+ */
+export async function fetchNotifications(limit = 50): Promise<Notification[]> {
+  try {
+    // Fetch notifications ordered by creation date (newest first)
+    const { data, error } = await supabase
+      .from("notifications")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      console.error("Error fetching notifications:", error);
+      return [];
+    }
+
+    return data as Notification[];
+  } catch (error) {
+    console.error("Exception in fetchNotifications:", error);
+    return [];
+  }
+}
 
 /**
  * Mark a notification as read
  */
-export async function markNotificationRead(notificationId: string) {
+export async function markNotificationAsRead(id: string): Promise<boolean> {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) return false;
-
     const { error } = await supabase
-      .from('notifications')
+      .from("notifications")
       .update({ is_read: true })
-      .eq('id', notificationId);
+      .eq("id", id);
 
     if (error) {
-      console.error('Error marking notification as read:', error);
+      console.error("Error marking notification as read:", error);
       return false;
     }
+
     return true;
   } catch (error) {
-    console.error('Error in markNotificationRead:', error);
+    console.error("Exception in markNotificationAsRead:", error);
     return false;
   }
 }
 
 /**
- * Mark all notifications as read for the current user
+ * Mark all notifications as read
  */
-export async function markAllNotificationsRead() {
+export async function markAllNotificationsAsRead(): Promise<boolean> {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) return false;
-
     const { error } = await supabase
-      .from('notifications')
+      .from("notifications")
       .update({ is_read: true })
-      .eq('is_read', false);
+      .is("is_read", false);
 
     if (error) {
-      console.error('Error marking all notifications as read:', error);
+      console.error("Error marking all notifications as read:", error);
       return false;
     }
+
     return true;
   } catch (error) {
-    console.error('Error in markAllNotificationsRead:', error);
+    console.error("Exception in markAllNotificationsAsRead:", error);
     return false;
   }
 }
@@ -54,23 +73,23 @@ export async function markAllNotificationsRead() {
 /**
  * Delete a notification
  */
-export async function deleteNotification(notificationId: string) {
+export async function deleteNotification(id: string): Promise<boolean> {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) return false;
-
+    console.log(`API: Deleting notification ID: ${id}`);
     const { error } = await supabase
-      .from('notifications')
+      .from("notifications")
       .delete()
-      .eq('id', notificationId);
+      .eq("id", id);
 
     if (error) {
-      console.error('Error deleting notification:', error);
+      console.error("Error deleting notification:", error);
       return false;
     }
+
+    console.log(`API: Successfully deleted notification ID: ${id}`);
     return true;
   } catch (error) {
-    console.error('Error in deleteNotification:', error);
+    console.error("Exception in deleteNotification:", error);
     return false;
   }
 }
@@ -78,48 +97,20 @@ export async function deleteNotification(notificationId: string) {
 /**
  * Create a new notification
  */
-export async function createNewNotification(notification: Notification) {
+export async function createNewNotification(notification: Notification): Promise<boolean> {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) return false;
-
     const { error } = await supabase
-      .from('notifications')
-      .insert([notification]);
+      .from("notifications")
+      .insert(notification);
 
     if (error) {
-      console.error('Error creating notification:', error);
+      console.error("Error creating notification:", error);
       return false;
     }
+
     return true;
   } catch (error) {
-    console.error('Error in createNewNotification:', error);
+    console.error("Exception in createNewNotification:", error);
     return false;
-  }
-}
-
-/**
- * Fetch notifications with optional limit
- */
-export async function fetchNotifications(limit = 10): Promise<Notification[]> {
-  try {
-    const userId = await getCurrentUserId();
-    if (!userId) return [];
-
-    const { data, error } = await supabase
-      .from('notifications')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(limit);
-
-    if (error) {
-      console.error('Error fetching notifications:', error);
-      return [];
-    }
-
-    return data as Notification[];
-  } catch (error) {
-    console.error('Error in fetchNotifications:', error);
-    return [];
   }
 }
