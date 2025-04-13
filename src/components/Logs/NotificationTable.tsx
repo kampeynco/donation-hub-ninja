@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Notification } from '@/components/Notifications/NotificationBell';
+import { Notification } from '@/types/notification';
 import NotificationRow from './NotificationRow';
 import EmptyState from './EmptyState';
 import LoadingRows from './LoadingRows';

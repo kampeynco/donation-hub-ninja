@@ -17,10 +17,10 @@ export function useNotificationsState(userId?: string) {
     try {
       setLoading(true);
       const data = await fetchNotifications(50);
-      // Ensure all notifications have the donor_id field (even if it's undefined)
+      // Ensure all notifications have the donor_id field (using contact_id as fallback)
       const normalizedData = data.map(notification => ({
         ...notification,
-        donor_id: notification.contact_id || undefined
+        donor_id: notification.donor_id || notification.contact_id
       }));
       setNotifications(normalizedData);
       setError(null);

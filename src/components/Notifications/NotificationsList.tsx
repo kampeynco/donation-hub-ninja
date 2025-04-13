@@ -1,5 +1,5 @@
 
-import { Notification } from './NotificationBell';
+import { Notification } from '@/types/notification';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';

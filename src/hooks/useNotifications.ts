@@ -1,8 +1,8 @@
 
 import { useState } from 'react';
 import { 
-  markNotificationRead,
-  markAllNotificationsRead,
+  markNotificationAsRead,
+  markAllNotificationsAsRead,
   fetchNotifications,
   deleteNotification,
   createDonationNotification,
@@ -22,7 +22,7 @@ export function useNotifications() {
   const markAsRead = async (id: string) => {
     setIsLoading(true);
     try {
-      return await markNotificationRead(id);
+      return await markNotificationAsRead(id);
     } catch (error) {
       console.error('Error marking notification as read:', error);
       return false;
@@ -37,7 +37,7 @@ export function useNotifications() {
   const markAllAsRead = async () => {
     setIsLoading(true);
     try {
-      return await markAllNotificationsRead();
+      return await markAllNotificationsAsRead();
     } catch (error) {
       console.error('Error marking all notifications as read:', error);
       return false;

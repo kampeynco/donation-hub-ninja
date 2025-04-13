@@ -1,7 +1,7 @@
 
-import { useEffect, useCallback } from 'react';
+import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Notification } from '@/components/Notifications/NotificationBell';
+import { Notification } from '@/types/notification';
 import { toast } from '@/hooks/use-toast';
 
 export function useNotificationsRealtime(
@@ -24,7 +24,12 @@ export function useNotificationsRealtime(
           table: 'notifications'
         },
         (payload) => {
-          updateNotifications(prev => [payload.new as Notification, ...prev]);
+          // Ensure donor_id is set for compatibility
+          const newNotification = payload.new as Notification;
+          if (!newNotification.donor_id && newNotification.contact_id) {
+            newNotification.donor_id = newNotification.contact_id;
+          }
+          updateNotifications(prev => [newNotification, ...prev]);
         }
       )
       .on(
@@ -47,8 +52,13 @@ export function useNotificationsRealtime(
           table: 'notifications'
         },
         (payload) => {
+          // Ensure donor_id is set for compatibility
+          const updatedNotification = payload.new as Notification;
+          if (!updatedNotification.donor_id && updatedNotification.contact_id) {
+            updatedNotification.donor_id = updatedNotification.contact_id;
+          }
           updateNotifications(prev => 
-            prev.map(n => n.id === payload.new.id ? { ...n, ...payload.new } : n)
+            prev.map(n => n.id === updatedNotification.id ? { ...n, ...updatedNotification } : n)
           );
         }
       )

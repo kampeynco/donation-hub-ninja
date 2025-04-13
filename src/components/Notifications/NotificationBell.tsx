@@ -9,16 +9,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { useNotificationsContext } from '@/context/NotificationsContext';
 import NotificationsList from './NotificationsList';
-
-export interface Notification {
-  id: string;
-  message: string;
-  is_read: boolean;
-  date: string;
-  action: 'user' | 'system' | 'donor';
-  donor_id: string | null;
-  contact_id?: string | null; // Add contact_id for compatibility with new schema
-}
+import { Notification as NotificationType } from '@/types/notification';
 
 const NotificationBell = () => {
   const { notifications, markAsRead, markAllAsRead, deleteNotification } = useNotificationsContext();

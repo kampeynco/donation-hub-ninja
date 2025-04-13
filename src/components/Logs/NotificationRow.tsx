@@ -5,7 +5,7 @@ import { IconTrash } from '@tabler/icons-react';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Notification } from '@/components/Notifications/NotificationBell';
+import { Notification } from '@/types/notification';
 import NotificationIcon from './NotificationIcon';
 
 interface NotificationRowProps {

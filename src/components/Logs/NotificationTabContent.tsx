@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { TabsContent } from '@/components/ui/tabs';
-import { Notification } from '@/components/Notifications/NotificationBell';
+import { Notification } from '@/types/notification';
 import NotificationTable from './NotificationTable';
 
 interface NotificationTabContentProps {
