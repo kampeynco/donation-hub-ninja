@@ -12,29 +12,29 @@ export async function fetchMonthlyDonorsCount() {
       return 0;
     }
 
-    // First get donor IDs associated with the current user
-    const { data: userDonors, error: userDonorsError } = await supabase
-      .from('user_donors')
-      .select('donor_id')
+    // First get contact IDs associated with the current user
+    const { data: userContacts, error: userContactsError } = await supabase
+      .from('user_contacts')
+      .select('contact_id')
       .eq('user_id', userId);
     
-    if (userDonorsError) {
-      console.error('Error fetching user donors:', userDonorsError);
+    if (userContactsError) {
+      console.error('Error fetching user contacts:', userContactsError);
       return 0;
     }
     
-    // Extract donor IDs as an array
-    const donorIds = userDonors?.map(ud => ud.donor_id) || [];
+    // Extract contact IDs as an array
+    const contactIds = userContacts?.map(uc => uc.contact_id) || [];
     
-    if (donorIds.length === 0) {
+    if (contactIds.length === 0) {
       return 0;
     }
     
-    // Use extracted donor IDs array to get monthly donors
+    // Use extracted contact IDs array to get monthly donors
     const { count, error } = await supabase
       .from('donations')
-      .select('donor_id', { count: 'exact', head: true })
-      .in('donor_id', donorIds)
+      .select('contact_id', { count: 'exact', head: true })
+      .in('contact_id', contactIds)
       .not('recurring_period', 'eq', 'once');
     
     if (error) throw error;

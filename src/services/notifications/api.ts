@@ -19,7 +19,7 @@ export async function createNotification({
     const notificationData = {
       message,
       action,
-      donor_id: donorId,
+      contact_id: donorId,
       date: new Date().toISOString(),
       is_read: false
     };
@@ -35,7 +35,13 @@ export async function createNotification({
       return null;
     }
     
-    return data as Notification;
+    // Convert contact_id to donor_id for backward compatibility with Notification type
+    const notification = {
+      ...data,
+      donor_id: data.contact_id
+    } as Notification;
+    
+    return notification;
   } catch (error) {
     console.error('Error in createNotification:', error);
     return null;
@@ -158,7 +164,13 @@ export async function fetchRecentNotifications(limit = 10): Promise<Notification
       return [];
     }
     
-    return data as Notification[];
+    // Map the data to include donor_id for backward compatibility
+    const notifications = data.map(item => ({
+      ...item,
+      donor_id: item.contact_id
+    })) as Notification[];
+    
+    return notifications;
   } catch (error) {
     console.error('Error in fetchRecentNotifications:', error);
     return [];

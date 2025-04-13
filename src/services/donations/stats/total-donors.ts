@@ -14,8 +14,8 @@ export async function fetchTotalDonorsCount() {
 
     // Get count of unique donors associated with the current user
     const { count, error } = await supabase
-      .from('user_donors')
-      .select('donor_id', { count: 'exact', head: true })
+      .from('user_contacts')
+      .select('contact_id', { count: 'exact', head: true })
       .eq('user_id', userId);
     
     if (error) throw error;

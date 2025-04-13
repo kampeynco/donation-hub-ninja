@@ -15,29 +15,29 @@ export async function fetchLastThirtyDaysStats() {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     
-    // First get donor IDs associated with the current user
-    const { data: userDonors, error: userDonorsError } = await supabase
-      .from('user_donors')
-      .select('donor_id')
+    // First get contact IDs associated with the current user
+    const { data: userContacts, error: userContactsError } = await supabase
+      .from('user_contacts')
+      .select('contact_id')
       .eq('user_id', userId);
     
-    if (userDonorsError) {
-      console.error('Error fetching user donors:', userDonorsError);
+    if (userContactsError) {
+      console.error('Error fetching user contacts:', userContactsError);
       return { total: 0, count: 0 };
     }
     
-    // Extract donor IDs as an array
-    const donorIds = userDonors?.map(ud => ud.donor_id) || [];
+    // Extract contact IDs as an array
+    const contactIds = userContacts?.map(uc => uc.contact_id) || [];
     
-    if (donorIds.length === 0) {
+    if (contactIds.length === 0) {
       return { total: 0, count: 0 };
     }
     
-    // Use extracted donor IDs array to get donations
+    // Use extracted contact IDs array to get donations
     const { data, error } = await supabase
       .from('donations')
       .select('amount')
-      .in('donor_id', donorIds)
+      .in('contact_id', contactIds)
       .gte('created_at', thirtyDaysAgo.toISOString());
     
     if (error) throw error;

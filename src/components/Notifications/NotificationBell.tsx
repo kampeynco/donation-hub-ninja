@@ -17,6 +17,7 @@ export interface Notification {
   date: string;
   action: 'user' | 'system' | 'donor';
   donor_id: string | null;
+  contact_id?: string | null; // Add contact_id for compatibility with new schema
 }
 
 const NotificationBell = () => {
