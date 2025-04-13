@@ -9,6 +9,54 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      contacts: {
+        Row: {
+          created_at: string
+          first_name: string | null
+          id: string
+          is_eligible_for_express_lane: boolean | null
+          is_express: boolean | null
+          is_mobile: boolean | null
+          is_paypal: boolean | null
+          last_name: string | null
+          status: Database["public"]["Enums"]["contact_status"]
+          text_message_option:
+            | Database["public"]["Enums"]["text_message_option"]
+            | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          first_name?: string | null
+          id?: string
+          is_eligible_for_express_lane?: boolean | null
+          is_express?: boolean | null
+          is_mobile?: boolean | null
+          is_paypal?: boolean | null
+          last_name?: string | null
+          status?: Database["public"]["Enums"]["contact_status"]
+          text_message_option?:
+            | Database["public"]["Enums"]["text_message_option"]
+            | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          first_name?: string | null
+          id?: string
+          is_eligible_for_express_lane?: boolean | null
+          is_express?: boolean | null
+          is_mobile?: boolean | null
+          is_paypal?: boolean | null
+          last_name?: string | null
+          status?: Database["public"]["Enums"]["contact_status"]
+          text_message_option?:
+            | Database["public"]["Enums"]["text_message_option"]
+            | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       custom_fields: {
         Row: {
           answer: string | null
@@ -45,10 +93,10 @@ export type Database = {
         Row: {
           amount: number
           committee_name: string | null
+          contact_id: string | null
           contribution_form: string | null
           created_at: string
           credit_card_expiration: string | null
-          donor_id: string | null
           entity_id: number | null
           express_signup: boolean | null
           gift_declined: boolean | null
@@ -77,10 +125,10 @@ export type Database = {
         Insert: {
           amount: number
           committee_name?: string | null
+          contact_id?: string | null
           contribution_form?: string | null
           created_at?: string
           credit_card_expiration?: string | null
-          donor_id?: string | null
           entity_id?: number | null
           express_signup?: boolean | null
           gift_declined?: boolean | null
@@ -109,10 +157,10 @@ export type Database = {
         Update: {
           amount?: number
           committee_name?: string | null
+          contact_id?: string | null
           contribution_form?: string | null
           created_at?: string
           credit_card_expiration?: string | null
-          donor_id?: string | null
           entity_id?: number | null
           express_signup?: boolean | null
           gift_declined?: boolean | null
@@ -141,97 +189,106 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "donations_donor_id_fkey"
-            columns: ["donor_id"]
+            columns: ["contact_id"]
             isOneToOne: false
-            referencedRelation: "donors"
+            referencedRelation: "contacts"
             referencedColumns: ["id"]
           },
         ]
       }
-      donors: {
+      duplicate_matches: {
         Row: {
+          address_score: number | null
+          confidence_score: number
+          contact1_id: string
+          contact2_id: string
           created_at: string
-          first_name: string | null
+          email_score: number | null
           id: string
-          is_eligible_for_express_lane: boolean | null
-          is_express: boolean | null
-          is_mobile: boolean | null
-          is_paypal: boolean | null
-          last_name: string | null
-          text_message_option:
-            | Database["public"]["Enums"]["text_message_option"]
-            | null
+          name_score: number | null
+          phone_score: number | null
+          resolved: boolean | null
+          reviewed_at: string | null
+          reviewed_by: string | null
           updated_at: string
         }
         Insert: {
+          address_score?: number | null
+          confidence_score: number
+          contact1_id: string
+          contact2_id: string
           created_at?: string
-          first_name?: string | null
+          email_score?: number | null
           id?: string
-          is_eligible_for_express_lane?: boolean | null
-          is_express?: boolean | null
-          is_mobile?: boolean | null
-          is_paypal?: boolean | null
-          last_name?: string | null
-          text_message_option?:
-            | Database["public"]["Enums"]["text_message_option"]
-            | null
+          name_score?: number | null
+          phone_score?: number | null
+          resolved?: boolean | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           updated_at?: string
         }
         Update: {
+          address_score?: number | null
+          confidence_score?: number
+          contact1_id?: string
+          contact2_id?: string
           created_at?: string
-          first_name?: string | null
+          email_score?: number | null
           id?: string
-          is_eligible_for_express_lane?: boolean | null
-          is_express?: boolean | null
-          is_mobile?: boolean | null
-          is_paypal?: boolean | null
-          last_name?: string | null
-          text_message_option?:
-            | Database["public"]["Enums"]["text_message_option"]
-            | null
+          name_score?: number | null
+          phone_score?: number | null
+          resolved?: boolean | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           updated_at?: string
         }
         Relationships: []
       }
       emails: {
         Row: {
+          contact_id: string | null
           created_at: string
-          donor_id: string | null
           email: string
           id: string
+          is_primary: boolean
+          type: Database["public"]["Enums"]["email_type"]
           updated_at: string
           verified: boolean | null
         }
         Insert: {
+          contact_id?: string | null
           created_at?: string
-          donor_id?: string | null
           email: string
           id?: string
+          is_primary?: boolean
+          type?: Database["public"]["Enums"]["email_type"]
           updated_at?: string
           verified?: boolean | null
         }
         Update: {
+          contact_id?: string | null
           created_at?: string
-          donor_id?: string | null
           email?: string
           id?: string
+          is_primary?: boolean
+          type?: Database["public"]["Enums"]["email_type"]
           updated_at?: string
           verified?: boolean | null
         }
         Relationships: [
           {
             foreignKeyName: "emails_donor_id_fkey"
-            columns: ["donor_id"]
+            columns: ["contact_id"]
             isOneToOne: false
-            referencedRelation: "donors"
+            referencedRelation: "contacts"
             referencedColumns: ["id"]
           },
         ]
       }
       employer_data: {
         Row: {
+          contact_id: string | null
           created_at: string
-          donor_id: string | null
           employer: string | null
           employer_addr1: string | null
           employer_city: string | null
@@ -242,8 +299,8 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          contact_id?: string | null
           created_at?: string
-          donor_id?: string | null
           employer?: string | null
           employer_addr1?: string | null
           employer_city?: string | null
@@ -254,8 +311,8 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          contact_id?: string | null
           created_at?: string
-          donor_id?: string | null
           employer?: string | null
           employer_addr1?: string | null
           employer_city?: string | null
@@ -268,9 +325,9 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "employer_data_donor_id_fkey"
-            columns: ["donor_id"]
+            columns: ["contact_id"]
             isOneToOne: false
-            referencedRelation: "donors"
+            referencedRelation: "contacts"
             referencedColumns: ["id"]
           },
         ]
@@ -305,10 +362,11 @@ export type Database = {
       locations: {
         Row: {
           city: string | null
+          contact_id: string | null
           country: string | null
           created_at: string
-          donor_id: string | null
           id: string
+          is_primary: boolean
           state: string | null
           street: string | null
           type: Database["public"]["Enums"]["location_type"] | null
@@ -317,10 +375,11 @@ export type Database = {
         }
         Insert: {
           city?: string | null
+          contact_id?: string | null
           country?: string | null
           created_at?: string
-          donor_id?: string | null
           id?: string
+          is_primary?: boolean
           state?: string | null
           street?: string | null
           type?: Database["public"]["Enums"]["location_type"] | null
@@ -329,10 +388,11 @@ export type Database = {
         }
         Update: {
           city?: string | null
+          contact_id?: string | null
           country?: string | null
           created_at?: string
-          donor_id?: string | null
           id?: string
+          is_primary?: boolean
           state?: string | null
           street?: string | null
           type?: Database["public"]["Enums"]["location_type"] | null
@@ -342,9 +402,9 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "locations_donor_id_fkey"
-            columns: ["donor_id"]
+            columns: ["contact_id"]
             isOneToOne: false
-            referencedRelation: "donors"
+            referencedRelation: "contacts"
             referencedColumns: ["id"]
           },
         ]
@@ -383,6 +443,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      merge_history: {
+        Row: {
+          created_at: string
+          id: string
+          merged_by: string | null
+          merged_contact_id: string
+          metadata: Json | null
+          primary_contact_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          merged_by?: string | null
+          merged_contact_id: string
+          metadata?: Json | null
+          primary_contact_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          merged_by?: string | null
+          merged_contact_id?: string
+          metadata?: Json | null
+          primary_contact_id?: string
+        }
+        Relationships: []
       }
       notification_settings: {
         Row: {
@@ -444,27 +531,27 @@ export type Database = {
       notifications: {
         Row: {
           action: Database["public"]["Enums"]["notification_action"]
+          contact_id: string | null
           created_at: string
           date: string
-          donor_id: string | null
           id: string
           is_read: boolean | null
           message: string
         }
         Insert: {
           action: Database["public"]["Enums"]["notification_action"]
+          contact_id?: string | null
           created_at?: string
           date?: string
-          donor_id?: string | null
           id?: string
           is_read?: boolean | null
           message: string
         }
         Update: {
           action?: Database["public"]["Enums"]["notification_action"]
+          contact_id?: string | null
           created_at?: string
           date?: string
-          donor_id?: string | null
           id?: string
           is_read?: boolean | null
           message?: string
@@ -472,44 +559,50 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "notifications_donor_id_fkey"
-            columns: ["donor_id"]
+            columns: ["contact_id"]
             isOneToOne: false
-            referencedRelation: "donors"
+            referencedRelation: "contacts"
             referencedColumns: ["id"]
           },
         ]
       }
       phones: {
         Row: {
+          contact_id: string | null
           created_at: string
-          donor_id: string | null
           id: string
+          is_primary: boolean
           phone: string
+          type: Database["public"]["Enums"]["phone_type"]
           updated_at: string
           verified: boolean | null
         }
         Insert: {
+          contact_id?: string | null
           created_at?: string
-          donor_id?: string | null
           id?: string
+          is_primary?: boolean
           phone: string
+          type?: Database["public"]["Enums"]["phone_type"]
           updated_at?: string
           verified?: boolean | null
         }
         Update: {
+          contact_id?: string | null
           created_at?: string
-          donor_id?: string | null
           id?: string
+          is_primary?: boolean
           phone?: string
+          type?: Database["public"]["Enums"]["phone_type"]
           updated_at?: string
           verified?: boolean | null
         }
         Relationships: [
           {
             foreignKeyName: "phones_donor_id_fkey"
-            columns: ["donor_id"]
+            columns: ["contact_id"]
             isOneToOne: false
-            referencedRelation: "donors"
+            referencedRelation: "contacts"
             referencedColumns: ["id"]
           },
         ]
@@ -544,31 +637,31 @@ export type Database = {
         }
         Relationships: []
       }
-      user_donors: {
+      user_contacts: {
         Row: {
+          contact_id: string
           created_at: string
-          donor_id: string
           id: string
           user_id: string
         }
         Insert: {
+          contact_id: string
           created_at?: string
-          donor_id: string
           id?: string
           user_id: string
         }
         Update: {
+          contact_id?: string
           created_at?: string
-          donor_id?: string
           id?: string
           user_id?: string
         }
         Relationships: [
           {
             foreignKeyName: "user_donors_donor_id_fkey"
-            columns: ["donor_id"]
+            columns: ["contact_id"]
             isOneToOne: false
-            referencedRelation: "donors"
+            referencedRelation: "contacts"
             referencedColumns: ["id"]
           },
         ]
@@ -602,6 +695,44 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      webhook_data: {
+        Row: {
+          created_at: string
+          error: string | null
+          id: string
+          payload: Json
+          processed: boolean | null
+          updated_at: string
+          webhook_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          error?: string | null
+          id?: string
+          payload: Json
+          processed?: boolean | null
+          updated_at?: string
+          webhook_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          error?: string | null
+          id?: string
+          payload?: Json
+          processed?: boolean | null
+          updated_at?: string
+          webhook_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webhook_data_webhook_id_fkey"
+            columns: ["webhook_id"]
+            isOneToOne: false
+            referencedRelation: "webhooks"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       webhooks: {
         Row: {
@@ -663,9 +794,12 @@ export type Database = {
       }
     }
     Enums: {
+      contact_status: "active" | "inactive" | "prospect" | "donor"
+      email_type: "personal" | "work" | "other"
       feature_name: "Segments" | "Donors"
-      location_type: "main" | "work"
+      location_type: "main" | "work" | "home" | "mailing" | "other"
       notification_action: "user" | "system" | "donor"
+      phone_type: "mobile" | "home" | "work" | "other"
       recurring_period: "once" | "weekly" | "monthly"
       text_message_option: "unknown" | "opt_in" | "opt_out"
       waitlist_status: "joined" | "approved" | "rejected" | "declined"
@@ -784,9 +918,12 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      contact_status: ["active", "inactive", "prospect", "donor"],
+      email_type: ["personal", "work", "other"],
       feature_name: ["Segments", "Donors"],
-      location_type: ["main", "work"],
+      location_type: ["main", "work", "home", "mailing", "other"],
       notification_action: ["user", "system", "donor"],
+      phone_type: ["mobile", "home", "work", "other"],
       recurring_period: ["once", "weekly", "monthly"],
       text_message_option: ["unknown", "opt_in", "opt_out"],
       waitlist_status: ["joined", "approved", "rejected", "declined"],

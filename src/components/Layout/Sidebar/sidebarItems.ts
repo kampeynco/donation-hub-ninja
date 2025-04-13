@@ -30,7 +30,7 @@ const sidebarItems: SidebarItemType[] = [
     icon: IconTent,
   },
   {
-    name: "Donors",
+    name: "Prospects",
     path: "/universe",
     icon: IconEmpathize,
     badge: {

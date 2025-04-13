@@ -14,10 +14,10 @@ export function formatDonation(item: any, donoEmails: Map<string, string>): Dona
       day: 'numeric',
       year: 'numeric'
     }),
-    name: item.donors ? 
-      `${item.donors.first_name || ''} ${item.donors.last_name || ''}`.trim() || 'Anonymous' 
+    name: item.contacts ? 
+      `${item.contacts.first_name || ''} ${item.contacts.last_name || ''}`.trim() || 'Anonymous' 
       : 'Anonymous',
-    email: item.donors ? donoEmails.get(item.donors.id) || null : null,
+    email: item.contacts ? donoEmails.get(item.contacts.id) || null : null,
     amount: Number(item.amount),
     recurringPeriod: item.recurring_period || null,
     recurringDuration: item.recurring_duration !== undefined ? Number(item.recurring_duration) : undefined
@@ -32,60 +32,61 @@ export function formatDonation(item: any, donoEmails: Map<string, string>): Dona
 export async function fetchDonorEmails(donations: any[]): Promise<Map<string, string>> {
   const donoEmails = new Map();
   
-  // Extract unique donor IDs
-  const donorIds = [...new Set(
+  // Extract unique contact IDs
+  const contactIds = [...new Set(
     donations
-      .filter(donation => donation.donors && donation.donors.id)
-      .map(donation => donation.donors.id)
+      .filter(donation => donation.contacts && donation.contacts.id)
+      .map(donation => donation.contacts.id)
   )];
   
-  if (donorIds.length === 0) {
+  if (contactIds.length === 0) {
     return donoEmails;
   }
   
   try {
-    // Get current user ID to ensure we only fetch emails for donors associated with this user
+    // Get current user ID to ensure we only fetch emails for contacts associated with this user
     const userId = await getCurrentUserId();
     if (!userId) {
       return donoEmails;
     }
 
-    // First get donor IDs associated with the current user
-    const { data: userDonors, error: userDonorsError } = await supabase
-      .from('user_donors')
-      .select('donor_id')
+    // First get contact IDs associated with the current user
+    const { data: userContacts, error: userContactsError } = await supabase
+      .from('user_contacts')
+      .select('contact_id')
       .eq('user_id', userId);
     
-    if (userDonorsError) {
-      console.error('Error fetching user donors:', userDonorsError);
+    if (userContactsError) {
+      console.error('Error fetching user contacts:', userContactsError);
       return donoEmails;
     }
     
-    // Extract user's donor IDs as an array
-    const userDonorIds = userDonors?.map(ud => ud.donor_id) || [];
+    // Extract user's contact IDs as an array
+    const userContactIds = userContacts?.map(uc => uc.contact_id) || [];
     
-    // Only proceed with donor IDs that belong to this user
-    const validDonorIds = donorIds.filter(id => userDonorIds.includes(id));
+    // Only proceed with contact IDs that belong to this user
+    const validContactIds = contactIds.filter(id => userContactIds.includes(id));
 
-    if (validDonorIds.length === 0) {
+    if (validContactIds.length === 0) {
       return donoEmails;
     }
 
-    // Fetch all emails with a single query, ensuring they belong to the current user's donors
+    // Fetch all emails with a single query, ensuring they belong to the current user's contacts
     const { data: emailData, error } = await supabase
       .from('emails')
-      .select('email, donor_id')
-      .in('donor_id', validDonorIds);
+      .select('email, contact_id')
+      .in('contact_id', validContactIds)
+      .eq('is_primary', true);
       
     if (error) {
-      console.error('Error fetching donor emails:', error);
+      console.error('Error fetching contact emails:', error);
       return donoEmails;
     }
       
     // Build the map from the results
     if (emailData && emailData.length > 0) {
       emailData.forEach(item => {
-        donoEmails.set(item.donor_id, item.email);
+        donoEmails.set(item.contact_id, item.email);
       });
     }
   } catch (error) {
