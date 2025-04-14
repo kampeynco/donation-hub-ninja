@@ -5,6 +5,8 @@ import { useNotificationsContext } from '@/context/NotificationsContext';
 import LogsHeader from '@/components/Logs/LogsHeader';
 import NotificationTabs from '@/components/Logs/NotificationTabs';
 import NotificationTabContent from '@/components/Logs/NotificationTabContent';
+import LogsNav from '@/components/Layout/NestedNav/LogsNav';
+import { useLocation } from 'react-router-dom';
 
 const Logs = () => {
   const {
@@ -16,17 +18,21 @@ const Logs = () => {
     markAllAsRead,
     deleteNotification
   } = useNotificationsContext();
-  const [activeTab, setActiveTab] = useState('all');
+  
+  const location = useLocation();
+  const path = location.pathname;
+  let activeTab = 'all';
+  
+  // Map paths to tab values
+  if (path === '/logs/donors') activeTab = 'donor';
+  else if (path === '/logs/account') activeTab = 'user';
+  else if (path === '/logs/system') activeTab = 'system';
 
   const getUnreadCount = (action?: string) => {
     if (!action || action === 'all') {
       return notifications.filter(n => !n.is_read).length;
     }
     return notifications.filter(n => !n.is_read && n.action === action).length;
-  };
-
-  const handleTabChange = (value: string) => {
-    setActiveTab(value);
   };
 
   const handleDeleteNotification = async (id: string) => {
@@ -47,10 +53,17 @@ const Logs = () => {
     <div className="container mx-auto py-8 space-y-8">
       <LogsHeader title="Activity Logs" hasUnread={hasUnread} onMarkAllAsRead={markAllAsRead} />
       
-      <Tabs defaultValue="all" value={activeTab} onValueChange={handleTabChange}>
-        <NotificationTabs activeTab={activeTab} unreadCounts={unreadCounts} />
-        
-        <NotificationTabContent activeTab={activeTab} notifications={filteredNotifications} loading={loading} error={error} onMarkAsRead={markAsRead} onDelete={handleDeleteNotification} />
+      <LogsNav />
+      
+      <Tabs value={activeTab}>
+        <NotificationTabContent 
+          activeTab={activeTab} 
+          notifications={filteredNotifications} 
+          loading={loading} 
+          error={error} 
+          onMarkAsRead={markAsRead} 
+          onDelete={handleDeleteNotification} 
+        />
       </Tabs>
     </div>
   );

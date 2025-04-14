@@ -1,12 +1,19 @@
+
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { IconUserCircle, IconUsersGroup, IconEye } from "@tabler/icons-react";
 import { useContactStatus } from "@/hooks/useContactStatus";
 import ContactsTabContent from "@/components/Prospects/ContactsTabContent";
 import DuplicatesTabContent from "@/components/Prospects/DuplicatesTabContent";
+import ProspectsNav from "@/components/Layout/NestedNav/ProspectsNav";
+import { useLocation } from "react-router-dom";
 
 const ProspectsPage = () => {
-  const [activeTab, setActiveTab] = useState("contacts");
+  const location = useLocation();
+  const path = location.pathname;
+  const activeTab = path === "/prospects/donors" ? "donors" : 
+                   path === "/prospects/merge" ? "duplicates" : "contacts";
+
   const { statusCounts, recentDonors, isLoading } = useContactStatus();
 
   return (
@@ -16,27 +23,10 @@ const ProspectsPage = () => {
         <p className="text-muted-foreground">Manage your contacts, donors, and potential duplicates</p>
       </div>
 
-      <Tabs defaultValue="contacts" value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 mb-6">
-          <TabsTrigger value="contacts" className="gap-1.5">
-            <IconUserCircle className="h-4 w-4" />
-            <span className="hidden sm:inline">Contacts</span>
-            <span className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full text-xs px-2">
-              {isLoading ? "..." : statusCounts.total}
-            </span>
-          </TabsTrigger>
-          <TabsTrigger value="donors" className="gap-1.5">
-            <IconEye className="h-4 w-4" />
-            <span className="hidden sm:inline">Active Donors</span>
-            <span className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full text-xs px-2">
-              {isLoading ? "..." : recentDonors}
-            </span>
-          </TabsTrigger>
-          <TabsTrigger value="duplicates" className="gap-1.5">
-            <IconUsersGroup className="h-4 w-4" />
-            <span className="hidden sm:inline">Duplicates</span>
-          </TabsTrigger>
-        </TabsList>
+      {/* Add the ProspectsNav component */}
+      <ProspectsNav />
+
+      <Tabs value={activeTab} className="w-full">
         <TabsContent value="contacts">
           <ContactsTabContent />
         </TabsContent>
