@@ -6,8 +6,8 @@ import {
   Route,
 } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ThemeProvider } from "@/components/theme-provider"
 import { AuthProvider } from "@/context/AuthContext";
+import { ThemeProvider } from "@/components/theme-provider";
 import Index from "@/pages/Index";
 import Home from "@/pages/Home";
 import SignIn from "@/pages/SignIn";
@@ -31,9 +31,9 @@ const queryClient = new QueryClient();
 function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <QueryClientProvider client={queryClient}>
-          <ThemeProvider>
+      <ThemeProvider defaultTheme="system" enableSystem>
+        <AuthProvider>
+          <QueryClientProvider client={queryClient}>
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/home" element={<Home />} />
@@ -67,9 +67,9 @@ function App() {
                 <Route path="/universe" element={<Layout><Universe /></Layout>} />
               </Route>
             </Routes>
-          </ThemeProvider>
-        </QueryClientProvider>
-      </AuthProvider>
+          </QueryClientProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </BrowserRouter>
   );
 }
