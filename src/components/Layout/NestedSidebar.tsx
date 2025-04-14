@@ -1,20 +1,15 @@
-
 import React from "react";
 import { useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import {
-  SidebarProvider,
-  Sidebar,
-  SidebarHeader,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-} from "@/components/ui/sidebar";
+import { SidebarProvider, Sidebar, SidebarHeader, SidebarContent, SidebarFooter, SidebarGroup } from "@/components/ui/sidebar";
 import { useAuth } from "@/context/AuthContext";
 import SidebarItem from "./SidebarItem";
 import SubSidebarItem from "./SubSidebarItem";
 import { ROUTES } from "@/constants/routes";
-import logo from "/lovable-uploads/updated_dc_logomark_light.png";
+
+const LIGHT_LOGO_MARK = "https://igjnhwvtasegwyiwcdkr.supabase.co/storage/v1/object/public/assets/images/donorcamp_logo_blue.png";
+const DARK_LOGO_MARK = "https://igjnhwvtasegwyiwcdkr.supabase.co/storage/v1/object/public/assets/images/donorcamp_logo_white.png";
+const logo = LIGHT_LOGO_MARK;  // Default to light logo, but you can add theme logic if needed
 
 interface NestedSidebarProps {
   className?: string;
@@ -24,24 +19,17 @@ export default function NestedSidebar({ className }: NestedSidebarProps) {
   const location = useLocation();
   const { user } = useAuth();
   
-  // Determine active main route and nested route
   const pathSegments = location.pathname.split('/').filter(Boolean);
   const activeMainRoute = pathSegments[0] || '';
   const activeNestedRoute = pathSegments.length > 1 ? pathSegments[1] : '';
   
-  // Check if prospects section is active
   const isProspectsActive = activeMainRoute === 'prospects';
-  
-  // Check if settings section is active
   const isSettingsActive = activeMainRoute === 'settings';
-  
-  // Check if logs section is active
   const isLogsActive = activeMainRoute === 'logs';
 
   return (
     <SidebarProvider>
       <div className="flex h-screen">
-        {/* Main Sidebar */}
         <Sidebar className={cn("border-r bg-white dark:bg-gray-900", className)}>
           <SidebarHeader className="flex h-14 items-center border-b px-4">
             <img
@@ -102,7 +90,6 @@ export default function NestedSidebar({ className }: NestedSidebarProps) {
           </SidebarFooter>
         </Sidebar>
 
-        {/* Nested/Sub Sidebar - Only shown when a section with nested items is active */}
         {(isProspectsActive || isSettingsActive || isLogsActive) && (
           <div className="w-48 shrink-0 border-r bg-white dark:bg-gray-800/50">
             <div className="p-2">

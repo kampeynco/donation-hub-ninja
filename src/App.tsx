@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -16,6 +15,7 @@ import Dashboard from "./pages/Dashboard";
 import Account from "./pages/Account";
 import Segments from "./pages/Segments";
 import Prospects from "./pages/prospects/Prospects";
+import Donors from "./pages/Donors";
 import FeatureProtectedRoute from "./components/Auth/FeatureProtectedRoute";
 import DonorsProtectedRoute from "./components/Auth/UniverseProtectedRoute";
 import Logs from "./pages/Logs";
