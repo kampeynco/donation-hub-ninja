@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { getCurrentUserId } from "@/services/donations/helpers";
 import type { DuplicateMatch, Contact } from "@/types/contact";
@@ -376,9 +377,9 @@ export async function findMatchingContact(
       .from('contacts')
       .select(`
         *,
-        emails(id, email, is_primary),
-        phones(id, phone, is_primary),
-        locations(id, street, city, state, zip, is_primary),
+        emails(id, email, is_primary, type, verified),
+        phones(id, phone, is_primary, type, verified),
+        locations(id, street, city, state, zip, is_primary, type),
         donations(*)
       `)
       .in('id', contactIds);
@@ -403,27 +404,59 @@ export async function findMatchingContact(
 
     // Compare with each existing contact
     for (const contact of contacts) {
+      // Ensure contact data matches our expected types
+      const typedContact = {
+        ...contact,
+        emails: contact.emails?.map(email => ({
+          id: email.id,
+          email: email.email,
+          type: email.type || 'personal',
+          is_primary: email.is_primary,
+          verified: email.verified || false,
+          contact_id: email.contact_id
+        })),
+        phones: contact.phones?.map(phone => ({
+          id: phone.id,
+          phone: phone.phone,
+          type: phone.type || 'mobile',
+          is_primary: phone.is_primary,
+          verified: phone.verified || false,
+          contact_id: phone.contact_id
+        })),
+        locations: contact.locations?.map(location => ({
+          id: location.id,
+          street: location.street,
+          city: location.city,
+          state: location.state,
+          zip: location.zip,
+          country: location.country || null,
+          type: location.type || 'main',
+          is_primary: location.is_primary,
+          contact_id: location.contact_id
+        }))
+      } as Contact;
+
       // Calculate component scores
       const nameScore = calculateNameScore(
         newContactData.first_name || null,
         newContactData.last_name || null,
-        contact.first_name,
-        contact.last_name
+        typedContact.first_name,
+        typedContact.last_name
       );
       
       const emailScore = calculateEmailScore(
         newEmailAddress,
-        extractEmailAddresses(contact.emails)
+        extractEmailAddresses(typedContact.emails)
       );
       
       const phoneScore = calculatePhoneScore(
         newPhoneNumber,
-        extractPhoneNumbers(contact.phones)
+        extractPhoneNumbers(typedContact.phones)
       );
       
       const addressScore = calculateAddressScore(
         newAddress,
-        extractAddresses(contact.locations)
+        extractAddresses(typedContact.locations)
       );
       
       // Calculate composite confidence score
@@ -437,7 +470,7 @@ export async function findMatchingContact(
       // Update best match if confidence is higher
       if (confidenceScore > highestConfidence) {
         highestConfidence = confidenceScore;
-        bestMatch = contact as Contact;
+        bestMatch = typedContact;
       }
     }
     
