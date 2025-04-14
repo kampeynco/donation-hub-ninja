@@ -2,6 +2,16 @@
 import { supabase } from "@/integrations/supabase/client";
 import { getCurrentUserId } from "@/services/donations/helpers";
 import type { DuplicateMatch, Contact } from "@/types/contact";
+import { 
+  calculateNameScore, 
+  calculateEmailScore, 
+  calculatePhoneScore,
+  calculateAddressScore,
+  calculateConfidenceScore,
+  extractEmailAddresses,
+  extractPhoneNumbers,
+  extractAddresses
+} from "@/utils/duplicateDetection";
 
 interface DuplicateFilters {
   page: number;
@@ -205,4 +215,284 @@ export async function resolveDuplicateMatch(params: ResolveDuplicateParams): Pro
     console.error('Error in resolveDuplicateMatch:', error);
     return false;
   }
+}
+
+/**
+ * Run a scan for potential duplicate contacts for a user
+ * This should be run periodically or when new contacts are added
+ */
+export async function scanForDuplicates(): Promise<number> {
+  try {
+    const userId = await getCurrentUserId();
+    if (!userId) return 0;
+
+    // Get all contacts for the current user
+    const { data: userContacts, error: userContactsError } = await supabase
+      .from('user_contacts')
+      .select('contact_id')
+      .eq('user_id', userId);
+    
+    if (userContactsError || !userContacts?.length) {
+      console.error('Error fetching user contacts:', userContactsError);
+      return 0;
+    }
+
+    const contactIds = userContacts.map(uc => uc.contact_id);
+    
+    // Fetch full contact details for comparison
+    const { data: contacts, error: contactsError } = await supabase
+      .from('contacts')
+      .select(`
+        id,
+        first_name,
+        last_name,
+        emails(id, email),
+        phones(id, phone),
+        locations(id, street, city, state, zip)
+      `)
+      .in('id', contactIds);
+    
+    if (contactsError || !contacts) {
+      console.error('Error fetching contacts for comparison:', contactsError);
+      return 0;
+    }
+
+    // Track new duplicates found
+    let duplicatesFound = 0;
+
+    // Compare each contact with every other contact
+    for (let i = 0; i < contacts.length; i++) {
+      for (let j = i + 1; j < contacts.length; j++) {
+        const contact1 = contacts[i];
+        const contact2 = contacts[j];
+        
+        // Calculate component scores
+        const nameScore = calculateNameScore(
+          contact1.first_name, 
+          contact1.last_name, 
+          contact2.first_name, 
+          contact2.last_name
+        );
+        
+        const emailScore = calculateEmailScore(
+          extractEmailAddresses(contact1.emails), 
+          extractEmailAddresses(contact2.emails)
+        );
+        
+        const phoneScore = calculatePhoneScore(
+          extractPhoneNumbers(contact1.phones), 
+          extractPhoneNumbers(contact2.phones)
+        );
+        
+        const addressScore = calculateAddressScore(
+          extractAddresses(contact1.locations), 
+          extractAddresses(contact2.locations)
+        );
+        
+        // Calculate composite confidence score
+        const confidenceScore = calculateConfidenceScore(
+          nameScore,
+          emailScore,
+          phoneScore,
+          addressScore
+        );
+        
+        // Only store matches above 50% confidence
+        if (confidenceScore >= 50) {
+          // Check if this pair already exists in duplicate_matches
+          const { data: existingMatch } = await supabase
+            .from('duplicate_matches')
+            .select('id')
+            .or(`contact1_id.eq.${contact1.id},contact2_id.eq.${contact1.id}`)
+            .or(`contact1_id.eq.${contact2.id},contact2_id.eq.${contact2.id}`)
+            .eq('resolved', false)
+            .maybeSingle();
+          
+          if (!existingMatch) {
+            // Insert as a new potential duplicate
+            const { error: insertError } = await supabase
+              .from('duplicate_matches')
+              .insert([{
+                contact1_id: contact1.id,
+                contact2_id: contact2.id,
+                confidence_score: confidenceScore,
+                name_score: nameScore,
+                email_score: emailScore,
+                phone_score: phoneScore,
+                address_score: addressScore,
+                resolved: false
+              }]);
+            
+            if (!insertError) {
+              duplicatesFound++;
+            } else {
+              console.error('Error inserting duplicate match:', insertError);
+            }
+          }
+        }
+      }
+    }
+    
+    return duplicatesFound;
+  } catch (error) {
+    console.error('Error in scanForDuplicates:', error);
+    return 0;
+  }
+}
+
+/**
+ * Find potential matches for a new contact
+ * Returns the best match if confidence is above threshold
+ */
+export async function findMatchingContact(
+  newContactData: {
+    first_name?: string | null;
+    last_name?: string | null;
+    email?: string;
+    phone?: string;
+    city?: string | null;
+    state?: string | null;
+    zip?: string | null;
+  },
+  minConfidence = 90
+): Promise<{contact: Contact | null, confidenceScore: number}> {
+  try {
+    const userId = await getCurrentUserId();
+    if (!userId) return { contact: null, confidenceScore: 0 };
+
+    // Get all contacts for the current user
+    const { data: userContacts, error: userContactsError } = await supabase
+      .from('user_contacts')
+      .select('contact_id')
+      .eq('user_id', userId);
+    
+    if (userContactsError || !userContacts?.length) {
+      return { contact: null, confidenceScore: 0 };
+    }
+
+    const contactIds = userContacts.map(uc => uc.contact_id);
+    
+    // Fetch full contact details for comparison
+    const { data: contacts, error: contactsError } = await supabase
+      .from('contacts')
+      .select(`
+        *,
+        emails(id, email, is_primary),
+        phones(id, phone, is_primary),
+        locations(id, street, city, state, zip, is_primary),
+        donations(*)
+      `)
+      .in('id', contactIds);
+    
+    if (contactsError || !contacts?.length) {
+      return { contact: null, confidenceScore: 0 };
+    }
+
+    let bestMatch: Contact | null = null;
+    let highestConfidence = 0;
+    
+    // Extract emails and phones for quick comparison
+    const newEmailAddress = newContactData.email ? [newContactData.email] : [];
+    const newPhoneNumber = newContactData.phone ? [newContactData.phone] : [];
+    const newAddress = (newContactData.city || newContactData.state || newContactData.zip) ? 
+      [{
+        street: null,
+        city: newContactData.city,
+        state: newContactData.state,
+        zip: newContactData.zip
+      }] : [];
+
+    // Compare with each existing contact
+    for (const contact of contacts) {
+      // Calculate component scores
+      const nameScore = calculateNameScore(
+        newContactData.first_name || null,
+        newContactData.last_name || null,
+        contact.first_name,
+        contact.last_name
+      );
+      
+      const emailScore = calculateEmailScore(
+        newEmailAddress,
+        extractEmailAddresses(contact.emails)
+      );
+      
+      const phoneScore = calculatePhoneScore(
+        newPhoneNumber,
+        extractPhoneNumbers(contact.phones)
+      );
+      
+      const addressScore = calculateAddressScore(
+        newAddress,
+        extractAddresses(contact.locations)
+      );
+      
+      // Calculate composite confidence score
+      const confidenceScore = calculateConfidenceScore(
+        nameScore,
+        emailScore,
+        phoneScore,
+        addressScore
+      );
+      
+      // Update best match if confidence is higher
+      if (confidenceScore > highestConfidence) {
+        highestConfidence = confidenceScore;
+        bestMatch = contact;
+      }
+    }
+    
+    // Only return matches that meet minimum confidence
+    if (highestConfidence >= minConfidence) {
+      // Exact match on a primary identifier is required for high confidence
+      if (bestMatch && (
+        hasPrimaryMatch(newEmailAddress, bestMatch.emails) || 
+        hasPrimaryMatch(newPhoneNumber, bestMatch.phones)
+      )) {
+        return { contact: bestMatch as Contact, confidenceScore: highestConfidence };
+      }
+    }
+    
+    return { contact: null, confidenceScore: 0 };
+  } catch (error) {
+    console.error('Error in findMatchingContact:', error);
+    return { contact: null, confidenceScore: 0 };
+  }
+}
+
+/**
+ * Helper to check if there's an exact match on a primary identifier
+ */
+function hasPrimaryMatch(
+  newValues: string[], 
+  existingValues?: Array<{ is_primary?: boolean, email?: string, phone?: string } | null>
+): boolean {
+  if (!newValues.length || !existingValues?.length) return false;
+  
+  for (const val of newValues) {
+    for (const existing of existingValues) {
+      if (!existing) continue;
+      
+      if (existing.is_primary) {
+        // Check if this is an email match
+        if (existing.email && existing.email.toLowerCase() === val.toLowerCase()) {
+          return true;
+        }
+        
+        // Check if this is a phone match
+        if (existing.phone) {
+          const normalizedNew = val.replace(/\D/g, '');
+          const normalizedExisting = existing.phone.replace(/\D/g, '');
+          
+          if (normalizedNew.length >= 7 && normalizedExisting.length >= 7) {
+            if (normalizedNew.slice(-7) === normalizedExisting.slice(-7)) {
+              return true;
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  return false;
 }

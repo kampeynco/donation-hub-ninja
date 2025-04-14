@@ -22,6 +22,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import DuplicateMatchDetails from "./DuplicateMatchDetails";
 import ContactsTablePagination from "./ContactsTablePagination";
+import ScanForDuplicatesButton from "./ScanForDuplicatesButton";
 import type { DuplicateMatch } from "@/types/contact";
 
 export default function DuplicatesTabContent() {
@@ -65,6 +66,7 @@ export default function DuplicatesTabContent() {
           <h2 className="text-xl font-semibold">Potential Duplicates</h2>
           <p className="text-sm text-gray-500">{totalDuplicates} potential duplicates found</p>
         </div>
+        <ScanForDuplicatesButton />
       </div>
 
       {/* Duplicates table */}
@@ -108,6 +110,7 @@ export default function DuplicatesTabContent() {
                       <h3 className="text-lg font-medium">No duplicates found</h3>
                       <p className="text-sm text-gray-500 max-w-sm mx-auto">
                         No duplicate contacts matching your criteria were found.
+                        Use the "Scan for Duplicates" button to find potential matches.
                       </p>
                     </div>
                   </div>
