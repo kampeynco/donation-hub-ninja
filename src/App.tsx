@@ -1,3 +1,4 @@
+
 import React from 'react';
 import {
   BrowserRouter,
@@ -22,6 +23,7 @@ import Layout from "@/components/Layout/Layout";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import SegmentsProtectedRoute from "@/components/SegmentsProtectedRoute";
 import UniverseProtectedRoute from "@/components/UniverseProtectedRoute";
+import FeaturesTab from "@/components/Account/FeaturesTab";
 
 const queryClient = new QueryClient();
 

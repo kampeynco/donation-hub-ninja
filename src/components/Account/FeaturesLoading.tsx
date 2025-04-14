@@ -22,3 +22,5 @@ export const FeaturesLoading: React.FC = () => {
     </div>
   );
 };
+
+export default FeaturesLoading;

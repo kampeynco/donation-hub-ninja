@@ -1,7 +1,6 @@
 
 import React from "react";
 import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { FeatureItem as FeatureItemType } from "@/types/features";
 import { BadgeCustom } from "@/components/ui/badge-custom";
@@ -51,3 +50,5 @@ export const FeatureItem: React.FC<FeatureItemProps> = ({
     </div>
   );
 };
+
+export default FeatureItem;
