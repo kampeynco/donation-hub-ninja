@@ -1,4 +1,3 @@
-
 export interface Contact {
   id: string;
   first_name: string | null;
@@ -15,6 +14,11 @@ export interface Contact {
   locations?: Location[];
   donations?: ContactDonation[];
   employer_data?: EmployerData[];
+  confidenceScore?: number;
+  nameScore?: number;
+  emailScore?: number;
+  phoneScore?: number;
+  addressScore?: number;
 }
 
 export interface Email {

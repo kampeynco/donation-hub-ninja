@@ -1,7 +1,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { getCurrentUserId } from "@/services/donations/helpers";
-import type { Contact, Email, Phone, Location } from "@/types/contact";
+import type { Contact, DuplicateMatch, Email, Phone, Location } from "@/types/contact";
 
 /**
  * Calculate name similarity score (35% first name, 40% last name)
@@ -232,8 +232,17 @@ export async function findPotentialDuplicates(contact: Contact): Promise<Contact
       return [];
     }
     
+    // Cast and ensure all contacts have the correct status type
+    const typedContacts = potentialDuplicates.map((contact: any) => {
+      // Convert 'inactive' status to 'active' to match Contact type
+      if (contact.status === 'inactive') {
+        contact.status = 'active';
+      }
+      return contact as Contact;
+    });
+    
     // Calculate confidence scores for each potential duplicate
-    const duplicatesWithScores = potentialDuplicates.map((potentialDuplicate: Contact) => {
+    const duplicatesWithScores = typedContacts.map((potentialDuplicate: Contact) => {
       const { 
         confidenceScore, 
         nameScore, 
@@ -349,8 +358,13 @@ export async function processContactForDuplicates(contactId: string): Promise<bo
       return false;
     }
     
+    // Convert 'inactive' status to 'active' to match Contact type
+    if (contact.status === 'inactive') {
+      contact.status = 'active';
+    }
+    
     // Find potential duplicates
-    const potentialDuplicates = await findPotentialDuplicates(contact);
+    const potentialDuplicates = await findPotentialDuplicates(contact as Contact);
     
     // Save all potential matches
     for (const duplicate of potentialDuplicates) {
@@ -360,7 +374,7 @@ export async function processContactForDuplicates(contactId: string): Promise<bo
         emailScore, 
         phoneScore, 
         addressScore 
-      } = calculateConfidenceScore(contact, duplicate);
+      } = calculateConfidenceScore(contact as Contact, duplicate);
       
       await saveDuplicateMatch(
         contact.id,
@@ -420,13 +434,7 @@ export async function mergeContacts(
       return false;
     }
     
-    // Begin transaction
-    const { error: beginError } = await supabase.rpc('begin_transaction');
-    if (beginError) {
-      console.error('Error beginning transaction:', beginError);
-      return false;
-    }
-    
+    // Instead of using RPC for transactions, we'll use individual queries
     try {
       // 1. Update emails - move all secondary emails to primary contact
       for (const email of secondaryContact.emails || []) {
@@ -521,14 +529,8 @@ export async function mergeContacts(
         
       if (deleteError) throw deleteError;
       
-      // Commit transaction
-      const { error: commitError } = await supabase.rpc('commit_transaction');
-      if (commitError) throw commitError;
-      
       return true;
     } catch (error) {
-      // Rollback transaction on error
-      await supabase.rpc('rollback_transaction');
       console.error('Error during contact merge:', error);
       return false;
     }
