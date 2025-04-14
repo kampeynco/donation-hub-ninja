@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,13 +15,11 @@ import SignUp from "./pages/Auth/SignUp";
 import Dashboard from "./pages/Dashboard";
 import Account from "./pages/Account";
 import Segments from "./pages/Segments";
-import Prospects from "./pages/prospects/Prospects";
 import Donors from "./pages/Donors";
 import FeatureProtectedRoute from "./components/Auth/FeatureProtectedRoute";
 import DonorsProtectedRoute from "./components/Auth/UniverseProtectedRoute";
 import Logs from "./pages/Logs";
 import NotFound from "./pages/NotFound";
-import { ROUTES } from "./constants/routes";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -33,6 +32,7 @@ const queryClient = new QueryClient({
   },
 });
 
+// Define the App component with brackets instead of parentheses
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
@@ -42,14 +42,14 @@ const App = () => {
             <AuthProvider>
               <Routes>
                 {/* Public routes */}
-                <Route path={ROUTES.HOME} element={<Home />} />
-                <Route path={ROUTES.AUTH.SIGNIN} element={<SignIn />} />
-                <Route path="/login" element={<Navigate to={ROUTES.AUTH.SIGNIN} replace />} />
-                <Route path={ROUTES.AUTH.SIGNUP} element={<SignUp />} />
+                <Route path="/" element={<Home />} />
+                <Route path="/auth/signin" element={<SignIn />} />
+                <Route path="/login" element={<Navigate to="/auth/signin" replace />} />
+                <Route path="/auth/signup" element={<SignUp />} />
                 
                 {/* Protected routes */}
                 <Route 
-                  path={ROUTES.DASHBOARD} 
+                  path="/dashboard" 
                   element={
                     <ProtectedRoute>
                       <Layout>
@@ -58,24 +58,6 @@ const App = () => {
                     </ProtectedRoute>
                   } 
                 />
-                
-                {/* Prospects routes */}
-                <Route 
-                  path={ROUTES.PROSPECTS.ROOT} 
-                  element={<Navigate to={ROUTES.PROSPECTS.PROSPECTS} replace />} 
-                />
-                <Route 
-                  path={ROUTES.PROSPECTS.PROSPECTS} 
-                  element={
-                    <ProtectedRoute>
-                      <Layout>
-                        <Prospects />
-                      </Layout>
-                    </ProtectedRoute>
-                  } 
-                />
-                
-                {/* Account routes */}
                 <Route 
                   path="/account" 
                   element={
@@ -87,13 +69,9 @@ const App = () => {
                   } 
                 />
                 
-                {/* Logs routes */}
+                {/* Updated routes for navigation items */}
                 <Route 
-                  path={ROUTES.LOGS.ROOT} 
-                  element={<Navigate to={ROUTES.LOGS.ALL} replace />}
-                />
-                <Route 
-                  path={ROUTES.LOGS.ALL} 
+                  path="/logs" 
                   element={
                     <ProtectedRoute>
                       <Layout>
@@ -102,7 +80,6 @@ const App = () => {
                     </ProtectedRoute>
                   } 
                 />
-                
                 <Route 
                   path="/personas" 
                   element={
@@ -127,7 +104,7 @@ const App = () => {
                 {/* Redirects for old routes */}
                 <Route path="/donors" element={<Navigate to="/universe" replace />} />
                 <Route path="/segments" element={<Navigate to="/personas" replace />} />
-                <Route path="/activity" element={<Navigate to={ROUTES.LOGS.ALL} replace />} />
+                <Route path="/activity" element={<Navigate to="/logs" replace />} />
                 <Route path="/connections" element={<Navigate to="/dashboard" replace />} />
                 
                 {/* 404 route */}
