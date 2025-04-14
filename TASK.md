@@ -102,163 +102,96 @@
   - Send notifications to relevant users only
   - Ensure committee name is never exposed in notifications
 
-## 4. Nested Left Sidebar Tasks
-### 4.1. Component Creation and Font Verification
-- [ ] Create new directory `src/components/layout` if it doesn't exist
-- [ ] Create `NestedSidebar.tsx` component
-- [ ] Create reusable sub-components:
-  - `SidebarItem.tsx` for main menu items (using existing icons)
-  - `SubSidebarItem.tsx` for secondary menu items (using specified Tabler icons)
-- [ ] Font Implementation Audit:
-  1. Check current GT-America implementation:
-    - Review app's font-face declarations
-    - Document all GT-America font weights in use
-    - Verify font loading from correct source
-  2. Verify GT-America source location:
-    - Check if fonts are loaded from Supabase storage
-    - Check if fonts are included in app's assets
-    - Document the authoritative source
-  3. Ensure consistent GT-America usage:
-    - Review all component styles
-    - Check Tailwind configuration
-    - Verify global CSS settings
-    - Document any inconsistencies
-  4. Font hierarchy verification:
-    - Map all GT-America variants in use
-    - Document fallback font stack
-    - Verify font-weight assignments
-  5. DO NOT:
-    - Add new font families
-    - Modify existing GT-America implementation
-    - Change font loading method
-    - Alter font weights or styles
+## 4. Nested Dashboard Navigation Tasks
+### 4.1. Component Analysis and Extension
+- [ ] Review existing sidebar components:
+  - Analyze current sidebar-menu.tsx structure
+  - Review sidebar-provider.tsx state management
+  - Document sidebar-util.tsx helper functions
+- [ ] Create new nested navigation components:
+  - Create `DashboardNestedNav.tsx` for reusable nested navigation
+  - Create page-specific navigation components:
+    - `ProspectsNav.tsx`
+    - `SettingsNav.tsx`
+    - `LogsNav.tsx`
+- [ ] Integrate with existing sidebar structure:
+  - Ensure no disruption to main sidebar
+  - Maintain current sidebar state management
+  - Preserve existing sidebar styling
 
-### 4.2. Route Structure Updates
-- [ ] Update route configuration to support new nested structure:
+### 4.2. Dashboard-Specific Navigation
+- [ ] Implement Prospects dashboard navigation:
+  - Add secondary navigation container
+  - Implement navigation for:
+    - Prospects (IconAddressBook)
+    - Donors (IconHeartDollar)
+    - Merge Duplicates (IconLayersDifference)
+  - Preserve existing dashboard content
+
+- [ ] Implement Settings dashboard navigation:
+  - Add secondary navigation container
+  - Implement navigation for:
+    - Profile (IconUserCircle)
+    - Notifications (IconBell)
+    - Billing (IconCreditCard)
+  - Preserve existing settings content
+
+- [ ] Implement Logs dashboard navigation:
+  - Add secondary navigation container
+  - Implement navigation for:
+    - All (IconBell)
+    - Donors (IconBellHeart)
+    - Account (IconBellBolt)
+    - System (IconBellCog)
+  - Preserve existing logs content
+
+### 4.3. Route Integration
+- [ ] Update route handling for nested navigation:
   ```typescript
-  /prospects
-    /prospects/prospects
-    /prospects/donors
-    /prospects/merge
-  /settings
-    /settings/profile
-    /settings/notifications
-    /settings/billing
-  /logs
-    /logs/all
-    /logs/donors
-    /logs/account
-    /logs/system
-  ```
-- [ ] Create route constants file for centralized route management
-- [ ] Add route guards/authentication checks if needed
+  // Preserve existing main routes
+  /prospects -> Existing main route
+  /settings -> Existing main route
+  /logs -> Existing main route
 
-### 4.3. Component Migration
-- [ ] Move existing tab content components to standalone pages:
-  - Migrate `ProspectsContent` from tab content
-  - Migrate `DonorsContent` from tab content
-  - Migrate `MergeDuplicatesContent` from tab content
-  - Migrate `ProfileTab` content
-  - Migrate `NotificationsTab` content
-  - Migrate `BillingTab` content
-  - Migrate `NotificationTabContent` for each logs section:
-    - All logs content
-    - Donors logs content
-    - Account logs content
-    - System logs content
-- [ ] Update component imports and exports
-- [ ] Remove old tab-based components
+  // Add nested routes
+  /prospects/:tab // prospects, donors, merge
+  /settings/:tab  // profile, notifications, billing
+  /logs/:tab      // all, donors, account, system
+  ```
+- [ ] Implement route parameter handling
+- [ ] Add route guards where needed
 
 ### 4.4. State Management
-- [ ] Implement active route tracking
-- [ ] Add state management for sidebar collapse/expand
-- [ ] Handle secondary sidebar visibility based on route
-- [ ] Preserve user preferences (e.g., sidebar state)
+- [ ] Extend existing sidebar state:
+  - Add nested navigation state
+  - Handle active tab state
+  - Preserve existing sidebar collapse state
+- [ ] Implement tab persistence
+- [ ] Handle navigation history
 
 ### 4.5. UI Implementation
-- [ ] Implement main sidebar styling:
-  - Preserve GT-America font family from fonts in assets/fonts
-  - Add proper spacing and padding
-  - Implement hover states
-  - Add active state styling
-  - Preserve existing main navigation icons
-- [ ] Implement secondary sidebar styling:
-  - Match design language of main sidebar
-  - Add subtle background difference
-  - Implement proper transitions
-- [ ] Implement EXACTLY these Tabler icons for secondary navigation:
+- [ ] Create nested navigation styling:
+  - Match existing sidebar design language
+  - Implement proper spacing and hierarchy
+  - Add transitions for tab changes
+  - Ensure responsive behavior
+- [ ] Implement specified Tabler icons:
   DO NOT CHANGE THESE ICONS EVEN IF PACKAGE SHOWS ERRORS
-  
-  Prospects section:
-  - IconAddressBook for Prospects
-  - IconHeartDollar for Donors
-  - IconLayersDifference for Merge Duplicates
-  
-  Settings section:
-  - IconUserCircle for Profile
-  - IconBell for Notifications
-  - IconCreditCard for Billing
-  
-  Logs section:
-  - IconBell for All
-  - IconBellHeart for Donors
-  - IconBellBolt for Account
-  - IconBellCog for System
+  - Use exact icons as specified for each section
+  - Maintain consistent icon sizing with main sidebar
+  - Preserve existing main sidebar icons
 
-  NOTE: These exact icons MUST be used regardless of:
-  - Package import errors
-  - IDE warnings
-  - Package version mismatches
-  - Suggested alternatives
-  
-  If icons appear missing from @tabler/icons-react:
-  1. DO NOT substitute with similar icons
-  2. DO NOT use alternative icon packages
-  3. DO NOT change the requested icons
-  4. Reference https://tabler.io/icons for the correct icon names
-
-### 4.6. Responsive Design
-- [ ] Implement mobile-friendly layout
-- [ ] Add collapse/expand functionality
-- [ ] Add touch gestures for mobile
-- [ ] Test breakpoints and responsive behavior
-
-### 4.7. Navigation Logic
-- [ ] Implement navigation state management
-- [ ] Add route change handlers
-- [ ] Implement breadcrumb generation
-- [ ] Handle deep linking
-
-### 4.8. Testing
-- [ ] Add unit tests for sidebar components
-- [ ] Add integration tests for navigation
+### 4.6. Testing
+- [ ] Test nested navigation integration:
+  - Verify no impact on main sidebar
+  - Test tab switching
+  - Validate route handling
+  - Check state persistence
 - [ ] Test responsive behavior
-- [ ] Test route handling
 - [ ] Cross-browser testing
 
-### 4.9. Performance Optimization
-- [ ] Implement code splitting for routes
-- [ ] Optimize component rendering
-- [ ] Add loading states
-- [ ] Implement transition animations
-
-### 4.10. Documentation
-- [ ] Add component documentation
-- [ ] Document routing structure
-- [ ] Add usage examples
-- [ ] Document state management
-- [ ] Add migration guide for existing code
-
-### 4.11. Cleanup
-- [ ] Remove old tab-based navigation code
-- [ ] Clean up unused imports
-- [ ] Remove deprecated routes
-- [ ] Update test files
-- [ ] Remove unused dependencies
-
-### 4.12. Final Review
-- [ ] Conduct accessibility audit
-- [ ] Review mobile responsiveness
-- [ ] Check performance metrics
-- [ ] Verify all routes work as expected
-- [ ] Ensure design consistency
+### 4.7. Documentation
+- [ ] Document nested navigation implementation
+- [ ] Update component usage guidelines
+- [ ] Document state management changes
+- [ ] Add examples for future dashboard extensions
