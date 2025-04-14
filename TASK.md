@@ -1,6 +1,5 @@
 
 # Capture Pillar Tasks
-
 ## 1. Preparation and Backup
 [X] Create complete backup of current database
 [X] Document current schema relationships
@@ -195,3 +194,145 @@
 - [ ] Update component usage guidelines
 - [ ] Document state management changes
 - [ ] Add examples for future dashboard extensions
+
+## 5. CSV Import Implementation Tasks
+### 5.1. File Upload and Initial Processing
+- [ ] Enhance existing CSV upload modal:
+  - Add file size limit validation (max 10MB)
+  - Add file type validation (.csv only)
+  - Add preview of file name and size
+  - Show upload progress indicator
+  - Handle upload errors with clear messages
+  - Support drag-and-drop and click-to-upload
+
+### 5.2. CSV Parsing and Preview
+- [ ] Implement CSV parsing:
+  - Parse CSV headers
+  - Show first 5 rows of data in preview
+  - Auto-detect delimiter (comma, tab, semicolon)
+  - Handle UTF-8 and other common encodings
+  - Validate basic CSV structure
+  - Show total rows count
+- [ ] Create preview interface:
+  - Display data in table format
+  - Show column headers
+  - Enable horizontal scrolling for many columns
+  - Allow preview pagination
+  - Show data type detection results
+
+### 5.3. Column Mapping Interface
+- [ ] Create column mapping UI:
+  - Display source CSV columns
+  - Show available system fields:
+    * First Name
+    * Last Name
+    * Email (with type selection)
+    * Phone (with type selection)
+    * Address Fields (with type selection)
+    * Status
+    * Custom Fields
+  - Enable drag-and-drop mapping
+  - Support manual dropdown selection
+  - Show required fields indicators
+  - Validate required mappings
+
+### 5.4. Custom Field Management
+- [ ] Implement custom field creation:
+  - Add "Create Custom Field" option in mapping
+  - Support field types:
+    * Text
+    * Number
+    * Date
+    * Boolean
+    * Select (with options)
+  - Allow field name customization
+  - Set validation rules
+  - Save fields for future imports
+- [ ] Add custom field validation:
+  - Validate field names
+  - Check for duplicates
+  - Verify field type compatibility
+  - Preview data with new fields
+
+### 5.5. Data Validation and Transformation
+- [ ] Implement field-level validation:
+  - Email format validation
+  - Phone number format checking
+  - Required field validation
+  - Data type validation
+  - Custom field validation
+- [ ] Add data transformation options:
+  - Trim whitespace
+  - Case normalization
+  - Phone number formatting
+  - Date format standardization
+  - Handle empty/null values
+  - Custom value mappings
+
+### 5.6. Duplicate Detection
+- [ ] Implement duplicate checking:
+  - Use existing confidence score system
+  - Check against current contacts
+  - Show potential matches inline
+  - Allow user to:
+    * Skip duplicate records
+    * Update existing records
+    * Create as new records
+    * Merge records
+  - Support bulk duplicate resolution
+
+### 5.7. Import Processing
+- [ ] Create import queue system:
+  - Process imports in background
+  - Show real-time progress
+  - Support large file handling
+  - Allow cancel operation
+  - Handle timeout scenarios
+  - Implement retry logic
+
+### 5.8. Error Handling
+- [ ] Implement error management:
+  - Show validation errors by row
+  - Allow row-level error correction
+  - Provide error export option
+  - Support partial imports
+  - Create error logs
+  - Enable rollback for failed imports
+
+### 5.9. Import Templates
+- [ ] Create template system:
+  - Save column mappings
+  - Store custom field configurations
+  - Save transformation rules
+  - Allow template naming
+  - Enable template reuse
+  - Support template export/import
+
+### 5.10. Reporting and Feedback
+- [ ] Implement import summary:
+  - Show records processed
+  - Display success count
+  - List error count
+  - Show duplicate resolutions
+  - Provide downloadable report
+  - Send email notification on completion
+
+### 5.11. Testing
+- [ ] Create comprehensive test suite:
+  - Test file upload
+  - Test CSV parsing
+  - Test column mapping
+  - Test custom fields
+  - Test duplicate detection
+  - Test error handling
+  - Test large file processing
+  - Test template system
+
+### 5.12. Documentation
+- [ ] Create user documentation:
+  - Import process guide
+  - Field mapping reference
+  - Custom field guide
+  - Error resolution guide
+  - Best practices
+  - Sample CSV templates
