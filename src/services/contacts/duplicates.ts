@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { getCurrentUserId } from "@/services/donations/helpers";
 import type { DuplicateMatch, Contact } from "@/types/contact";
@@ -412,16 +411,14 @@ export async function findMatchingContact(
           email: email.email,
           type: email.type || 'personal',
           is_primary: email.is_primary,
-          verified: email.verified || false,
-          contact_id: email.contact_id
+          verified: email.verified || false
         })),
         phones: contact.phones?.map(phone => ({
           id: phone.id,
           phone: phone.phone,
           type: phone.type || 'mobile',
           is_primary: phone.is_primary,
-          verified: phone.verified || false,
-          contact_id: phone.contact_id
+          verified: phone.verified || false
         })),
         locations: contact.locations?.map(location => ({
           id: location.id,
@@ -429,10 +426,8 @@ export async function findMatchingContact(
           city: location.city,
           state: location.state,
           zip: location.zip,
-          country: location.country || null,
           type: location.type || 'main',
-          is_primary: location.is_primary,
-          contact_id: location.contact_id
+          is_primary: location.is_primary
         }))
       } as Contact;
 
