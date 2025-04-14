@@ -299,12 +299,12 @@ async function createDonationNotification(
     
     // For each associated user, create a donation notification
     for (const userContact of userContacts) {
-      const { error } = await supabase.from('notifications').insert([{
-        action: 'donation',
+      const { error } = await supabase.from('notifications').insert({
+        action: 'donor', // Use 'donor' instead of 'donation' to match the enum type
         contact_id: contact.id,
         message: `New donation of $${amount.toFixed(2)} received`,
         is_read: false,
-      }]);
+      });
       
       if (error) {
         console.error('Failed to create donation notification:', error);

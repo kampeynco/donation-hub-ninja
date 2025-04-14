@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { getCurrentUserId } from "@/services/donations/helpers";
 import type { DuplicateMatch, Contact } from "@/types/contact";
@@ -438,7 +437,7 @@ export async function findMatchingContact(
       // Update best match if confidence is higher
       if (confidenceScore > highestConfidence) {
         highestConfidence = confidenceScore;
-        bestMatch = contact;
+        bestMatch = contact as Contact;
       }
     }
     
@@ -449,7 +448,7 @@ export async function findMatchingContact(
         hasPrimaryMatch(newEmailAddress, bestMatch.emails) || 
         hasPrimaryMatch(newPhoneNumber, bestMatch.phones)
       )) {
-        return { contact: bestMatch as Contact, confidenceScore: highestConfidence };
+        return { contact: bestMatch, confidenceScore: highestConfidence };
       }
     }
     
