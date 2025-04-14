@@ -4,7 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import { useEffect } from "react";
 import { useFeatureCache } from "@/hooks/useFeatureCache";
-import NestedSidebar from "./NestedSidebar";
+import NestedSidebar from "@/components/Layout/NestedSidebar";
 
 interface LayoutProps {
   children: React.ReactNode;
