@@ -31,7 +31,7 @@ const sidebarItems: SidebarItemType[] = [
   },
   {
     name: "Prospects",
-    path: "/universe",
+    path: "/prospects",
     icon: IconEmpathize,
     badge: {
       text: "Beta",
@@ -43,7 +43,7 @@ const sidebarItems: SidebarItemType[] = [
   },
   {
     name: "Segments",
-    path: "/personas",
+    path: "/segments",
     icon: IconCurrentLocation,
     badge: {
       text: "Beta",

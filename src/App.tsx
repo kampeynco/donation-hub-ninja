@@ -35,7 +35,7 @@ function App() {
         <AuthProvider>
           <QueryClientProvider client={queryClient}>
             <Routes>
-              <Route path="/" element={<Index />} />
+              <Route path="/" element={<Home />} />
               <Route path="/home" element={<Home />} />
               <Route path="/signin" element={<SignIn />} />
               <Route path="/signup" element={<SignUp />} />
