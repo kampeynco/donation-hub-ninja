@@ -56,7 +56,7 @@ const SidebarItem = ({
                   isActive ? "bg-donor-blue text-white hover:bg-donor-blue hover:text-white" : ""
                 }`}
               >
-                <Icon className="h-5 w-5" style={{ height: "1.25rem", width: "1.25rem" }} />
+                <Icon className="h-5 w-5" />
                 {!collapsed && <span className="ml-2">{name}</span>}
               </Button>
               

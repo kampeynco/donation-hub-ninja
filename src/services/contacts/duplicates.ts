@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { getCurrentUserId } from "@/services/donations/helpers";
 import type { DuplicateMatch, Contact } from "@/types/contact";
@@ -427,7 +426,7 @@ export async function findMatchingContact(
           city: location.city,
           state: location.state,
           zip: location.zip,
-          country: location.country || null,
+          country: location.country,
           type: location.type || 'main',
           is_primary: location.is_primary
         }))

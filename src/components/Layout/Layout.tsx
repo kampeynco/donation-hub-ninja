@@ -2,7 +2,6 @@
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { NotificationsProvider } from "@/context/NotificationsContext";
-import { ThemeProvider } from "@/context/ThemeContext";
 import DashboardSidebar from "./DashboardSidebar";
 import { useEffect } from "react";
 import { useFeatureCache } from "@/hooks/useFeatureCache";
@@ -24,17 +23,15 @@ const Layout = ({ children }: LayoutProps) => {
   return (
     <TooltipProvider>
       <NotificationsProvider>
-        <ThemeProvider>
-          <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900 dark:text-white">
-            <DashboardSidebar />
-            <main className="flex-1">
-              <div className="container max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-                {children}
-              </div>
-            </main>
-            <Toaster />
-          </div>
-        </ThemeProvider>
+        <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900 dark:text-white">
+          <DashboardSidebar />
+          <main className="flex-1">
+            <div className="container max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+              {children}
+            </div>
+          </main>
+          <Toaster />
+        </div>
       </NotificationsProvider>
     </TooltipProvider>
   );

@@ -27,7 +27,7 @@ const NotFound = () => {
           or is temporarily unavailable.
         </p>
         <Button asChild>
-          <Link to="/signin">Return to Sign In</Link>
+          <Link to="/auth/signin">Return to Sign In</Link>
         </Button>
       </div>
     </div>
