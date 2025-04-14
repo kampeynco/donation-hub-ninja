@@ -2,6 +2,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { getCurrentUserId } from "@/services/donations/helpers";
 import type { DuplicateMatch, Contact } from "@/types/contact";
+import { mergeContacts } from "./duplicate-detection";
 
 interface DuplicateFilters {
   page: number;
@@ -165,38 +166,14 @@ export async function resolveDuplicateMatch(params: ResolveDuplicateParams): Pro
         ? duplicate.contact2_id 
         : duplicate.contact1_id;
 
-      // Call server function to handle the merge (simplified for now)
-      // This would typically call a server function that handles the complex merge logic
+      // Execute the merge
+      const mergeSuccess = await mergeContacts(primaryContactId, secondaryContactId);
       
-      // For now, we'll just mark it as resolved
-      const { error } = await supabase
-        .from('duplicate_matches')
-        .update({
-          resolved: true,
-          reviewed_by: userId,
-          reviewed_at: new Date().toISOString()
-        })
-        .eq('id', duplicateId);
-
-      if (error) {
-        console.error('Error resolving duplicate:', error);
+      if (!mergeSuccess) {
+        console.error('Error merging contacts');
         return false;
       }
-
-      // Record the merge in history
-      const { error: historyError } = await supabase
-        .from('merge_history')
-        .insert([{
-          primary_contact_id: primaryContactId,
-          merged_contact_id: secondaryContactId,
-          merged_by: userId
-        }]);
-
-      if (historyError) {
-        console.error('Error recording merge history:', historyError);
-        // Don't return false here, as the main operation succeeded
-      }
-
+      
       return true;
     }
 
