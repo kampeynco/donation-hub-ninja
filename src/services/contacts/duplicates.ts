@@ -378,7 +378,7 @@ export async function findMatchingContact(
         *,
         emails(id, email, is_primary, type, verified),
         phones(id, phone, is_primary, type, verified),
-        locations(id, street, city, state, zip, is_primary, type),
+        locations(id, street, city, state, zip, country, is_primary, type),
         donations(*)
       `)
       .in('id', contactIds);
@@ -426,6 +426,7 @@ export async function findMatchingContact(
           city: location.city,
           state: location.state,
           zip: location.zip,
+          country: location.country,
           type: location.type || 'main',
           is_primary: location.is_primary
         }))
