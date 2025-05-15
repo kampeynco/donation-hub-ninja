@@ -41,7 +41,7 @@ export async function addEmployerData(
     const { data: newEmployerData, error: employerError } = await supabase
       .from("employer_data")
       .insert({
-        donor_id: donorId,
+        contact_id: donorId,
         employer: donor.employerData.employer || null,
         occupation: donor.employerData.occupation || null,
         employer_addr1: donor.employerData.employerAddr1 || null,

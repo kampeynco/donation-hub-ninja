@@ -1,21 +1,25 @@
 
-import { ActBlueDonor, ActBlueContribution } from "../../types.ts";
+import { ActBlueDonor } from "../../types.ts";
 import { DonorData } from "../types.ts";
 
 /**
- * Extracts donor information from the ActBlue donor and contribution
+ * Extract donor data from ActBlue webhook payload
+ * Maps ActBlue fields to our database schema
  */
 export function extractDonorData(
   donor: ActBlueDonor | undefined,
-  contribution: ActBlueContribution
+  donation: any
 ): DonorData {
-  return {
+  // Set defaults for donor data
+  const donorData: DonorData = {
     first_name: donor?.firstname || null,
     last_name: donor?.lastname || null,
-    is_express: contribution.isExpress || false,
-    is_mobile: contribution.isMobile || false,
-    is_paypal: contribution.isPaypal || false,
-    // New field
-    is_eligible_for_express_lane: donor?.isEligibleForExpressLane || false
+    status: 'donor',
+    is_express: donation?.express === true || donation?.expressSignup === true || null,
+    is_mobile: donation?.mobile === true || null,
+    is_paypal: (donation?.paymentMethod || '').toLowerCase().includes('paypal') || null,
+    is_eligible_for_express_lane: donation?.expressLaneEligible === true || null,
   };
+  
+  return donorData;
 }

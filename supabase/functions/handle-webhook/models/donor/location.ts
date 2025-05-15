@@ -30,7 +30,7 @@ export async function addDonorLocation(
     const { data: newLocation, error: locationError } = await supabase
       .from("locations")
       .insert({
-        donor_id: donorId,
+        contact_id: donorId,
         street: donor.addr1 || '',
         city: donor.city || '',
         state: donor.state || '',

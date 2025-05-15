@@ -25,7 +25,7 @@ export async function findOrCreateDonor(
     // Try to find existing donor by email
     const { data: existingEmail, error: emailError } = await supabase
       .from("emails")
-      .select("donor_id, email")
+      .select("contact_id, email")
       .eq("email", donor.email)
       .maybeSingle();
     
@@ -43,13 +43,13 @@ export async function findOrCreateDonor(
     let donorId;
     let emailId;
 
-    if (existingEmail?.donor_id) {
+    if (existingEmail?.contact_id) {
       // Update existing donor
-      donorId = existingEmail.donor_id;
+      donorId = existingEmail.contact_id;
       console.log(`[${requestId}] Found existing donor with ID ${donorId}, updating donor data`);
       
       const { error: donorUpdateError } = await supabase
-        .from("donors")
+        .from("contacts")
         .update(donorData)
         .eq("id", donorId);
       
@@ -70,7 +70,7 @@ export async function findOrCreateDonor(
       console.log(`[${requestId}] No existing donor found for email ${donor.email}, creating new donor`);
       
       const { data: newDonor, error: donorError } = await supabase
-        .from("donors")
+        .from("contacts")
         .insert(donorData)
         .select()
         .single();
@@ -94,7 +94,7 @@ export async function findOrCreateDonor(
         .from("emails")
         .insert({
           email: donor.email,
-          donor_id: donorId,
+          contact_id: donorId,
         })
         .select()
         .single();
@@ -114,15 +114,15 @@ export async function findOrCreateDonor(
       logDbOperation("Created email record", emailId, requestId);
     }
     
-    // Add entry to user_donors junction table if userId is provided
+    // Add entry to user_contacts junction table if userId is provided
     // This is the case when the webhook is called with a user ID from Hookdeck
     if (userId && donorId) {
       // Check if association already exists
       const { data: existingAssociation, error: checkAssociationError } = await supabase
-        .from("user_donors")
+        .from("user_contacts")
         .select("id")
         .eq("user_id", userId)
-        .eq("donor_id", donorId)
+        .eq("contact_id", donorId)
         .maybeSingle();
         
       if (checkAssociationError) {
@@ -133,10 +133,10 @@ export async function findOrCreateDonor(
       // Only create a new association if one doesn't exist
       if (!existingAssociation) {
         const { error: associationError } = await supabase
-          .from("user_donors")
+          .from("user_contacts")
           .insert({
             user_id: userId,
-            donor_id: donorId
+            contact_id: donorId
           });
           
         if (associationError) {
