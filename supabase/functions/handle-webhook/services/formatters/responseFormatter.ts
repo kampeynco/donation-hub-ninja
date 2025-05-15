@@ -11,7 +11,7 @@ export async function sendNotification(
   userId: string,
   donationId: string,
   amount: number,
-  donorId: string,
+  contactId: string,
   donorName: string | null,
   donorEmail: string | undefined,
   donationType: 'recurring' | 'one_time',
@@ -24,7 +24,7 @@ export async function sendNotification(
         userId,
         donationId,
         amount,
-        donorId,
+        contactId,
         donorName,
         donorEmail,
         donationType,
@@ -55,12 +55,12 @@ export function formatDonorResponse(
   locationId: string | null, 
   employerDataId: string | null
 ) {
-  if (!donorResult?.donorId) {
+  if (!donorResult?.contactId) {
     return null;
   }
   
   return { 
-    id: donorResult.donorId, 
+    id: donorResult.contactId, 
     ...donorResult.donorData,
     email: donor?.email,
     location: locationId ? {

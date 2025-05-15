@@ -56,7 +56,7 @@ export async function getUserEmail(userId: string): Promise<string | null> {
 export async function createWebNotification(
   message: string,
   action: 'donation' | 'recurring_donation',
-  donorId: string,
+  contactId: string,
   requestId: string
 ): Promise<boolean> {
   // Map the action type to match the database enum values
@@ -68,7 +68,7 @@ export async function createWebNotification(
     .insert({
       message,
       action: dbAction,
-      donor_id: donorId,
+      contact_id: contactId,
       is_read: false
     });
   

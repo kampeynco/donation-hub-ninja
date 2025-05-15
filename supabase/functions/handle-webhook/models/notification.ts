@@ -10,13 +10,13 @@ export async function createDonationNotification(
   supabase: ReturnType<typeof createClient>,
   contribution: ActBlueContribution,
   donor: ActBlueDonor | undefined,
-  donorId: string | null,
+  contactId: string | null,
   donationData: DonationData,
   requestId: string
 ): Promise<ProcessResult<{id: string}>> {
   try {
-    if (!donorId) {
-      console.log(`[${requestId}] No donor ID provided for notification, skipping`);
+    if (!contactId) {
+      console.log(`[${requestId}] No contact ID provided for notification, skipping`);
       return { success: true, data: { id: '' }};
     }
     
@@ -48,7 +48,7 @@ export async function createDonationNotification(
       .insert({
         message,
         action: 'donor', // Updated to match the notification_action enum in the database
-        donor_id: donorId,
+        contact_id: contactId,
         date: new Date().toISOString(),
         is_read: false
       })
@@ -60,7 +60,7 @@ export async function createDonationNotification(
       return { success: true, data: { id: '' }}; // Non-critical error, still return success
     }
     
-    console.log(`[${requestId}] Created ${isRecurring ? 'recurring donation' : 'donation'} notification for donor ${donorId}`);
+    console.log(`[${requestId}] Created ${isRecurring ? 'recurring donation' : 'donation'} notification for contact ${contactId}`);
     return { success: true, data: { id: data.id }};
   } catch (error) {
     console.error(`[${requestId}] Error in createDonationNotification:`, error);

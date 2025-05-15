@@ -4,33 +4,33 @@ import { ActBlueDonor } from "../../types.ts";
 import { logDbOperation } from "../utils.ts";
 
 /**
- * Adds location information for a donor if provided
+ * Adds location information for a contact if provided
  */
 export async function addDonorLocation(
   supabase: ReturnType<typeof createClient>,
   donor: ActBlueDonor | undefined,
-  donorId: string | null,
+  contactId: string | null,
   requestId: string
 ): Promise<{success: boolean, locationId: string | null}> {
   // Return early if any required data is missing
-  if (!donorId || !donor) {
+  if (!contactId || !donor) {
     return { success: true, locationId: null };
   }
   
   // Check if we have any valid location data to insert
   // Return early if no location data is present
   if (!donor.addr1 && !donor.city && !donor.state && !donor.zip && !donor.country) {
-    console.log(`[${requestId}] No location data provided for donor ${donorId}`);
+    console.log(`[${requestId}] No location data provided for contact ${contactId}`);
     return { success: true, locationId: null };
   }
 
   try {
-    console.log(`[${requestId}] Adding location data for donor ${donorId}`);
+    console.log(`[${requestId}] Adding location data for contact ${contactId}`);
     
     const { data: newLocation, error: locationError } = await supabase
       .from("locations")
       .insert({
-        contact_id: donorId,
+        contact_id: contactId,
         street: donor.addr1 || '',
         city: donor.city || '',
         state: donor.state || '',
@@ -48,7 +48,7 @@ export async function addDonorLocation(
     }
     
     const locationId = newLocation.id;
-    logDbOperation("Created location", locationId, requestId, `for donor: ${donorId}`);
+    logDbOperation("Created location", locationId, requestId, `for contact: ${contactId}`);
     
     return { success: true, locationId };
   } catch (error) {

@@ -10,7 +10,7 @@ import { errorResponses } from "../../error-handler.ts";
 export async function createDonation(
   supabase: ReturnType<typeof createClient>,
   donationData: DonationData,
-  donorId: string | null,
+  contactId: string | null,
   requestId: string,
   timestamp: string
 ): Promise<ProcessResult<{donationId: string, donationData: any}>> {
@@ -21,7 +21,7 @@ export async function createDonation(
       .from("donations")
       .insert({
         ...donationData,
-        donor_id: donorId,
+        contact_id: contactId,
       })
       .select()
       .single();
@@ -38,7 +38,7 @@ export async function createDonation(
     }
     
     const donationId = newDonation.id;
-    logDbOperation("Created donation", donationId, requestId, donorId ? `for donor: ${donorId}` : 'anonymous');
+    logDbOperation("Created donation", donationId, requestId, contactId ? `for contact: ${contactId}` : 'anonymous');
     
     return { success: true, data: { donationId, donationData: newDonation } };
   } catch (error) {

@@ -53,7 +53,7 @@ export async function processActBlueWebhook(
       supabase, 
       donation, 
       lineItems, 
-      donorResult?.donorId || null, 
+      donorResult?.contactId || null, 
       requestId, 
       timestamp
     );
@@ -62,9 +62,9 @@ export async function processActBlueWebhook(
     return { success: false, error: donationError };
   }
 
-  // Send notification for the donation if donor exists and userId is provided
-  // We only want to send notifications if we have both a donor ID and a user ID
-  if (donorResult?.donorId && userId) {
+  // Send notification for the donation if contact exists and userId is provided
+  // We only want to send notifications if we have both a contact ID and a user ID
+  if (donorResult?.contactId && userId) {
     // Determine if this is a recurring donation by checking recurringPeriod
     const isRecurring = donationData.recurring_period && donationData.recurring_period !== 'once';
     
@@ -84,7 +84,7 @@ export async function processActBlueWebhook(
       userId,
       donationResult.donationId,
       donationAmount,
-      donorResult.donorId,
+      donorResult.contactId,
       fullDonorName,
       donor?.email,
       isRecurring ? 'recurring' : 'one_time',
